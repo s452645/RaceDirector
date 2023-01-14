@@ -11,18 +11,14 @@
       "isBackground": true,
       // change this to your `beforeDevCommand`:
       "command": "ng",
-      "args": [
-        "serve"
-      ]
+      "args": ["serve"]
     },
     {
       "label": "ui:build",
       "type": "shell",
       // change this to your `beforeBuildCommand`:
       "command": "ng",
-      "args": [
-        "build"
-      ]
+      "args": ["build"]
     }
   ]
 }
