@@ -4,7 +4,7 @@
     "beforeBuildCommand": "ng build",
     "beforeDevCommand": "ng serve",
     "devPath": "http://localhost:4200",
-    "distDir": "../src/assets"
+    "distDir": "../dist/race-director-frontend"
   },
   "package": {
     "productName": "race-director",
@@ -29,7 +29,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.s452645.racedirector",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -59,7 +59,19 @@
         "height": 600,
         "resizable": true,
         "title": "Race Director",
-        "width": 800
+        "width": 800,
+        "visible": false,
+        "center": true
+      },
+      {
+        "width": 400,
+        "height": 200,
+        "decorations": false,
+        "center": true,
+        "transparent": true,
+        "alwaysOnTop": true,
+        "url": "assets/splashscreen.html",
+        "label": "splashscreen"
       }
     ]
   }
