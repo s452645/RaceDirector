@@ -29,7 +29,7 @@ fn main() {
     tauri::async_runtime::spawn(async move {
       // initialize your app here instead of sleeping :)
       println!("Initializing...");
-      std::thread::sleep(std::time::Duration::from_secs(10));
+      std::thread::sleep(std::time::Duration::from_secs(2));
       println!("Done initializing.");
 
       // After it's done, close the splashscreen and display the main window

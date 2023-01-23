@@ -30,7 +30,7 @@ namespace backend.Controllers
 
         // GET: api/Cars/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Car>> GetCar(long id)
+        public async Task<ActionResult<Car>> GetCar(Guid id)
         {
             var car = await _context.Cars.FindAsync(id);
 
@@ -45,7 +45,7 @@ namespace backend.Controllers
         // PUT: api/Cars/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCar(long id, Car car)
+        public async Task<IActionResult> PutCar(Guid id, Car car)
         {
             if (id != car.Id)
             {
@@ -100,7 +100,7 @@ namespace backend.Controllers
 
         // DELETE: api/Cars/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCar(long id)
+        public async Task<IActionResult> DeleteCar(Guid id)
         {
             var car = await _context.Cars.FindAsync(id);
             if (car == null)
@@ -114,7 +114,7 @@ namespace backend.Controllers
             return NoContent();
         }
 
-        private bool CarExists(long id)
+        private bool CarExists(Guid id)
         {
             return _context.Cars.Any(e => e.Id == id);
         }
