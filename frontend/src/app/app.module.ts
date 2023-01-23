@@ -9,13 +9,15 @@ import { ButtonModule } from 'primeng/button';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+import { SidebarComponent } from './components/layout/sidebar/sidebar.component';
+import { MainContainerComponent } from './components/layout/main-container/main-container.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
 }
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, SidebarComponent, MainContainerComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

@@ -1,5 +1,5 @@
 import { PrimeNGConfig } from 'primeng/api';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { invoke } from '@tauri-apps/api';
 
@@ -7,6 +7,7 @@ import { invoke } from '@tauri-apps/api';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class AppComponent implements OnInit {
   title = 'race-director-frontend';

@@ -1,0 +1,26 @@
+i {
+  font-size: 1.5rem;
+  font-weight: lighter;
+  color: var(--text-color);
+}
+
+.sidebar-icon-container {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  width: 100%;
+  transition: all ease-in-out 0.2s;
+  height: 100%;
+  padding-left: 1.75rem;
+  padding-right: 1.75rem;
+}
+
+.sidebar-icon-container:hover {
+  background-color: var(--surface-hover);
+  cursor: pointer;
+}
+
+.sidebar-expanded-text {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
+}
