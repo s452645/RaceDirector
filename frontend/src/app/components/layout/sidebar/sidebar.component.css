@@ -1,0 +1,22 @@
+.sidebar-icon-container {
+  box-sizing: border-box;
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding-left: calc(1.75rem - 2.6px);
+  padding-right: 1.75rem;
+  border-left: 2px solid transparent;
+  transition: background-color 0.1s ease-in;
+}
+
+.sidebar-icon-container:hover {
+  background-color: var(--surface-border);
+  cursor: pointer;
+}
+
+.selected {
+  background-color: var(--surface-border);
+  border-left: 2px solid white;
+}
