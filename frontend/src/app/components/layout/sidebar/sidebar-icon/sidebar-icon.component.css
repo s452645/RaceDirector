@@ -1,13 +1,10 @@
-html {
-  height: 100vh;
+i {
+  font-size: 1.5rem;
+  font-weight: lighter;
+  color: var(--text-color);
 }
 
-body {
-  height: 100%;
-  margin: 0;
-}
-
-p {
+.sidebar-expanded-text {
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
     'Lucida Sans', Arial, sans-serif;
 }

@@ -1,26 +1,22 @@
-i {
-  font-size: 1.5rem;
-  font-weight: lighter;
-  color: var(--text-color);
-}
-
 .sidebar-icon-container {
+  box-sizing: border-box;
   display: flex;
   gap: 1.5rem;
   align-items: center;
   width: 100%;
-  transition: all ease-in-out 0.2s;
   height: 100%;
-  padding-left: 1.75rem;
+  padding-left: calc(1.75rem - 2.6px);
   padding-right: 1.75rem;
+  border-left: 2px solid transparent;
+  transition: background-color 0.1s ease-in;
 }
 
 .sidebar-icon-container:hover {
-  background-color: var(--surface-hover);
+  background-color: var(--surface-border);
   cursor: pointer;
 }
 
-.sidebar-expanded-text {
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
-    'Lucida Sans', Arial, sans-serif;
+.selected {
+  background-color: var(--surface-border);
+  border-left: 2px solid white;
 }
