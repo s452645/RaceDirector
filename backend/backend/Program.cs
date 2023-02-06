@@ -1,10 +1,11 @@
+using backend.Services;
 using backenend.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddSingleton<HardwareCommunicationService>();
 builder.Services.AddControllers();
 builder.Services.AddDbContext<BackendContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("BackendContext"))
