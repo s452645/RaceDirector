@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Models;
 using backenend.Models;
+using backend.Services;
 
 namespace backend.Controllers
 {
@@ -15,11 +16,25 @@ namespace backend.Controllers
     public class CarsController : ControllerBase
     {
         private readonly BackendContext _context;
+        private readonly HardwareCommunicationService _commsService;
 
-        public CarsController(BackendContext context)
+        public CarsController(BackendContext context, HardwareCommunicationService commsService)
         {
             _context = context;
+            _commsService = commsService;
+
+            _commsService.Connect();
         }
+
+        // POST: api/Cars/msg
+        [HttpPost("msg")]
+        public void PostMessage(string message)
+        {
+            _commsService.SendMessage(message);
+            string receivedMessage = _commsService.ReceiveMessage();
+            Console.WriteLine(receivedMessage);
+        }
+
 
         // GET: api/Cars
         [HttpGet]
