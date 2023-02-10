@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { BackendService } from 'src/app/services/backend.service';
 import {
   RouteTitle,
   RouteTitleService,
@@ -16,7 +17,8 @@ export class BaseContainerComponent implements OnInit, OnDestroy {
 
   constructor(
     private routeTitleService: RouteTitleService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public backendService: BackendService
   ) {}
 
   ngOnInit(): void {

@@ -2,7 +2,18 @@ using backend.Services;
 using backenend.Models;
 using Microsoft.EntityFrameworkCore;
 
+var customOriginsConfig = "_customOriginsConfig";
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: customOriginsConfig,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod();
+                      });
+});
 
 // Add services to the container.
 builder.Services.AddSingleton<HardwareCommunicationService>();
@@ -25,6 +36,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(customOriginsConfig);
 
 app.UseAuthorization();
 

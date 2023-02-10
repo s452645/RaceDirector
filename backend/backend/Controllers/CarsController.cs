@@ -31,8 +31,6 @@ namespace backend.Controllers
         public void PostMessage(string message)
         {
             _commsService.SendMessage(message);
-            string receivedMessage = _commsService.ReceiveMessage();
-            Console.WriteLine(receivedMessage);
         }
 
 
