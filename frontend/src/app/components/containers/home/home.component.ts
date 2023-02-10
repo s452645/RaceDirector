@@ -6,4 +6,10 @@ import { BaseContainerComponent } from '../base-container/base-container.compone
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
 })
-export class HomeComponent extends BaseContainerComponent {}
+export class HomeComponent extends BaseContainerComponent {
+  public makeTestRequest(message: string): void {
+    this.backendService
+      .textRequest(message)
+      .subscribe(response => console.log(response));
+  }
+}

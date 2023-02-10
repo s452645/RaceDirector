@@ -1,5 +1,5 @@
-from socket_controller import SocketController
-from usb_controller import UsbController
+from SocketController import SocketController
+from UsbController import UsbController
 from serial.serialutil import SerialException
 
 
@@ -12,22 +12,28 @@ class MainProgram:
 
     def socket_received_data_handler(self, data: str):
         # a good place to perform some ifs
-        if data == "exit":
-            self.exit()
-            return
-
         self.usb_controller.send(data)
 
         # ideally it should listen for usb messeges constanty,
         # not only as a response
-        usb_response = self.usb_controller.receive()
+        # usb_response = self.usb_controller.receive()
 
         # a good place to perform some ifs
-        self.socket_controller.send(usb_response)
+        # self.socket_controller.send(usb_response)
+
+        if data == "EXIT":
+            self.exit()
+            return
+
+    def serial_received_data_handler(self, data: str):
+        # self.socket_controller.send(data)
+        # for the time being
+        print(data)
 
     def run(self):
         self.isRunning = True
         self.socket_controller.listen(self.socket_received_data_handler)
+        self.usb_controller.listen_to_serial(self.serial_received_data_handler)
 
     def exit(self):
         if not self.isRunning:

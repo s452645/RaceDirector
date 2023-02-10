@@ -1,7 +1,7 @@
 from machine import PWM, Pin
 import time
 
-from elevator.consts import TICK_DURATION_SECONDS
+from consts import TICK_DURATION_SECONDS
 
 MOTOR_MODE_STOP = "MOTOR_MODE_STOP"
 MOTOR_MODE_UP = "MOTOR_MODE_UP"
@@ -12,7 +12,7 @@ class Motor:
   def __init__(
     self, 
     no_pin1: int, 
-    no_pin2: int, 
+    no_pin2: int,
     no_pin_speed: int, 
     pin_speed_freq = 1000, 
     tick_duration_s = TICK_DURATION_SECONDS

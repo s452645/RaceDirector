@@ -6,7 +6,7 @@ class PendingState(AbstractState):
 
   def act(self) -> None:
     self.elevator.motor.stop()
-    self._set_position_from_user()
+    print("Describe the current position of the elevator (DOWN/MIDDLE/UP)")
 
 
   # actions:
@@ -18,13 +18,13 @@ class PendingState(AbstractState):
     pass
 
   def test_up(self) -> None:
-    pass
+    self.elevator.transition_to(STAY_UP_STATE)
 
   def test_down(self) -> None:
-    pass
+    self.elevator.transition_to(STAY_DOWN_STATE)
 
   def cancel(self) -> None:
-    pass
+    self.elevator.transition_to(STAY_MIDDLE_STATE)
 
   def arm(self) -> None:
     pass
@@ -37,31 +37,3 @@ class PendingState(AbstractState):
 
   def clean_up(self) -> None:
     pass
-
-
-  def _set_position_from_user(self) -> None:
-    while True:
-      print("Describe the current position of the elevator:")
-      print("\t0 - DOWN")
-      print("\t1 - MIDDLE")
-      print("\t2 - UP")
-      print()
-
-      position_input = input()
-
-      try:
-        position_int = int(position_input)
-
-        if position_int == 0:
-          self.elevator.transition_to(STAY_DOWN_STATE)
-          return
-        elif position_int == 1:
-          self.elevator.transition_to(STAY_MIDDLE_STATE)
-          return
-        elif position_int == 2:
-          self.elevator.transition_to(STAY_UP_STATE)
-          return
-        else:
-          print("Invalid position. Please, select one of the values described below:\n")
-      except ValueError:
-        print("Invalid position. Please, enter a positive integer\n")

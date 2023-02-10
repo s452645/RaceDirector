@@ -1,4 +1,4 @@
-from BreakBeamSensor import BreakBeamSensor
+from sensors.BreakBeamSensor import BreakBeamSensor
 from elevator.AbstractState import AbstractState
 from elevator.Motor import Motor
 from elevator.states.ArmedState import ArmedState
@@ -55,7 +55,7 @@ class Elevator:
     self._state = state
     self._state.elevator = self
 
-    print("Elevator set to" + state_str)    
+    print("Elevator set to" + state_str)
     self._state.act()
 
   
