@@ -10,8 +10,8 @@ namespace backend.Services
         public readonly static string defaultHostName = "defaultHostName";
         public readonly static int defaultPort = 6655;
 
-        private readonly IPEndPoint endpoint;
-        private readonly Socket socket;
+        private IPEndPoint? endpoint;
+        private Socket? socket;
 
         private byte[] bytes = new byte[1024];
         private bool isConnected = false;
@@ -19,28 +19,30 @@ namespace backend.Services
         public HardwareCommunicationService()
         {
             IPHostEntry host = Dns.GetHostEntry(defaultHostName);
-            IPAddress ipAddress = host.AddressList[5];
-
-            this.endpoint = new IPEndPoint(ipAddress, defaultPort);
-            this.socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            this.Connect(host.AddressList.ToList());
         }
 
-        public bool Connect()
+        private bool Connect(List<IPAddress> iPAddresses)
         {
-            if (this.isConnected)
-            {
-                return true;
-            }
+            List<IPAddress> addressesToCheck = iPAddresses;
 
-            try
+            while (!this.isConnected && addressesToCheck.Count > 0)
             {
-                this.socket.Connect(endpoint);
-                Console.WriteLine($"Socket connected to {socket.RemoteEndPoint}");
-                this.isConnected = true;
-            } catch (Exception e)
-            {
-                Console.WriteLine($"Error while connecting to {socket.RemoteEndPoint}: {e.Message}");
-                this.isConnected = false;
+                var ipAddress = addressesToCheck[0];
+                addressesToCheck.RemoveAt(0);
+
+                try
+                {
+                    this.endpoint = new IPEndPoint(ipAddress, defaultPort);
+                    this.socket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+                    this.socket.Connect(endpoint);
+                    Console.WriteLine($"Socket connected to {socket.RemoteEndPoint}");
+                    this.isConnected = true;
+                } catch (Exception e)
+                {
+                    Console.WriteLine($"Error while connecting to {socket?.RemoteEndPoint}: {e.Message}");
+                }
             }
 
             return this.isConnected;

@@ -39,7 +39,7 @@ class Motor:
 
 
   def go_up(self, speed=40000, duration_s=None):
-    print("Motor is going up (speed: " + str(speed) + " duration: " + str("-" if duration_s is None else duration_s))
+    print("Motor is going up (speed: " + str(speed) + " duration: " + str("-" if duration_s is None else duration_s) + ")")
 
     self._motor_mode = MOTOR_MODE_UP
     self._pin_speed.duty_u16(speed)

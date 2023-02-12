@@ -1,5 +1,5 @@
 from elevator.AbstractState import AbstractState
-from elevator.Elevator import PENDING_STATE
+from elevator.consts import PENDING_STATE
 
 # logs strategy?
 

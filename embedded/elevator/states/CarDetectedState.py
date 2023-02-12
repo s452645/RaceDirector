@@ -1,8 +1,8 @@
 from time import sleep
 from machine import Pin
+from consts import TICK_DURATION_SECONDS
 from elevator.AbstractState import AbstractState
-from elevator.Elevator import OFF_STATE, STAY_DOWN_STATE, WAITING_STATE, GO_UP_STATE
-from elevator.consts import LIFT_DELAY_SECONDS, TICK_DURATION_SECONDS
+from elevator.consts import GO_UP_STATE, LIFT_DELAY_SECONDS, OFF_STATE, STAY_DOWN_STATE, WAITING_STATE
 
 # logs strategy?
 

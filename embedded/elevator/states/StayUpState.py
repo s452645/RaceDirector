@@ -1,5 +1,5 @@
 from elevator.AbstractState import AbstractState
-from elevator.Elevator import OFF_STATE, TEST_GO_DOWN_STATE
+from elevator.consts import OFF_STATE, TEST_GO_DOWN_STATE
 
 # logs strategy?
 

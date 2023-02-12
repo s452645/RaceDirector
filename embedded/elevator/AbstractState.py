@@ -1,13 +1,11 @@
-from elevator.Elevator import Elevator
-
 class AbstractState:
 
   @property
-  def elevator(self) -> Elevator:
+  def elevator(self):
     return self._elevator
 
   @elevator.setter
-  def elevator(self, elevator: Elevator) -> None:
+  def elevator(self, elevator) -> None:
     self._elevator = elevator
 
   def act(self) -> None:

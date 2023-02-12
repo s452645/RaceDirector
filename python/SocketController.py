@@ -1,4 +1,5 @@
 import socket
+import time
 
 
 class SocketController:
@@ -20,6 +21,8 @@ class SocketController:
         while self.connected:
             data = self.connection.recv(4096).decode()
             data_handler(data)
+            # investigate
+            time.sleep(0.1)
 
     def send(self, data):
         self.connection.send(data.encode())

@@ -5,7 +5,7 @@ import time
 class UsbController:
     TERMINATOR = '\n'.encode('UTF8')
 
-    def __init__(self, device='COM3', baud=115200, timeout=1, mock_connection=False):
+    def __init__(self, device='COM4', baud=115200, timeout=1, mock_connection=False):
         self.mock_connection = mock_connection
         self.mock_msg = ''
         self.exit = False
