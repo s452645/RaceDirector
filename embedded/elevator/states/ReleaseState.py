@@ -1,7 +1,7 @@
 from time import sleep
+from consts import TICK_DURATION_SECONDS
 from elevator.AbstractState import AbstractState
-from elevator.Elevator import OFF_STATE, GO_DOWN_STATE, STAY_UP_STATE
-from elevator.consts import RELEASE_DURATION_SECONDS, TICK_DURATION_SECONDS
+from elevator.consts import RELEASE_DURATION_SECONDS, OFF_STATE, GO_DOWN_STATE, STAY_UP_STATE
 
 # logs strategy?
 

@@ -1,5 +1,5 @@
+from elevator.consts import ARMED_STATE, CAR_DETECTED_STATE, GO_DOWN_STATE, GO_UP_STATE, OFF_STATE, PENDING_STATE, RELEASE_STATE, STAY_DOWN_STATE, STAY_MIDDLE_STATE, STAY_UP_STATE, TEST_GO_DOWN_STATE, TEST_GO_UP_STATE, WAITING_STATE
 from sensors.BreakBeamSensor import BreakBeamSensor
-from elevator.AbstractState import AbstractState
 from elevator.Motor import Motor
 from elevator.states.ArmedState import ArmedState
 from elevator.states.GoDownState import GoDownState
@@ -11,21 +11,7 @@ from elevator.states.StayMiddleState import StayMiddleState
 from elevator.states.StayUpState import StayUpState
 from elevator.states.WaitingState import WaitingState
 from elevator.states.ReleaseState import ReleaseState
-from elevator.states.CarDetectedState import CarDetectedState 
-
-OFF_STATE = "OFF_STATE"
-PENDING_STATE = "PENDING_STATE"
-STAY_DOWN_STATE = "STAY_DOWN_STATE"
-STAY_MIDDLE_STATE = "STAY_MIDDLE_STATE"
-STAY_UP_STATE = "STAY_UP_STATE"
-TEST_GO_UP_STATE = "TEST_GO_UP_STATE"
-GO_UP_STATE = "GO_UP_STATE"
-TEST_GO_DOWN_STATE = "TEST_GO_DOWN_STATE"
-GO_DOWN_STATE = "GO_DOWN_STATE"
-ARMED_STATE = "ARMED_STATE"
-WAITING_STATE = "WAITING_STATE"
-CAR_DETECTED_STATE = "CAR_DETECTED_STATE"
-RELEASE_STATE = "RELEASE_STATE"
+from elevator.states.CarDetectedState import CarDetectedState
 
 # should elevator count any time at all?
 # like time between start and finish, etc.
@@ -42,6 +28,7 @@ class Elevator:
 
     self._bottom_sensor = bottom_sensor
     self._top_sensor = top_sensor
+    self._state = OffState()
 
     self.transition_to(OFF_STATE)
 
@@ -55,7 +42,7 @@ class Elevator:
     self._state = state
     self._state.elevator = self
 
-    print("Elevator set to" + state_str)
+    print("Elevator set to " + state_str)
     self._state.act()
 
   
@@ -103,7 +90,7 @@ class Elevator:
 
 
 
-  def _match_state(self, state_str: str) -> AbstractState:
+  def _match_state(self, state_str: str):
     if state_str == OFF_STATE:
       return OffState()
     elif state_str == PENDING_STATE:

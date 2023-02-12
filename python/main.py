@@ -1,3 +1,5 @@
+from threading import Thread
+
 from SocketController import SocketController
 from UsbController import UsbController
 from serial.serialutil import SerialException
@@ -7,7 +9,7 @@ class MainProgram:
     def __init__(self):
         self.isRunning = False
 
-        self.usb_controller = UsbController(mock_connection=True)
+        self.usb_controller = UsbController(mock_connection=False)
         self.socket_controller = SocketController()
 
     def socket_received_data_handler(self, data: str):
@@ -32,8 +34,15 @@ class MainProgram:
 
     def run(self):
         self.isRunning = True
-        self.socket_controller.listen(self.socket_received_data_handler)
-        self.usb_controller.listen_to_serial(self.serial_received_data_handler)
+
+        t1 = Thread(target=self.socket_controller.listen, args=[self.socket_received_data_handler])
+        t2 = Thread(target=self.usb_controller.listen_to_serial, args=[self.serial_received_data_handler])
+
+        t1.start()
+        t2.start()
+
+        t1.join()
+        t2.join()
 
     def exit(self):
         if not self.isRunning:
