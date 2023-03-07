@@ -18,6 +18,12 @@ export class BackendService {
       .pipe(catchError(this.handleError));
   }
 
+  public textResponse(): Observable<string> {
+    return this.httpClient
+      .get<string>('https://localhost:7219/api/Cars/pico-w')
+      .pipe(catchError(this.handleError));
+  }
+
   private handleError(error: HttpErrorResponse) {
     if (error.status === 0) {
       // A client-side or network error occurred. Handle it accordingly.

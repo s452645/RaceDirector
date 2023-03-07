@@ -17,6 +17,8 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddSingleton<HardwareCommunicationService>();
+builder.Services.AddSingleton<TimeSyncService>();
+
 builder.Services.AddControllers();
 builder.Services.AddDbContext<BackendContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("BackendContext"))
@@ -42,5 +44,7 @@ app.UseCors(customOriginsConfig);
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseWebSockets();
 
 app.Run();

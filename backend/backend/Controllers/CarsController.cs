@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using backend.Models;
 using backenend.Models;
 using backend.Services;
+using System.Net.WebSockets;
 
 namespace backend.Controllers
 {
@@ -16,21 +17,17 @@ namespace backend.Controllers
     public class CarsController : ControllerBase
     {
         private readonly BackendContext _context;
-        private readonly HardwareCommunicationService _commsService;
+        // private readonly HardwareCommunicationService _commsService;
 
-        public CarsController(BackendContext context, HardwareCommunicationService commsService)
+        public CarsController(
+            BackendContext context,
+            // HardwareCommunicationService commsService,
+            TimeSyncService timeSyncService)
         {
             _context = context;
-            _commsService = commsService;
-        }
+            // _commsService = commsService;
 
-        // POST: api/Cars/msg
-        [HttpPost("msg")]
-        public void PostMessage(string message)
-        {
-            _commsService.SendMessage(message);
         }
-
 
         // GET: api/Cars
         [HttpGet]
