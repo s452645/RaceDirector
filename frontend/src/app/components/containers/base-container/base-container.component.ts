@@ -6,6 +6,7 @@ import {
   RouteTitle,
   RouteTitleService,
 } from 'src/app/services/route-title.service';
+import { WebSocketService } from 'src/app/services/websocket.service';
 
 @Component({
   selector: 'app-base-container',
@@ -18,7 +19,8 @@ export class BaseContainerComponent implements OnInit, OnDestroy {
   constructor(
     private routeTitleService: RouteTitleService,
     private route: ActivatedRoute,
-    public backendService: BackendService
+    public backendService: BackendService,
+    public webSocketService: WebSocketService
   ) {}
 
   ngOnInit(): void {
@@ -27,6 +29,12 @@ export class BaseContainerComponent implements OnInit, OnDestroy {
       this.routeTitleService.setRouteTitle(routeTitle);
     });
     this.subscription.add(s);
+
+    const s2 = this.webSocketService.messages.subscribe(msg => {
+      console.log('Response from websocket: ' + msg);
+    });
+
+    this.subscription.add(s2);
   }
 
   ngOnDestroy(): void {

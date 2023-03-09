@@ -12,4 +12,8 @@ export class HomeComponent extends BaseContainerComponent {
       .textRequest(message)
       .subscribe(response => console.log(response));
   }
+
+  public getTextResponse(): void {
+    this.webSocketService.messages.next({ content: '', source: '' });
+  }
 }

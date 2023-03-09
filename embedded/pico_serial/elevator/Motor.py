@@ -38,7 +38,7 @@ class Motor:
     self._motor_mode = MOTOR_MODE_STOP
 
 
-  def go_up(self, speed=40000, duration_s=None):
+  def go_up(self, speed=50000, duration_s=None):
     print("Motor is going up (speed: " + str(speed) + " duration: " + str("-" if duration_s is None else duration_s) + ")")
 
     self._motor_mode = MOTOR_MODE_UP
@@ -50,7 +50,7 @@ class Motor:
       self._stop_after_s(duration_s)
 
 
-  def go_down(self, speed=40000, duration_s=None):
+  def go_down(self, speed=50000, duration_s=None):
     print("Motor is going down (speed: " + str(speed) + " duration: " + str("-" if duration_s is None else duration_s))
 
     self._motor_mode = MOTOR_MODE_DOWN
