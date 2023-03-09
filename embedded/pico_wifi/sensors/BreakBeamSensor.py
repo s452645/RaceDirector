@@ -9,5 +9,9 @@ class BreakBeamSensor:
     def set_handler(self, handler) -> None:
         self._pin.irq(handler=handler, trigger=Pin.IRQ_FALLING | Pin.IRQ_RISING)
 
+    def set_handler_with_ID(self, handler_with_ID):
+        handler = lambda pin: handler_with_ID(pin, self._id)
+        self.set_handler(handler)
+
     def get_value(self):
         return self._pin.value()

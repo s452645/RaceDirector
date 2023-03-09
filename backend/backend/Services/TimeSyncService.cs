@@ -1,7 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Net;
 using System.Text;
-using Newtonsoft.Json;
 using System.Net.WebSockets;
 using System;
 
@@ -9,22 +8,26 @@ namespace backend.Services
 {
     public class PicoWBoard
     {
+        private byte[] _buffer = new byte[1024];
         private string _address { get; }
         private int _port { get; }
         private Socket? _syncSocket { get; set; }
 
-        public PicoWBoard(string address)
+        private string Id { get; }
+
+        public PicoWBoard(string id, string address, int port)
         {
+            this.Id = id;
             this._address = address;
-            this._port = 80;
+            this._port = port;
         }
 
         public async Task<bool> Connect()
         {
             try
             { 
-                IPAddress parsedAddress = IPAddress.Parse("192.168.1.10");
-                IPEndPoint ipEndPoint = new IPEndPoint(parsedAddress, 80);
+                IPAddress parsedAddress = IPAddress.Parse(this._address);
+                IPEndPoint ipEndPoint = new IPEndPoint(parsedAddress, this._port);
 
                 _syncSocket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 await _syncSocket.ConnectAsync(ipEndPoint);
@@ -44,15 +47,17 @@ namespace backend.Services
         {
             try
             {
-                Byte[] bytes = Encoding.UTF8.GetBytes("sync");
-                await _syncSocket?.SendAsync(bytes, SocketFlags.None);
+                Byte[] bytes = Encoding.UTF8.GetBytes("[-]->sync");
 
+                if (_syncSocket == null)
+                {
+                    return null;
+                }
 
-                var buffer = new byte[1024];
-                var receivedByteCount = await _syncSocket.ReceiveAsync(buffer, SocketFlags.None);
-                string returnData = Encoding.UTF8.GetString(buffer, 0, receivedByteCount);
-
-                if (!returnData.Equals("ready"))
+                await _syncSocket.SendAsync(bytes, SocketFlags.None);
+                var response = await this.receiveMsg();
+                
+                if (!response.Equals("ready"))
                 {
                     return null;
                 }
@@ -64,17 +69,15 @@ namespace backend.Services
                 await _syncSocket.SendAsync(bytes, SocketFlags.None);
 
                 bytes = Encoding.UTF8.GetBytes($"[2]->{t1}");
-                receivedByteCount = await _syncSocket.SendAsync(bytes, SocketFlags.None);
-                await _syncSocket.ReceiveAsync(buffer, SocketFlags.None);
+                await _syncSocket.SendAsync(bytes, SocketFlags.None);
+
+                _ = await this.receiveMsg();
 
                 var t4 = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds();
-
                 bytes = Encoding.UTF8.GetBytes($"[3]->{t4}");
                 await _syncSocket.SendAsync(bytes, SocketFlags.None);
 
-
-                receivedByteCount = await _syncSocket.ReceiveAsync(buffer, SocketFlags.None);
-                return Encoding.UTF8.GetString(buffer, 0, receivedByteCount);
+                return await this.receiveMsg();
             } 
             catch (Exception e)
             {
@@ -82,6 +85,18 @@ namespace backend.Services
                 Console.WriteLine(e.ToString());
                 return null;
             }
+        }
+
+        private async Task<string> receiveMsg()
+        {
+            if (this._syncSocket == null)
+            {
+                Console.WriteLine("Receive msg failed: socket is null");
+                throw new SocketException();
+            }
+
+            var receivedByteCount = await _syncSocket.ReceiveAsync(this._buffer, SocketFlags.None);
+            return Encoding.UTF8.GetString(this._buffer, 0, receivedByteCount);
         }
     }
 
@@ -96,7 +111,7 @@ namespace backend.Services
             _boards.Add(board);
         }
 
-        public async void SyncAll(WebSocket webSocket, TaskCompletionSource<object> socketFinishedTcs)
+        public async void KeepSyncingAll(WebSocket webSocket, TaskCompletionSource<object> socketFinishedTcs)
         {
             _websocket = webSocket;
             _socketFinishedTcs = socketFinishedTcs;
@@ -116,15 +131,15 @@ namespace backend.Services
             this._boards.ForEach(async (board) =>
             {
                 // TODO: is it blocking the main thread?
-                var task = Task.Run(() =>
+                var task = Task.Run(async () =>
                 {
-                    return Encoding.UTF8.GetBytes(board.Sync()?.ToString() ?? "");
+                    var response = await board.Sync() ?? "";
+                    return Encoding.UTF8.GetBytes(response);
                 });
 
                 if (task.Wait(TimeSpan.FromSeconds(10)))
                 {
                     byte[] response = task.Result;
-
                     var byteArraySegment = new ArraySegment<byte>(response, 0, response.Length);
 
                     if (_websocket != null)

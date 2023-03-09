@@ -7,7 +7,7 @@ from machine import Pin
 
 from consts import EXIT_COMMAND, TICK_DURATION_SECONDS
 from elevator.consts import BOTTOM_SENSOR_PIN, MOTOR_PIN_1, MOTOR_PIN_2, MOTOR_PIN_SPEED, UPPER_SENSOR_PIN
-\
+
 class Pico:
 
   def __init__(self):
