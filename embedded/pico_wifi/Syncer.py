@@ -9,11 +9,10 @@ class Syncer:
         self,
         reader: uasyncio.StreamReader,
         writer: uasyncio.StreamWriter,
-        timer: SyncedTimer,
     ):
         self.reader = reader
         self.writer = writer
-        self.timer = timer
+        self.timer = SyncedTimer()
 
     async def run(self):
         while True:
@@ -28,7 +27,12 @@ class Syncer:
     # ===============================================================================
 
     async def _sync_clock(self):
-        await send(self.writer, self.timer, "ready")
+        await send(
+            self.writer,
+            self.timer,
+            "[1]",
+            "ready",
+        )
 
         t1 = 0
         t2 = 0
@@ -54,19 +58,21 @@ class Syncer:
 
         sync_result = self.timer.calculate_offset(t1, t2, t3, t4)
         response = {
-            "t1": t1,
-            "t2": t2,
-            "t3": t3,
-            "t4": t4,
-            "sync_result": {
-                "result": sync_result.result,
-                "offset": sync_result.offset,
-                "avg_offset": sync_result.avg_offset,
-                "new_clock_offset": sync_result.new_clock_offset,
-            },
+            # commented out until .NET can handle it
+            # "t1": t1,
+            # "t2": t2,
+            # "t3": t3,
+            # "t4": t4,
+            # "sync_result":
+            # {
+            "Result": sync_result.result,
+            "CurrentSyncOffset": sync_result.offset,
+            "LastTenOffsetsAvg": sync_result.avg_offset,
+            "NewClockOffset": sync_result.new_clock_offset,
+            # },
         }
 
-        await send(self.writer, self.timer, json.dumps(response))
+        await send(self.writer, self.timer, "[3]", json.dumps(response))
 
     async def _sync_packet(self):
         t2, _ = await recv(self.reader, self.timer, "[1]")
@@ -75,7 +81,7 @@ class Syncer:
         return t1, t2
 
     async def _delay_packet(self):
-        t3 = await send(self.writer, self.timer, "-")
+        t3 = await send(self.writer, self.timer, "[2]", "-")
         _, t4 = await recv(self.reader, self.timer, "[3]")
 
         return t3, t4

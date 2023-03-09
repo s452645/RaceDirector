@@ -2,9 +2,12 @@ import uasyncio
 from timers.AbstractTimer import AbstractTimer
 
 
-async def send(writer: uasyncio.StreamWriter, timer: AbstractTimer, data: str):
+async def send(
+    writer: uasyncio.StreamWriter, timer: AbstractTimer, param: str, data: str
+):
     t = timer.get_current_time()
 
+    data = f"{param}->{data}"
     writer.write(data.encode("utf8"))
     await writer.drain()
 

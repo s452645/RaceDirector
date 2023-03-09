@@ -1,4 +1,5 @@
-﻿using backend.Services;
+﻿using backend.Models.Hardware;
+using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -12,22 +13,21 @@ namespace backend.Controllers
             int Port
         );
 
-        private readonly TimeSyncService _timeSyncService;
+        private readonly HardwareWifiCommunicationService _wifiCommsService;
 
-        public WebSocketController(TimeSyncService timeSyncService)
+        public WebSocketController(HardwareWifiCommunicationService wifiCommsService)
         {
-            _timeSyncService = timeSyncService;
-
-            var board = new PicoWBoard("Board-1", "192.168.1.3", 15000);
-            _timeSyncService.addBoard(board);
+            _wifiCommsService = wifiCommsService;
         }
 
         [Route("/addBoard")]
-        public ActionResult AddBoard([FromBody] AddBoardRequest request)
+        public async Task<ActionResult> AddBoard([FromBody] AddBoardRequest request)
         {
             var board = new PicoWBoard(request.Id, request.Address, request.Port);
-            this._timeSyncService.addBoard(board);
-            return Ok();
+            var result = await _wifiCommsService.AddAndConnectBoard(board);
+            
+            // how to return sth else?
+            return result ? Ok() : BadRequest();
         }
 
 
@@ -39,7 +39,7 @@ namespace backend.Controllers
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
                 var socketFinishedTcs = new TaskCompletionSource<object>();
 
-                _timeSyncService.KeepSyncingAll(webSocket, socketFinishedTcs);
+                _wifiCommsService.SyncAllForever(webSocket, socketFinishedTcs);
 
                 await socketFinishedTcs.Task;
             }
@@ -47,6 +47,20 @@ namespace backend.Controllers
             {
                 HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             }
+        }
+
+        [Route("/events")]
+        public async Task HandleEvents()
+        {
+            if (!HttpContext.WebSockets.IsWebSocketRequest)
+            {
+                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            }
+
+            using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+            var socketFinishedTcs = new TaskCompletionSource<object>();
+
+            _wifiCommsService
         }
     }
 }

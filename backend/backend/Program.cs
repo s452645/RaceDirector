@@ -18,6 +18,8 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 builder.Services.AddSingleton<HardwareCommunicationService>();
 builder.Services.AddSingleton<TimeSyncService>();
+builder.Services.AddSingleton<HardwareWifiCommunicationService>();
+builder.Services.AddSingleton<WifiEventsService>();
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<BackendContext>(options => 
