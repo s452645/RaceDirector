@@ -1,5 +1,5 @@
 ﻿using backend.Models.Hardware;
-using backend.Services;
+using backend.Services.Boards;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -9,25 +9,23 @@ namespace backend.Controllers
         public record AddBoardRequest
         (
             string Id,
-            string Address,
-            int Port
+            string Address
         );
 
-        private readonly HardwareWifiCommunicationService _wifiCommsService;
+        private readonly BoardsManager _boardsManager;
 
-        public WebSocketController(HardwareWifiCommunicationService wifiCommsService)
+        public WebSocketController(BoardsManager boardsManager)
         {
-            _wifiCommsService = wifiCommsService;
+            this._boardsManager = boardsManager;
         }
 
         [Route("/addBoard")]
         public async Task<ActionResult> AddBoard([FromBody] AddBoardRequest request)
         {
-            var board = new PicoWBoard(request.Id, request.Address, request.Port);
-            var result = await _wifiCommsService.AddAndConnectBoard(board);
+            var board = new PicoWBoard(request.Id, request.Address);
+            var result = await _boardsManager.AddPicoWBoard(board);
             
-            // how to return sth else?
-            return result ? Ok() : BadRequest();
+            return Ok();
         }
 
 
@@ -39,7 +37,7 @@ namespace backend.Controllers
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
                 var socketFinishedTcs = new TaskCompletionSource<object>();
 
-                _wifiCommsService.SyncAllForever(webSocket, socketFinishedTcs);
+                _boardsManager.LaunchSyncAllBoards(webSocket, socketFinishedTcs);
 
                 await socketFinishedTcs.Task;
             }
@@ -60,7 +58,7 @@ namespace backend.Controllers
             using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
             var socketFinishedTcs = new TaskCompletionSource<object>();
 
-            _wifiCommsService
+            _boardsManager.LaunchEventHandlingAllBoards(webSocket, socketFinishedTcs);
         }
     }
 }

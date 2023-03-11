@@ -1,9 +1,9 @@
 ﻿using backend.Models.Hardware;
 using System.Net.WebSockets;
 
-namespace backend.Services
+namespace backend.Services.Boards.Comms
 {
-    public class WifiEventsService
+    class BoardEventsService
     {
         private WebSocket? _websocket;
         private TaskCompletionSource<object>? _socketFinishedTcs;

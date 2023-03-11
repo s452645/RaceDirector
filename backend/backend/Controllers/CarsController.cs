@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Models;
 using backenend.Models;
-using backend.Services;
 using System.Net.WebSockets;
+using backend.Services.Boards.Comms;
 
 namespace backend.Controllers
 {
@@ -20,9 +20,9 @@ namespace backend.Controllers
         // private readonly HardwareCommunicationService _commsService;
 
         public CarsController(
-            BackendContext context,
-            // HardwareCommunicationService commsService,
-            TimeSyncService timeSyncService)
+            BackendContext context
+            // HardwareCommunicationService commsService
+            )
         {
             _context = context;
             // _commsService = commsService;

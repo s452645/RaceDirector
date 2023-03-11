@@ -3,9 +3,9 @@ using System.Net.WebSockets;
 using backend.Models.Hardware;
 using System.Text.Json;
 
-namespace backend.Services
+namespace backend.Services.Boards.Comms
 {
-    public enum SyncBoardResult 
+    public enum SyncBoardResult
     {
         SYNC_SUCCESS,
         SYNC_DROPPED,
@@ -13,8 +13,7 @@ namespace backend.Services
         SYNC_ERROR
     }
 
-
-    public record SyncBoardResponse 
+    public record SyncBoardResponse
     (
         SyncBoardResult Result,
         int? CurrentSyncOffset,
@@ -23,8 +22,7 @@ namespace backend.Services
         string? Message
     );
 
-
-    public class TimeSyncService
+    class TimeSyncService
     {
         private WebSocket? _websocket;
         private TaskCompletionSource<object>? _socketFinishedTcs;
@@ -41,18 +39,18 @@ namespace backend.Services
             _socketFinishedTcs = socketFinishedTcs;
 
             var autoEvent = new AutoResetEvent(false);
-                        
+
             var stateTimer = new Timer(
-                (Object? stateInfo) => SyncAllBoards(stateInfo, boards),
+                (stateInfo) => SyncAllBoards(stateInfo, boards),
                 autoEvent, 1000, 30000);
         }
 
-        private void SyncAllBoards(Object? stateInfo, List<PicoWBoard> boards)
+        private void SyncAllBoards(object? stateInfo, List<PicoWBoard> boards)
         {
             boards.ForEach(async (board) =>
             {
                 // TODO: is it blocking the main thread?
-                var task = Task.Run(async () => await this.SyncBoard(board));
+                var task = Task.Run(async () => await SyncBoard(board));
 
                 if (task.Wait(TimeSpan.FromSeconds(10)))
                 {
@@ -75,7 +73,9 @@ namespace backend.Services
 
         async private Task<SyncBoardResponse> SyncBoard(PicoWBoard picoWBoard)
         {
-            if (!picoWBoard.IsConnected())
+            var syncSocket = picoWBoard.SyncSocket;
+
+            if (!syncSocket.IsConnected())
             {
                 var msg = $"Sync board failed: Pico W Board [{picoWBoard.Id}] is not connected.";
                 return new SyncBoardResponse(SyncBoardResult.SYNC_ERROR, null, null, null, msg);
@@ -83,8 +83,8 @@ namespace backend.Services
 
             try
             {
-                await picoWBoard.Send("[-]", "sync");
-                var response = await picoWBoard.Receive("[1]");
+                await syncSocket.Send("[-]", "sync");
+                var response = await syncSocket.Receive("[1]");
 
                 if (!response.Equals("ready"))
                 {
@@ -94,13 +94,13 @@ namespace backend.Services
 
                 Thread.Sleep(100);
 
-                var t1 = await picoWBoard.Send("[1]", "-");
-                await picoWBoard.Send("[2]", t1.ToString());
+                var t1 = await syncSocket.Send("[1]", "-");
+                await syncSocket.Send("[2]", t1.ToString());
 
-                var (_, t4) = await picoWBoard.Receive("[2]");
-                await picoWBoard.Send("[3]", t4.ToString());
+                var (_, t4) = await syncSocket.Receive("[2]");
+                await syncSocket.Send("[3]", t4.ToString());
 
-                var (results, _) = await picoWBoard.Receive("[3]");
+                var (results, _) = await syncSocket.Receive("[3]");
                 var deserialized = JsonSerializer.Deserialize<SyncBoardResponse>(results);
 
                 if (deserialized == null)
