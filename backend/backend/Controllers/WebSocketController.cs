@@ -4,30 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class WebSocketController : ControllerBase
     {
-        public record AddBoardRequest
-        (
-            string Id,
-            string Address
-        );
-
         private readonly BoardsManager _boardsManager;
 
         public WebSocketController(BoardsManager boardsManager)
         {
             this._boardsManager = boardsManager;
         }
-
-        [Route("/addBoard")]
-        public async Task<ActionResult> AddBoard([FromBody] AddBoardRequest request)
-        {
-            var board = new PicoWBoard(request.Id, request.Address);
-            var result = await _boardsManager.AddPicoWBoard(board);
-            
-            return Ok();
-        }
-
 
         [Route("/sync")]
         public async Task Sync()

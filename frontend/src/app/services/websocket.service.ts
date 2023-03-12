@@ -14,21 +14,20 @@ export interface Message {
 })
 export class WebSocketService {
   private subject: AnonymousSubject<MessageEvent> | undefined;
-  public messages: Subject<Message>;
+  public messages: Subject<Message> = new Subject();
 
-  constructor() {
+  public createSyncWebSocket(): void {
     this.messages = <Subject<Message>>this.connect(
       'wss://localhost:7219/sync'
     ).pipe(
       map((response: MessageEvent): Message => {
-        console.log(response.data);
         const data = JSON.parse(response.data);
         return data;
       })
     );
   }
 
-  public connect(url: string): AnonymousSubject<MessageEvent> {
+  private connect(url: string): AnonymousSubject<MessageEvent> {
     if (!this.subject) {
       this.subject = this.create(url);
       console.log('Successfully connected: ' + url);

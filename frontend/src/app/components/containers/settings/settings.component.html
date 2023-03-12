@@ -1,1 +1,64 @@
-<p>settings works!</p>
+<div>
+  <div class="flex flex-column w-full align-items-center mt-4">
+    <div>
+      <span class="p-float-label">
+        <input id="float-input" type="text" pInputText [(ngModel)]="boardId" />
+        <label for="float-input">Board ID</label>
+      </span>
+    </div>
+    <div class="mt-4">
+      <span class="p-float-label">
+        <input
+          id="float-input"
+          type="text"
+          pInputText
+          [(ngModel)]="ipAddress"
+        />
+        <label for="float-input">IP Address</label>
+      </span>
+    </div>
+    <button
+      pButton
+      type="button"
+      label="Add board"
+      class="p-button-sm mt-4"
+      (click)="handleClick()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Sync"
+      class="p-button-info mt-4"
+      (click)="createSyncWebSocket()"
+    ></button>
+  </div>
+
+  <div class="flex flex-column align-items-center mt-8">
+    <p-table
+      [value]="boards"
+      [tableStyle]="{ 'min-width': '50rem', width: '50%' }"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Id</th>
+          <th>Address</th>
+          <th>Connected</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-board>
+        <tr>
+          <td>{{ board.id }}</td>
+          <td>{{ board.address }}</td>
+          <td>{{ board.isConnected ? 'Yes' : 'No' }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+    <button
+      pButton
+      type="button"
+      label="Refresh"
+      class="p-button-info mt-4"
+      (click)="refreshBoards()"
+    ></button>
+  </div>
+</div>

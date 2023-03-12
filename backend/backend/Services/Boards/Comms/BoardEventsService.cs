@@ -3,7 +3,7 @@ using System.Net.WebSockets;
 
 namespace backend.Services.Boards.Comms
 {
-    class BoardEventsService
+    public class BoardEventsService
     {
         private WebSocket? _websocket;
         private TaskCompletionSource<object>? _socketFinishedTcs;

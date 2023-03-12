@@ -1,4 +1,5 @@
-﻿using backend.Models.Hardware;
+﻿using backend.Models;
+using backend.Models.Hardware;
 using backend.Services.Boards.Comms;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using System.Net.WebSockets;
@@ -12,7 +13,7 @@ namespace backend.Services.Boards
 
         private readonly List<PicoWBoard> _picoWBoards = new();
 
-        BoardsManager(TimeSyncService timeSyncService, BoardEventsService boardEventsService) 
+        public BoardsManager(TimeSyncService timeSyncService, BoardEventsService boardEventsService) 
         {
             _timeSyncService = timeSyncService;
             _boardEventsService = boardEventsService;
@@ -21,9 +22,19 @@ namespace backend.Services.Boards
         public async Task<bool> AddPicoWBoard(PicoWBoard picoWBoard)
         {
             var result = await picoWBoard.ConnectSockets();
-            this._picoWBoards.Add(picoWBoard);
+
+            if (result) {
+                this._picoWBoards.Add(picoWBoard);
+            }
 
             return result;
+        }
+
+        public List<PicoWBoardDto> GetAllBoards()
+        {
+            return this._picoWBoards.Select(board =>
+                new PicoWBoardDto(board.Id, board.SyncSocket.Address, board.IsConnected())
+            ).ToList();
         }
 
         public void LaunchSyncAllBoards(WebSocket webSocket, TaskCompletionSource<object> socketFinishedTcs)

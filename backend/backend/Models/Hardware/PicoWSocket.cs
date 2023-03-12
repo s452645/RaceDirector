@@ -7,16 +7,17 @@ namespace backend.Models.Hardware
     public class PicoWSocket
     {
         private byte[] _buffer = new byte[1024];
-        private readonly string _address;
         private readonly int _port;
         private Socket? _socket;
 
+
         public string BoardId { get; }
+        public readonly string Address;
 
         public PicoWSocket(string boardId, string address, int port)
         {
             BoardId = boardId;
-            _address = address;
+            Address = address;
             _port = port;
         }
 
@@ -24,7 +25,7 @@ namespace backend.Models.Hardware
         {
             try
             {
-                IPAddress parsedAddress = IPAddress.Parse(this._address);
+                IPAddress parsedAddress = IPAddress.Parse(this.Address);
                 IPEndPoint ipEndPoint = new IPEndPoint(parsedAddress, this._port);
 
                 _socket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
@@ -54,10 +55,12 @@ namespace backend.Models.Hardware
             }
 
             var msg = $"{Param}->{Message}";
+            Console.WriteLine($"Sending {msg}");
             var msgBytes = Encoding.UTF8.GetBytes(msg);
 
             var timestamp = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds();
             await this._socket!.SendAsync(msgBytes, SocketFlags.None);
+            Console.WriteLine($"Sent {msg}");
 
             return timestamp;
         }
@@ -75,6 +78,7 @@ namespace backend.Models.Hardware
             var timestamp = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds();
 
             var received = Encoding.UTF8.GetString(this._buffer, 0, receivedByteCount);
+            Console.WriteLine($"Received {received}");
 
             var splitted = received.Split("->");
             var param = splitted[0];
@@ -85,7 +89,8 @@ namespace backend.Models.Hardware
                 throw new SocketException();
             }
 
-            return Tuple.Create(param, timestamp);
+            Console.WriteLine("Returning...");
+            return Tuple.Create(splitted[1], timestamp);
         }
     }
 

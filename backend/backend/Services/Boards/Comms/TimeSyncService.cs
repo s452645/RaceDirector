@@ -22,11 +22,13 @@ namespace backend.Services.Boards.Comms
         string? Message
     );
 
-    class TimeSyncService
+    public class TimeSyncService
     {
         private WebSocket? _websocket;
         private TaskCompletionSource<object>? _socketFinishedTcs;
-
+        
+        // TODO: make syncing much more error-proof, inform frontend or at least log every problem
+        // but always try to have a fallback and continue syncing process
         public void StartSyncingAll(List<PicoWBoard> boards, WebSocket webSocket, TaskCompletionSource<object> socketFinishedTcs)
         {
             if (boards.Any(board => !board.IsConnected()))
@@ -83,8 +85,8 @@ namespace backend.Services.Boards.Comms
 
             try
             {
-                await syncSocket.Send("[-]", "sync");
-                var response = await syncSocket.Receive("[1]");
+                _ = await syncSocket.Send("[-]", "sync");
+                var (response, _) = await syncSocket.Receive("[1]");
 
                 if (!response.Equals("ready"))
                 {
