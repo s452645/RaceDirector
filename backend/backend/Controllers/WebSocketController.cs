@@ -1,35 +1,18 @@
-﻿using backend.Services;
+﻿using backend.Models.Hardware;
+using backend.Services.Boards;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class WebSocketController : ControllerBase
     {
-        public record AddBoardRequest
-        (
-            string Id,
-            string Address,
-            int Port
-        );
+        private readonly BoardsManager _boardsManager;
 
-        private readonly TimeSyncService _timeSyncService;
-
-        public WebSocketController(TimeSyncService timeSyncService)
+        public WebSocketController(BoardsManager boardsManager)
         {
-            _timeSyncService = timeSyncService;
-
-            var board = new PicoWBoard("Board-1", "192.168.1.3", 15000);
-            _timeSyncService.addBoard(board);
+            this._boardsManager = boardsManager;
         }
-
-        [Route("/addBoard")]
-        public ActionResult AddBoard([FromBody] AddBoardRequest request)
-        {
-            var board = new PicoWBoard(request.Id, request.Address, request.Port);
-            this._timeSyncService.addBoard(board);
-            return Ok();
-        }
-
 
         [Route("/sync")]
         public async Task Sync()
@@ -39,7 +22,7 @@ namespace backend.Controllers
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
                 var socketFinishedTcs = new TaskCompletionSource<object>();
 
-                _timeSyncService.KeepSyncingAll(webSocket, socketFinishedTcs);
+                _boardsManager.LaunchSyncAllBoards(webSocket, socketFinishedTcs);
 
                 await socketFinishedTcs.Task;
             }
@@ -47,6 +30,20 @@ namespace backend.Controllers
             {
                 HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             }
+        }
+
+        [Route("/events")]
+        public async Task HandleEvents()
+        {
+            if (!HttpContext.WebSockets.IsWebSocketRequest)
+            {
+                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            }
+
+            using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+            var socketFinishedTcs = new TaskCompletionSource<object>();
+
+            _boardsManager.LaunchEventHandlingAllBoards(webSocket, socketFinishedTcs);
         }
     }
 }

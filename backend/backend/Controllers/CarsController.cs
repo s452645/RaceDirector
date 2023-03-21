@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using backend.Models;
 using backenend.Models;
-using backend.Services;
-using System.Net.WebSockets;
 
 namespace backend.Controllers
 {
@@ -20,9 +13,9 @@ namespace backend.Controllers
         // private readonly HardwareCommunicationService _commsService;
 
         public CarsController(
-            BackendContext context,
-            // HardwareCommunicationService commsService,
-            TimeSyncService timeSyncService)
+            BackendContext context
+            // HardwareCommunicationService commsService
+            )
         {
             _context = context;
             // _commsService = commsService;

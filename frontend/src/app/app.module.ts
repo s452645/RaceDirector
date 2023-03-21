@@ -6,6 +6,12 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { CheckboxModule } from 'primeng/checkbox';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { RippleModule } from 'primeng/ripple';
+import { ToastModule } from 'primeng/toast';
+import { TableModule } from 'primeng/table';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,6 +25,8 @@ import { OwnersComponent } from './components/containers/owners/owners.component
 import { BaseContainerComponent } from './components/containers/base-container/base-container.component';
 import SeasonsComponent from './components/containers/seasons/seasons.component';
 import { SettingsComponent } from './components/containers/settings/settings.component';
+import { FormsModule } from '@angular/forms';
+import { PicosSyncStatusComponent } from './components/layout/sidebar/picos-sync-status/picos-sync-status.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -37,10 +45,19 @@ export function HttpLoaderFactory(http: HttpClient) {
     OwnersComponent,
     SettingsComponent,
     BaseContainerComponent,
+    PicosSyncStatusComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    InputTextModule,
+    CheckboxModule,
+    ButtonModule,
+    RadioButtonModule,
+    RippleModule,
+    FormsModule,
+    ToastModule,
+    TableModule,
     AppRoutingModule,
     ButtonModule,
     HttpClientModule,

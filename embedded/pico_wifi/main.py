@@ -12,7 +12,6 @@ led = machine.Pin("LED", machine.Pin.OUT)
 
 
 def connect():
-    # Connect to WLAN
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     wlan.connect(WIFI_SSID, WIFI_PASSWORD)
@@ -32,12 +31,14 @@ async def main():
         ip = connect()
 
         server_manager = ServerManager()
-        sensors = []
 
-        
-        sync_server = uasyncio.create_task(server_manager.launch_sync_server(ip, SYNC_SERVER_PORT))
-        event_server = uasyncio.create_task(server_manager.launch_event_server(sensors, ip, EVENT_SERVER_PORT))
-        
+        sync_server = uasyncio.create_task(
+            server_manager.launch_sync_server(ip, SYNC_SERVER_PORT)
+        )
+        event_server = uasyncio.create_task(
+            server_manager.launch_event_server(ip, EVENT_SERVER_PORT)
+        )
+
         await sync_server
         await event_server
 
@@ -46,5 +47,3 @@ async def main():
 
 
 uasyncio.run(main())
-
-

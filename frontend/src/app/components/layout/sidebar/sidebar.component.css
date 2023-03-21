@@ -20,3 +20,7 @@
   background-color: var(--surface-border);
   border-left: 2px solid white;
 }
+
+.height-95 {
+  height: 95%;
+}

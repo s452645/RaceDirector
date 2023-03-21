@@ -3,8 +3,10 @@ import { Observable, Observer } from 'rxjs';
 import { AnonymousSubject } from 'rxjs/internal/Subject';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ToastMessageService } from './toast-message.service';
+import { Message } from 'primeng/api';
 
-export interface Message {
+export interface WebSocketMsg {
   source: string;
   content: string;
 }
@@ -13,27 +15,22 @@ export interface Message {
   providedIn: 'root',
 })
 export class WebSocketService {
-  private subject: AnonymousSubject<MessageEvent> | undefined;
-  public messages: Subject<Message>;
+  constructor(private toastMessageService: ToastMessageService) {}
 
-  constructor() {
-    this.messages = <Subject<Message>>this.connect(
-      'wss://localhost:7219/sync'
+  public createSyncWebSocket(route: string): Subject<WebSocketMsg> {
+    return <Subject<WebSocketMsg>>this.connect(
+      `wss://localhost:7219/${route}`
     ).pipe(
-      map((response: MessageEvent): Message => {
-        console.log(response.data);
-        const data = JSON.parse(response.data);
-        return data;
+      map((response: MessageEvent): WebSocketMsg => {
+        return response.data;
       })
     );
   }
 
-  public connect(url: string): AnonymousSubject<MessageEvent> {
-    if (!this.subject) {
-      this.subject = this.create(url);
-      console.log('Successfully connected: ' + url);
-    }
-    return this.subject;
+  private connect(url: string): AnonymousSubject<MessageEvent> {
+    const subject = this.create(url);
+    console.log(`Socket successfully connected on ${url}`);
+    return subject;
   }
 
   private create(url: string): AnonymousSubject<MessageEvent> {
@@ -51,6 +48,7 @@ export class WebSocketService {
       },
       error: (err: Error) => {
         console.error(JSON.stringify(err));
+        this.createToastMessage(err.message);
       },
       next: (data: unknown) => {
         console.log('Message sent to websocket: ', data);
@@ -61,5 +59,15 @@ export class WebSocketService {
     };
 
     return new AnonymousSubject<MessageEvent>(observer, observable);
+  }
+
+  private createToastMessage(message: string): void {
+    const toastMsg: Message = {
+      severity: 'error',
+      summary: 'Web socket error',
+      detail: message,
+    };
+
+    this.toastMessageService.createToastMessage(toastMsg);
   }
 }
