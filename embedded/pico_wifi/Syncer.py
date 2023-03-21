@@ -27,7 +27,7 @@ class Syncer:
     # ===============================================================================
 
     async def _sync_clock(self):
-        await send(
+        _ = await send(
             self.writer,
             self.timer,
             "[1]",
@@ -42,6 +42,13 @@ class Syncer:
         try:
             t1, t2 = await self._sync_packet()
             t3, t4 = await self._delay_packet()
+            
+        # TODO: not only, on slower networks (mobile hotspot) it can get out of sync
+        # between .NET and board and there is some unrecognized exception thrown
+        # add many safety layers for such scenarios, with aborting the connection
+        # as the last option which should never happen
+        # (.NET & picos should always try to reconnect/resync)
+        # also, add more info for frontend for such scenarios
         except AssertionError:
             print("Current sync aborted. Waiting for next.")
             return

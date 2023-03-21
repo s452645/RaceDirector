@@ -15,6 +15,7 @@ namespace backend.Services.Boards.Comms
 
     public record SyncBoardResponse
     (
+        string BoardId,
         SyncBoardResult Result,
         int? CurrentSyncOffset,
         float? LastTenOffsetsAvg,
@@ -22,11 +23,13 @@ namespace backend.Services.Boards.Comms
         string? Message
     );
 
-    class TimeSyncService
+    public class TimeSyncService
     {
         private WebSocket? _websocket;
         private TaskCompletionSource<object>? _socketFinishedTcs;
-
+        
+        // TODO: make syncing much more error-proof, inform frontend or at least log every problem
+        // but always try to have a fallback and continue syncing process
         public void StartSyncingAll(List<PicoWBoard> boards, WebSocket webSocket, TaskCompletionSource<object> socketFinishedTcs)
         {
             if (boards.Any(board => !board.IsConnected()))
@@ -78,18 +81,18 @@ namespace backend.Services.Boards.Comms
             if (!syncSocket.IsConnected())
             {
                 var msg = $"Sync board failed: Pico W Board [{picoWBoard.Id}] is not connected.";
-                return new SyncBoardResponse(SyncBoardResult.SYNC_ERROR, null, null, null, msg);
+                return new SyncBoardResponse(picoWBoard.Id, SyncBoardResult.SYNC_ERROR, null, null, null, msg);
             }
 
             try
             {
-                await syncSocket.Send("[-]", "sync");
-                var response = await syncSocket.Receive("[1]");
+                _ = await syncSocket.Send("[-]", "sync");
+                var (response, _) = await syncSocket.Receive("[1]");
 
                 if (!response.Equals("ready"))
                 {
                     var msg = $"Sync board failed: Pico W Board [{picoWBoard.Id}] sent an unexpected request";
-                    return new SyncBoardResponse(SyncBoardResult.SYNC_ERROR, null, null, null, msg);
+                    return new SyncBoardResponse(picoWBoard.Id, SyncBoardResult.SYNC_ERROR, null, null, null, msg);
                 }
 
                 Thread.Sleep(100);
@@ -105,7 +108,7 @@ namespace backend.Services.Boards.Comms
 
                 if (deserialized == null)
                 {
-                    return new SyncBoardResponse(SyncBoardResult.SYNC_ERROR, null, null, null, "Could not deserialize sync results.");
+                    return new SyncBoardResponse(picoWBoard.Id, SyncBoardResult.SYNC_ERROR, null, null, null, "Could not deserialize sync results.");
                 }
 
                 return deserialized;
@@ -114,7 +117,7 @@ namespace backend.Services.Boards.Comms
             {
                 Console.WriteLine("Error while syncing");
                 Console.WriteLine(e.ToString());
-                return new SyncBoardResponse(SyncBoardResult.SYNC_ERROR, null, null, null, $"Unexpected error: {e.ToString()}");
+                return new SyncBoardResponse(picoWBoard.Id, SyncBoardResult.SYNC_ERROR, null, null, null, $"Unexpected error: {e.ToString()}");
             }
         }
     }

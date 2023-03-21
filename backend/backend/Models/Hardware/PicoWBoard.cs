@@ -2,8 +2,8 @@
 {
     public class PicoWBoard
     {
-        public static readonly int SYNC_PORT = 12000;
-        public static readonly int EVENT_PORT = 15000;
+        public static readonly int SYNC_PORT = 15000;
+        public static readonly int EVENT_PORT = 12000;
 
         public PicoWSocket SyncSocket { get; }
         public PicoWSocket EventSocket { get; }
