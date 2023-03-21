@@ -1,4 +1,5 @@
-using backend.Services;
+using backend.Services.Boards;
+using backend.Services.Boards.Comms;
 using backenend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,10 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddSingleton<HardwareCommunicationService>();
+builder.Services.AddSingleton<TimeSyncService>();
+builder.Services.AddSingleton<BoardsManager>();
+builder.Services.AddSingleton<BoardEventsService>();
+
 builder.Services.AddControllers();
 builder.Services.AddDbContext<BackendContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("BackendContext"))
@@ -42,5 +47,7 @@ app.UseCors(customOriginsConfig);
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseWebSockets();
 
 app.Run();
