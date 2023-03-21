@@ -1,7 +1,4 @@
 {
-  "settings": {
-    "ipAddress": "IP Address"
-  },
   "primeng": {
     "startsWith": "Starts with",
     "contains": "Contains",
@@ -42,24 +39,8 @@
       "Friday",
       "Saturday"
     ],
-    "dayNamesShort": [
-      "Sun",
-      "Mon",
-      "Tue",
-      "Wed",
-      "Thu",
-      "Fri",
-      "Sat"
-    ],
-    "dayNamesMin": [
-      "Su",
-      "Mo",
-      "Tu",
-      "We",
-      "Th",
-      "Fr",
-      "Sa"
-    ],
+    "dayNamesShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+    "dayNamesMin": ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"],
     "monthNames": [
       "January",
       "February",

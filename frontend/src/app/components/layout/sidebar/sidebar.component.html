@@ -1,58 +1,52 @@
 <div
   [ngStyle]="{ backgroundColor: 'var(--surface-ground)' }"
-  class="h-full border-gray-800 border-right-1 flex flex-column justify-content-between"
+  [ngClass]="isExpanded ? 'w-12rem' : 'w-5rem'"
+  class="flex flex-column h-full justify-content-evenly align-items-center py-6 transition-all transition-duration-200 border-gray-800 border-right-1"
 >
+  <app-sidebar-icon
+    [ngClass]="isSelected('Home') ? 'selected' : ''"
+    class="sidebar-icon-container"
+    routerLink="/home"
+    icon="pi-home"
+    expandedText="Home"
+    [isExpanded]="isExpanded"
+  />
+  <app-sidebar-icon
+    [ngClass]="isSelected('Seasons') ? 'selected' : ''"
+    routerLink="/seasons"
+    class="sidebar-icon-container"
+    icon="pi-calendar-times"
+    expandedText="Seasons"
+    [isExpanded]="isExpanded"
+  />
+  <app-sidebar-icon
+    [ngClass]="isSelected('Cars') ? 'selected' : ''"
+    routerLink="/cars"
+    class="sidebar-icon-container"
+    icon="pi-car"
+    expandedText="Cars"
+    [isExpanded]="isExpanded"
+  />
+  <app-sidebar-icon
+    [ngClass]="isSelected('Owners') ? 'selected' : ''"
+    routerLink="/owners"
+    class="sidebar-icon-container"
+    icon="pi-users"
+    expandedText="Owners"
+    [isExpanded]="isExpanded"
+  />
+  <app-sidebar-icon
+    [ngClass]="isSelected('Settings') ? 'selected' : ''"
+    routerLink="/settings"
+    class="sidebar-icon-container"
+    icon="pi-cog"
+    expandedText="Settings"
+    [isExpanded]="isExpanded"
+  />
   <div
-    [ngClass]="isExpanded ? 'w-12rem' : 'w-5rem'"
-    class="height-95 flex flex-column justify-content-evenly align-items-center pt-6 transition-all transition-duration-200"
+    class="justify-content-end px-5 sidebar-icon-container h-18rem"
+    (click)="onToggleExpand()"
   >
-    <app-sidebar-icon
-      [ngClass]="isSelected('Home') ? 'selected' : ''"
-      class="sidebar-icon-container"
-      routerLink="/home"
-      icon="pi-home"
-      expandedText="Home"
-      [isExpanded]="isExpanded"
-    />
-    <app-sidebar-icon
-      [ngClass]="isSelected('Seasons') ? 'selected' : ''"
-      routerLink="/seasons"
-      class="sidebar-icon-container"
-      icon="pi-calendar-times"
-      expandedText="Seasons"
-      [isExpanded]="isExpanded"
-    />
-    <app-sidebar-icon
-      [ngClass]="isSelected('Cars') ? 'selected' : ''"
-      routerLink="/cars"
-      class="sidebar-icon-container"
-      icon="pi-car"
-      expandedText="Cars"
-      [isExpanded]="isExpanded"
-    />
-    <app-sidebar-icon
-      [ngClass]="isSelected('Owners') ? 'selected' : ''"
-      routerLink="/owners"
-      class="sidebar-icon-container"
-      icon="pi-users"
-      expandedText="Owners"
-      [isExpanded]="isExpanded"
-    />
-    <app-sidebar-icon
-      [ngClass]="isSelected('Settings') ? 'selected' : ''"
-      routerLink="/settings"
-      class="sidebar-icon-container"
-      icon="pi-cog"
-      expandedText="Settings"
-      [isExpanded]="isExpanded"
-    />
-    <div
-      class="justify-content-end px-5 sidebar-icon-container h-18rem"
-      (click)="onToggleExpand()"
-    >
-      <i [ngClass]="icon" class="text-base pi"></i>
-    </div>
+    <i [ngClass]="icon" class="text-base pi"></i>
   </div>
-
-  <app-picos-sync-status></app-picos-sync-status>
 </div>
