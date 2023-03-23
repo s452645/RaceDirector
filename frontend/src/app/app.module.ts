@@ -12,6 +12,7 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
 import { TableModule } from 'primeng/table';
+import { CalendarModule } from 'primeng/calendar';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -27,6 +28,7 @@ import SeasonsComponent from './components/containers/seasons/seasons.component'
 import { SettingsComponent } from './components/containers/settings/settings.component';
 import { FormsModule } from '@angular/forms';
 import { PicosSyncStatusComponent } from './components/layout/sidebar/picos-sync-status/picos-sync-status.component';
+import { SeasonDetailsComponent } from './components/seasons/season-details/season-details.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -46,12 +48,14 @@ export function HttpLoaderFactory(http: HttpClient) {
     SettingsComponent,
     BaseContainerComponent,
     PicosSyncStatusComponent,
+    SeasonDetailsComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     InputTextModule,
     CheckboxModule,
+    CalendarModule,
     ButtonModule,
     RadioButtonModule,
     RippleModule,

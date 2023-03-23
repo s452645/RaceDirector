@@ -1,3 +1,4 @@
+using backend.Services;
 using backend.Services.Boards;
 using backend.Services.Boards.Comms;
 using backenend.Models;
@@ -21,6 +22,8 @@ builder.Services.AddSingleton<HardwareCommunicationService>();
 builder.Services.AddSingleton<TimeSyncService>();
 builder.Services.AddSingleton<BoardsManager>();
 builder.Services.AddSingleton<BoardEventsService>();
+
+builder.Services.AddScoped<SeasonService>();
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<BackendContext>(options => 

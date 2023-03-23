@@ -29,7 +29,9 @@ export class SyncDataService implements OnDestroy {
   public syncBoardResponses: Subject<SyncBoardResponse> = new Subject();
 
   private subscription = new Subscription();
-  private interval: NodeJS.Timer | undefined;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private interval: any;
 
   constructor(private websocketService: WebSocketService) {
     if (MOCK_BACKEND) {

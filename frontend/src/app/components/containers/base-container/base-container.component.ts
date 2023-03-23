@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BackendService } from 'src/app/services/backend.service';
 import { PicoBoardsService } from 'src/app/services/pico-boards.service';
@@ -7,6 +7,8 @@ import {
   RouteTitle,
   RouteTitleService,
 } from 'src/app/services/route-title.service';
+import { SeasonsService } from 'src/app/services/seasons.service';
+import { ToastMessageService } from 'src/app/services/toast-message.service';
 import { WebSocketService } from 'src/app/services/websocket.service';
 
 @Component({
@@ -19,7 +21,10 @@ export class BaseContainerComponent implements OnInit, OnDestroy {
 
   constructor(
     private routeTitleService: RouteTitleService,
-    private route: ActivatedRoute,
+    protected route: ActivatedRoute,
+    protected router: Router,
+    protected seasonsService: SeasonsService,
+    protected toastMessageService: ToastMessageService,
     public backendService: BackendService,
     public webSocketService: WebSocketService,
     public picoBoardsService: PicoBoardsService

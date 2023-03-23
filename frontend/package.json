@@ -23,9 +23,10 @@
     "@ngx-translate/core": "^14.0.0",
     "@ngx-translate/http-loader": "^7.0.0",
     "@tauri-apps/api": "^1.2.0",
+    "moment": "^2.29.4",
     "primeflex": "^3.3.0",
     "primeicons": "^6.0.1",
-    "primeng": "^15.0.1",
+    "primeng": "^15.2.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.12.0"
