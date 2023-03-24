@@ -56,5 +56,60 @@ namespace backend.Services
 
             return new SeasonDto(season);
         }
+
+        public List<SeasonEventDto> GetSeasonEvents(Guid seasonId)
+        {
+            var season = _context.Seasons.Include(s => s.Events).ToList().Find(s => s.Id == seasonId);
+
+            if (season == null)
+            {
+                // TODO: throw not found exception
+                throw new Exception();
+            }
+
+            return season.Events.Select(e => new SeasonEventDto(e)).ToList();
+        }
+
+        public async Task<SeasonEventDto> AddSeasonEvent(Guid seasonId, SeasonEventDto seasonEvent)
+        {
+            var season = await _context.Seasons.FindAsync(seasonId);
+
+            if (season == null) 
+            {
+                // TODO: throw not found exception
+                throw new Exception();
+            }
+
+            var eventEntity = seasonEvent.ToEntity();
+            eventEntity.Season = season;
+
+            _context.SeasonEvents.Add(eventEntity);
+
+            await _context.SaveChangesAsync();
+            return seasonEvent;
+        }
+
+        public async Task<SeasonEventDto> DeleteSeasonEvent(Guid seasonId, Guid seasonEventId)
+        {
+            var season = _context.Seasons.Include(s => s.Events).ToList().Find(s => s.Id == seasonId);
+
+            if (season == null)
+            {
+                // TODO: throw not found exception
+                throw new Exception();
+            }
+
+            var seasonEvent = season.Events.Find(e => e.Id == seasonEventId);
+            if (seasonEvent == null)
+            {
+                // TODO: throw not found exception
+                throw new Exception();
+            }
+
+            _context.SeasonEvents.Remove(seasonEvent);
+            await _context.SaveChangesAsync();
+
+            return new SeasonEventDto(seasonEvent);
+        }
     }
 }

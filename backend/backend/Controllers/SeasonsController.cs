@@ -46,5 +46,25 @@ namespace backend.Controllers
             await _seasonService.DeleteSeason(id);
             return NoContent();
         }
+
+        [HttpGet("{seasonId}/season-events")]
+        public ActionResult<List<SeasonEventDto>> GetSeasonEvents(Guid seasonId)
+        {
+            return _seasonService.GetSeasonEvents(seasonId);
+        }
+
+        [HttpPost("{seasonId}/season-events")]
+        public async Task<ActionResult<SeasonEventDto>> AddSeasonEvent(Guid seasonId, SeasonEventDto seasonEvent)
+        {
+            var createdEvent = await _seasonService.AddSeasonEvent(seasonId, seasonEvent);
+            return Ok(createdEvent);
+        }
+
+        [HttpDelete("{seasonId}/season-events/{seasonEventId}")]
+        public async Task<ActionResult<SeasonEventDto>> DeleteSeasonEvent(Guid seasonId, Guid seasonEventId)
+        {
+            await _seasonService.DeleteSeasonEvent(seasonId, seasonEventId);
+            return NoContent();
+        }
     }
 }

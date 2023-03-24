@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backenend.Models;
 
@@ -11,9 +12,10 @@ using backenend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    partial class BackendContextModelSnapshot : ModelSnapshot
+    [Migration("20230323210920_IntroduceSeasonEvent")]
+    partial class IntroduceSeasonEvent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -341,10 +343,10 @@ namespace backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("CircuitId")
+                    b.Property<Guid>("CircuitId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("EndDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -354,7 +356,7 @@ namespace backend.Migrations
                     b.Property<Guid>("SeasonId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("StartDate")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -618,10 +620,12 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.Circuit", "Circuit")
                         .WithMany()
-                        .HasForeignKey("CircuitId");
+                        .HasForeignKey("CircuitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("backend.Models.Season", "Season")
-                        .WithMany("Events")
+                        .WithMany()
                         .HasForeignKey("SeasonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -698,8 +702,6 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Season", b =>
                 {
-                    b.Navigation("Events");
-
                     b.Navigation("Standings");
 
                     b.Navigation("TeamStandings");

@@ -16,6 +16,18 @@ export class SeasonDto {
   // TODO: standings
 }
 
+export class SeasonEventDto {
+  id: string | undefined;
+
+  constructor(
+    public name: string,
+    public startDate: Date | undefined,
+    public endDate: Date | undefined
+  ) {}
+
+  // TODO: circuit
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -32,5 +44,11 @@ export class SeasonsService {
 
   public deleteSeason(seasonId: string): Observable<SeasonDto> {
     return this.backendService.delete<SeasonDto>(URL, seasonId);
+  }
+
+  public getSeasonEvents(seasonId: string): Observable<SeasonEventDto[]> {
+    return this.backendService.get<SeasonEventDto[]>(
+      `${URL}/${seasonId}/season-events`
+    );
   }
 }
