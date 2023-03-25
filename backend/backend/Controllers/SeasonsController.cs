@@ -53,6 +53,12 @@ namespace backend.Controllers
             return _seasonService.GetSeasonEvents(seasonId);
         }
 
+        [HttpGet("{seasonId}/season-events/{seasonEventId}")]
+        public ActionResult<SeasonEventDto> GetSeasonEventById(Guid seasonId, Guid seasonEventId)
+        {
+            return _seasonService.GetSeasonEventById(seasonId, seasonEventId);
+        }
+
         [HttpPost("{seasonId}/season-events")]
         public async Task<ActionResult<SeasonEventDto>> AddSeasonEvent(Guid seasonId, SeasonEventDto seasonEvent)
         {

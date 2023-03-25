@@ -1,4 +1,5 @@
-﻿using backend.Models.Dtos;
+﻿using backend.Exceptions;
+using backend.Models.Dtos;
 using backenend.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,8 +26,7 @@ namespace backend.Services
 
             if (season == null)
             {
-                // TODO: throw not found exception
-                throw new Exception();
+                throw new NotFoundException($"Season [{id}] not found");
             }
 
             return new SeasonDto(season);
@@ -47,8 +47,7 @@ namespace backend.Services
 
             if (season == null)
             {
-                // TODO: throw not found exception
-                throw new Exception();
+                throw new NotFoundException($"Season [{id}] not found");
             }
 
             _context.Seasons.Remove(season);
@@ -63,11 +62,29 @@ namespace backend.Services
 
             if (season == null)
             {
-                // TODO: throw not found exception
-                throw new Exception();
+                throw new NotFoundException($"Season [{seasonId}] not found");
             }
 
             return season.Events.Select(e => new SeasonEventDto(e)).ToList();
+        }
+
+        public SeasonEventDto GetSeasonEventById(Guid seasonId, Guid seasonEventId)
+        {
+            var season = _context.Seasons.Include(s => s.Events).ToList().Find(s => s.Id == seasonId);
+
+            if (season == null)
+            {
+                throw new NotFoundException($"Season [{seasonId}] not found");
+            }
+
+            var seasonEvent = season.Events.Find(e => e.Id == seasonEventId);
+
+            if (seasonEvent == null)
+            {
+                throw new NotFoundException($"Season event [{seasonEventId}] not found in season [{seasonId}]");
+            }
+
+            return new SeasonEventDto(seasonEvent);
         }
 
         public async Task<SeasonEventDto> AddSeasonEvent(Guid seasonId, SeasonEventDto seasonEvent)
@@ -76,8 +93,7 @@ namespace backend.Services
 
             if (season == null) 
             {
-                // TODO: throw not found exception
-                throw new Exception();
+                throw new NotFoundException($"Season [{seasonId}] not found");
             }
 
             var eventEntity = seasonEvent.ToEntity();
@@ -95,15 +111,13 @@ namespace backend.Services
 
             if (season == null)
             {
-                // TODO: throw not found exception
-                throw new Exception();
+                throw new NotFoundException($"Season [{seasonId}] not found");
             }
 
             var seasonEvent = season.Events.Find(e => e.Id == seasonEventId);
             if (seasonEvent == null)
             {
-                // TODO: throw not found exception
-                throw new Exception();
+                throw new NotFoundException($"Season event [{seasonEventId}] not found in season [{seasonId}]");
             }
 
             _context.SeasonEvents.Remove(seasonEvent);

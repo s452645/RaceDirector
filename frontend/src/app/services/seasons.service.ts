@@ -38,6 +38,10 @@ export class SeasonsService {
     return this.backendService.get<SeasonDto[]>(URL);
   }
 
+  public getSeasonById(id: string): Observable<SeasonDto> {
+    return this.backendService.get<SeasonDto>(`${URL}/${id}`);
+  }
+
   public addSeason(season: SeasonDto): Observable<SeasonDto> {
     return this.backendService.post<SeasonDto, SeasonDto>(URL, season);
   }
@@ -49,6 +53,35 @@ export class SeasonsService {
   public getSeasonEvents(seasonId: string): Observable<SeasonEventDto[]> {
     return this.backendService.get<SeasonEventDto[]>(
       `${URL}/${seasonId}/season-events`
+    );
+  }
+
+  public getSeasonEventById(
+    seasonId: string,
+    seasonEventId: string
+  ): Observable<SeasonEventDto> {
+    return this.backendService.get<SeasonEventDto>(
+      `${URL}/${seasonId}/season-events/${seasonEventId}`
+    );
+  }
+
+  public addSeasonEvent(
+    seasonId: string,
+    seasonEvent: SeasonEventDto
+  ): Observable<void> {
+    return this.backendService.post<SeasonEventDto, void>(
+      `${URL}/${seasonId}/season-events`,
+      seasonEvent
+    );
+  }
+
+  public deleteSeasonEvent(
+    seasonId: string,
+    seasonEventId: string
+  ): Observable<SeasonEventDto> {
+    return this.backendService.delete<SeasonEventDto>(
+      `${URL}/${seasonId}/season-events`,
+      seasonEventId
     );
   }
 }
