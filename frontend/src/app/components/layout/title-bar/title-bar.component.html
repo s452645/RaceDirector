@@ -1,5 +1,13 @@
 <div
-  class="w-full border-bottom-1 border-gray-600 flex align-items-center justify-content-center h-5rem"
+  class="w-full border-bottom-1 border-gray-600 flex align-items-center justify-content-between h-5rem"
 >
+  <p-button
+    icon="pi pi-arrow-left"
+    styleClass="p-button-rounded p-button-text p-button-secondary"
+    class="w-1 pl-1"
+    [disabled]="!canGoBack"
+    (onClick)="goBack()"
+  ></p-button>
   <p class="title-text text-2xl font-bold">{{ routeTitle }}</p>
+  <p class="w-1"></p>
 </div>

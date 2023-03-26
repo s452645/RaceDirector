@@ -1,0 +1,26 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div
+    class="flex flex-column pt-4 align-items-center"
+    [ngStyle]="{ gap: '3rem' }"
+  >
+    <span class="p-float-label">
+      <input pInputText id="name" formControlName="name" />
+      <label htmlFor="name">Name</label>
+    </span>
+    <span class="p-float-label">
+      <p-calendar id="startDate" appendTo="body" formControlName="startDate" />
+      <label htmlFor="startDate">Start date</label>
+    </span>
+    <span class="p-float-label">
+      <p-calendar id="endDate" appendTo="body" formControlName="endDate" />
+      <label htmlFor="endDate">End date</label>
+    </span>
+  </div>
+
+  <p-button
+    type="submit"
+    label="Submit"
+    [disabled]="!form.valid"
+    [loading]="isSubmitButtonLoading"
+  ></p-button>
+</form>

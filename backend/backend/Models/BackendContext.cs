@@ -29,4 +29,9 @@ public class BackendContext : DbContext
     public DbSet<Season> Seasons => Set<Season>();
     public DbSet<SeasonCarStanding> SeasonCarStandings => Set<SeasonCarStanding>();
     public DbSet<SeasonTeamStanding> SeasonTeamStandings => Set<SeasonTeamStanding>();
+    public DbSet<BreakBeamSensor> BreakBeamSensors => Set<BreakBeamSensor>();
+    public DbSet<Checkpoint> Checkpoints => Set<Checkpoint>();
+    public DbSet<Circuit> Circuits => Set<Circuit>();
+    public DbSet<PicoBoard> PicoBoards => Set<PicoBoard>();
+    public DbSet<SeasonEvent> SeasonEvents => Set<SeasonEvent>();
 }

@@ -1,3 +1,5 @@
+using backend.Exceptions;
+using backend.Services;
 using backend.Services.Boards;
 using backend.Services.Boards.Comms;
 using backenend.Models;
@@ -22,7 +24,10 @@ builder.Services.AddSingleton<TimeSyncService>();
 builder.Services.AddSingleton<BoardsManager>();
 builder.Services.AddSingleton<BoardEventsService>();
 
+builder.Services.AddScoped<SeasonService>();
+
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<BackendContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("BackendContext"))
 );
@@ -41,6 +46,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/error");
+}
 
 app.UseCors(customOriginsConfig);
 

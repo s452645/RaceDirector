@@ -12,6 +12,9 @@ import { RadioButtonModule } from 'primeng/radiobutton';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
 import { TableModule } from 'primeng/table';
+import { CalendarModule } from 'primeng/calendar';
+import { DialogModule } from 'primeng/dialog';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -25,8 +28,11 @@ import { OwnersComponent } from './components/containers/owners/owners.component
 import { BaseContainerComponent } from './components/containers/base-container/base-container.component';
 import SeasonsComponent from './components/containers/seasons/seasons.component';
 import { SettingsComponent } from './components/containers/settings/settings.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PicosSyncStatusComponent } from './components/layout/sidebar/picos-sync-status/picos-sync-status.component';
+import { SeasonDetailsComponent } from './components/seasons/season-details/season-details.component';
+import { SeasonEventComponent } from './components/seasons/season-event/season-event.component';
+import { NewSeasonEventComponent } from './components/seasons/season-event/new-season-event/new-season-event.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -46,13 +52,19 @@ export function HttpLoaderFactory(http: HttpClient) {
     SettingsComponent,
     BaseContainerComponent,
     PicosSyncStatusComponent,
+    SeasonDetailsComponent,
+    SeasonEventComponent,
+    NewSeasonEventComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     InputTextModule,
     CheckboxModule,
+    CalendarModule,
+    DialogModule,
     ButtonModule,
+    ConfirmPopupModule,
     RadioButtonModule,
     RippleModule,
     FormsModule,
@@ -61,6 +73,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppRoutingModule,
     ButtonModule,
     HttpClientModule,
+    ReactiveFormsModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
