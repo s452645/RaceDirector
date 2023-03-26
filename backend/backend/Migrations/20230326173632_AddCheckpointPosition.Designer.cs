@@ -12,17 +12,40 @@ using backenend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    [Migration("20230122213918_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20230326173632_AddCheckpointPosition")]
+    partial class AddCheckpointPosition
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.13")
+                .HasAnnotation("ProductVersion", "6.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("backend.Models.BreakBeamSensor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BoardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Pin")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BoardId");
+
+                    b.ToTable("BreakBeamSensors");
+                });
 
             modelBuilder.Entity("backend.Models.Car", b =>
                 {
@@ -90,6 +113,52 @@ namespace backend.Migrations
                     b.HasIndex("WidthId");
 
                     b.ToTable("CarSizes");
+                });
+
+            modelBuilder.Entity("backend.Models.Checkpoint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BreakBeamSensorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CircuitId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BreakBeamSensorId");
+
+                    b.HasIndex("CircuitId");
+
+                    b.ToTable("Checkpoints");
+                });
+
+            modelBuilder.Entity("backend.Models.Circuit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Circuits");
                 });
 
             modelBuilder.Entity("backend.Models.OfficialName", b =>
@@ -192,6 +261,25 @@ namespace backend.Migrations
                     b.ToTable("Photos");
                 });
 
+            modelBuilder.Entity("backend.Models.PicoBoard", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("IPAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PicoBoards");
+                });
+
             modelBuilder.Entity("backend.Models.Pot", b =>
                 {
                     b.Property<Guid>("Id")
@@ -257,6 +345,39 @@ namespace backend.Migrations
                     b.HasIndex("SeasonId");
 
                     b.ToTable("SeasonCarStandings");
+                });
+
+            modelBuilder.Entity("backend.Models.SeasonEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CircuitId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SeasonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CircuitId")
+                        .IsUnique()
+                        .HasFilter("[CircuitId] IS NOT NULL");
+
+                    b.HasIndex("SeasonId");
+
+                    b.ToTable("SeasonEvents");
                 });
 
             modelBuilder.Entity("backend.Models.SeasonTeamStanding", b =>
@@ -364,6 +485,17 @@ namespace backend.Migrations
                     b.ToTable("CarPot");
                 });
 
+            modelBuilder.Entity("backend.Models.BreakBeamSensor", b =>
+                {
+                    b.HasOne("backend.Models.PicoBoard", "Board")
+                        .WithMany("BreakBeamSensors")
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Board");
+                });
+
             modelBuilder.Entity("backend.Models.Car", b =>
                 {
                     b.HasOne("backend.Models.Photo", "MainPhoto")
@@ -412,6 +544,23 @@ namespace backend.Migrations
                     b.Navigation("Weight");
 
                     b.Navigation("Width");
+                });
+
+            modelBuilder.Entity("backend.Models.Checkpoint", b =>
+                {
+                    b.HasOne("backend.Models.BreakBeamSensor", "BreakBeamSensor")
+                        .WithMany()
+                        .HasForeignKey("BreakBeamSensorId");
+
+                    b.HasOne("backend.Models.Circuit", "Circuit")
+                        .WithMany("Checkpoints")
+                        .HasForeignKey("CircuitId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BreakBeamSensor");
+
+                    b.Navigation("Circuit");
                 });
 
             modelBuilder.Entity("backend.Models.OfficialName", b =>
@@ -477,6 +626,23 @@ namespace backend.Migrations
                     b.Navigation("Season");
                 });
 
+            modelBuilder.Entity("backend.Models.SeasonEvent", b =>
+                {
+                    b.HasOne("backend.Models.Circuit", "Circuit")
+                        .WithOne("SeasonEvent")
+                        .HasForeignKey("backend.Models.SeasonEvent", "CircuitId");
+
+                    b.HasOne("backend.Models.Season", "Season")
+                        .WithMany("Events")
+                        .HasForeignKey("SeasonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Circuit");
+
+                    b.Navigation("Season");
+                });
+
             modelBuilder.Entity("backend.Models.SeasonTeamStanding", b =>
                 {
                     b.HasOne("backend.Models.Season", null)
@@ -527,13 +693,28 @@ namespace backend.Migrations
                     b.Navigation("Size");
                 });
 
+            modelBuilder.Entity("backend.Models.Circuit", b =>
+                {
+                    b.Navigation("Checkpoints");
+
+                    b.Navigation("SeasonEvent")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("backend.Models.Owner", b =>
                 {
                     b.Navigation("Cars");
                 });
 
+            modelBuilder.Entity("backend.Models.PicoBoard", b =>
+                {
+                    b.Navigation("BreakBeamSensors");
+                });
+
             modelBuilder.Entity("backend.Models.Season", b =>
                 {
+                    b.Navigation("Events");
+
                     b.Navigation("Standings");
 
                     b.Navigation("TeamStandings");

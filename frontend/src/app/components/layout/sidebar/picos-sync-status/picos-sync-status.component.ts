@@ -2,20 +2,20 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import {
   PicoBoardsService,
-  PicoWBoardDto,
+  DEPPicoWBoardDto,
 } from 'src/app/services/pico-boards.service';
 import {
   SyncBoardResponse,
   SyncDataService,
 } from 'src/app/services/sync-data.service';
 
-class SyncedPicoWBoardDto implements PicoWBoardDto {
+class SyncedPicoWBoardDto implements DEPPicoWBoardDto {
   public id: string;
   public address: string;
   public isConnected: boolean;
   public lastOffset: number | undefined;
 
-  constructor(picoWBoard: PicoWBoardDto) {
+  constructor(picoWBoard: DEPPicoWBoardDto) {
     this.id = picoWBoard.id;
     this.address = picoWBoard.address;
     this.isConnected = picoWBoard.isConnected;
@@ -40,7 +40,7 @@ export class PicosSyncStatusComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription.add(
       this.picoBoardsService
-        .getBoards()
+        .DEPgetBoards()
         .subscribe(boards =>
           boards.forEach(board =>
             this.boards.push(new SyncedPicoWBoardDto(board))

@@ -1,0 +1,86 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div
+    class="flex flex-column"
+    [ngStyle]="{ gap: '3rem', marginBottom: '-1rem' }"
+  >
+    <div
+      class="flex flex-column pt-4 align-items-center"
+      [ngStyle]="{
+        gap: '3rem',
+        height: '60vh',
+        maxHeight: '60vh',
+        overflow: 'auto'
+      }"
+    >
+      <span class="p-float-label">
+        <input pInputText id="name" formControlName="name" />
+        <label htmlFor="name">Name</label>
+      </span>
+
+      <div
+        formArrayName="checkpoints"
+        class="flex flex-column align-items-center w-24rem"
+        [ngStyle]="{ gap: '2rem' }"
+      >
+        <div
+          *ngFor="let checkpoint of checkpoints.controls; let i = index"
+          [formGroupName]="i"
+          class="flex flex-column align-items-center border-round w-full bg-bluegray-800 pt-5 pb-4"
+          [ngStyle]="{ gap: '2rem' }"
+        >
+          <span class="p-float-label">
+            <input
+              pInputText
+              id="checkpointName"
+              formControlName="checkpointName"
+            />
+            <label htmlFor="checkpointName">Checkpoint name</label>
+          </span>
+
+          <p-dropdown
+            appendTo="body"
+            formControlName="type"
+            [options]="checkpointTypes"
+            optionLabel="name"
+            [placeholder]="'Checkpoint ' + i + ' type'"
+            class="w-8"
+            styleClass="w-full"
+          ></p-dropdown>
+
+          <p-dropdown
+            appendTo="body"
+            formControlName="sensorId"
+            [options]="breakBeamSensors"
+            optionLabel="name"
+            [placeholder]="'Checkpoint ' + i + ' sensor'"
+            class="w-10"
+            styleClass="w-full"
+          ></p-dropdown>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-content-between">
+      <div class="flex w-6 justify-content-between">
+        <p-button
+          label="Add checkpoint"
+          styleClass="p-button-secondary p-button-text"
+          (onClick)="addCheckpoint()"
+        ></p-button>
+        <p-button
+          label="Remove checkpoint"
+          styleClass="p-button-danger p-button-text"
+          (onClick)="removeCheckpoint()"
+        ></p-button>
+      </div>
+
+      <p-button
+        type="submit"
+        label="Submit"
+        styleClass="p-button-success p-button-text"
+        [disabled]="!form.valid"
+        [loading]="isSubmitButtonLoading"
+      ></p-button>
+    </div>
+  </div>
+</form>

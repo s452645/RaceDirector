@@ -54,6 +54,8 @@
   [(visible)]="newEventDialogVisible"
   [style]="{ width: '50vw' }"
 >
-  <app-new-season-event (newSeasonEvent)="handleAddNewSeasonEvent($event)" />
+  <app-new-season-event-form
+    (newSeasonEvent)="handleAddNewSeasonEvent($event)"
+  />
 </p-dialog>
 <p-confirmPopup></p-confirmPopup>

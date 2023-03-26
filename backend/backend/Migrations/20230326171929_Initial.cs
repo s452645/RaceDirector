@@ -5,10 +5,35 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace backend.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Circuits",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Circuits", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PicoBoards",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IPAddress = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PicoBoards", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Seasons",
                 columns: table => new
@@ -51,6 +76,53 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "BreakBeamSensors",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Pin = table.Column<int>(type: "int", nullable: false),
+                    BoardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BreakBeamSensors", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BreakBeamSensors_PicoBoards_BoardId",
+                        column: x => x.BoardId,
+                        principalTable: "PicoBoards",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SeasonEvents",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CircuitId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SeasonId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SeasonEvents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SeasonEvents_Circuits_CircuitId",
+                        column: x => x.CircuitId,
+                        principalTable: "Circuits",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_SeasonEvents_Seasons_SeasonId",
+                        column: x => x.SeasonId,
+                        principalTable: "Seasons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Teams",
                 columns: table => new
                 {
@@ -66,6 +138,32 @@ namespace backend.Migrations
                         name: "FK_Teams_Seasons_SeasonId",
                         column: x => x.SeasonId,
                         principalTable: "Seasons",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Checkpoints",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    BreakBeamSensorId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    CircuitId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Checkpoints", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Checkpoints_BreakBeamSensors_BreakBeamSensorId",
+                        column: x => x.BreakBeamSensorId,
+                        principalTable: "BreakBeamSensors",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Checkpoints_Circuits_CircuitId",
+                        column: x => x.CircuitId,
+                        principalTable: "Circuits",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -290,6 +388,11 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_BreakBeamSensors_BoardId",
+                table: "BreakBeamSensors",
+                column: "BoardId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_CarPot_PotsId",
                 table: "CarPot",
                 column: "PotsId");
@@ -331,6 +434,18 @@ namespace backend.Migrations
                 column: "WidthId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Checkpoints_BreakBeamSensorId",
+                table: "Checkpoints",
+                column: "BreakBeamSensorId",
+                unique: true,
+                filter: "[BreakBeamSensorId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Checkpoints_CircuitId",
+                table: "Checkpoints",
+                column: "CircuitId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OfficialNames_CarId",
                 table: "OfficialNames",
                 column: "CarId",
@@ -364,6 +479,18 @@ namespace backend.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_SeasonCarStandings_SeasonId",
                 table: "SeasonCarStandings",
+                column: "SeasonId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SeasonEvents_CircuitId",
+                table: "SeasonEvents",
+                column: "CircuitId",
+                unique: true,
+                filter: "[CircuitId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SeasonEvents_SeasonId",
+                table: "SeasonEvents",
                 column: "SeasonId");
 
             migrationBuilder.CreateIndex(
@@ -417,10 +544,16 @@ namespace backend.Migrations
                 name: "CarSizes");
 
             migrationBuilder.DropTable(
+                name: "Checkpoints");
+
+            migrationBuilder.DropTable(
                 name: "OfficialNames");
 
             migrationBuilder.DropTable(
                 name: "SeasonCarStandings");
+
+            migrationBuilder.DropTable(
+                name: "SeasonEvents");
 
             migrationBuilder.DropTable(
                 name: "SeasonTeamStandings");
@@ -432,10 +565,19 @@ namespace backend.Migrations
                 name: "UnitValues");
 
             migrationBuilder.DropTable(
+                name: "BreakBeamSensors");
+
+            migrationBuilder.DropTable(
                 name: "Series");
 
             migrationBuilder.DropTable(
+                name: "Circuits");
+
+            migrationBuilder.DropTable(
                 name: "Teams");
+
+            migrationBuilder.DropTable(
+                name: "PicoBoards");
 
             migrationBuilder.DropTable(
                 name: "Seasons");

@@ -56,9 +56,11 @@ namespace backend.Services
             return new SeasonDto(season);
         }
 
-        public List<SeasonEventDto> GetSeasonEvents(Guid seasonId)
+        public async Task<List<SeasonEventDto>> GetSeasonEvents(Guid seasonId)
         {
-            var season = _context.Seasons.Include(s => s.Events).ToList().Find(s => s.Id == seasonId);
+            var season = await _context.Seasons
+                .Include(s => s.Events)
+                .FirstOrDefaultAsync(s => s.Id == seasonId);
 
             if (season == null)
             {
@@ -68,9 +70,14 @@ namespace backend.Services
             return season.Events.Select(e => new SeasonEventDto(e)).ToList();
         }
 
-        public SeasonEventDto GetSeasonEventById(Guid seasonId, Guid seasonEventId)
+        public async Task<SeasonEventDto> GetSeasonEventById(Guid seasonId, Guid seasonEventId)
         {
-            var season = _context.Seasons.Include(s => s.Events).ToList().Find(s => s.Id == seasonId);
+            var season = await _context.Seasons
+                .Include(s => s.Events)
+                .ThenInclude(e => e.Circuit!)
+                .ThenInclude(c => c.Checkpoints)
+                .ThenInclude(c => c.BreakBeamSensor)
+                .FirstOrDefaultAsync(s => s.Id == seasonId);
 
             if (season == null)
             {

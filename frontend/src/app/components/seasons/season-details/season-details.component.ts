@@ -9,7 +9,7 @@ import {
   SeasonsService,
 } from 'src/app/services/seasons.service';
 import { UtilsService } from 'src/app/services/utils.service';
-import { NewSeasonEventComponent } from '../season-event/new-season-event/new-season-event.component';
+import { NewSeasonEventFormComponent } from '../season-event/new-season-event-form/new-season-event-form.component';
 
 @Component({
   selector: 'app-season-details',
@@ -18,8 +18,8 @@ import { NewSeasonEventComponent } from '../season-event/new-season-event/new-se
   providers: [ConfirmationService],
 })
 export class SeasonDetailsComponent implements OnInit, OnDestroy {
-  @ViewChild(NewSeasonEventComponent, { static: true })
-  private newEventFormCmp!: NewSeasonEventComponent;
+  @ViewChild(NewSeasonEventFormComponent, { static: true })
+  private newEventFormCmp!: NewSeasonEventFormComponent;
 
   public seasonId: string | null = null;
   public season: SeasonDto | null = null;

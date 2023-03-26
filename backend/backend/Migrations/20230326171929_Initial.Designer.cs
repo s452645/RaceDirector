@@ -12,8 +12,8 @@ using backenend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    [Migration("20230323210920_IntroduceSeasonEvent")]
-    partial class IntroduceSeasonEvent
+    [Migration("20230326171929_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -121,15 +121,24 @@ namespace backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BreakBeamSensorId")
+                    b.Property<Guid?>("BreakBeamSensorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CircuitId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("BreakBeamSensorId");
+                    b.HasIndex("BreakBeamSensorId")
+                        .IsUnique()
+                        .HasFilter("[BreakBeamSensorId] IS NOT NULL");
 
                     b.HasIndex("CircuitId");
 
@@ -343,10 +352,10 @@ namespace backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CircuitId")
+                    b.Property<Guid?>("CircuitId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("EndDate")
+                    b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
@@ -356,12 +365,14 @@ namespace backend.Migrations
                     b.Property<Guid>("SeasonId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("StartDate")
+                    b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CircuitId");
+                    b.HasIndex("CircuitId")
+                        .IsUnique()
+                        .HasFilter("[CircuitId] IS NOT NULL");
 
                     b.HasIndex("SeasonId");
 
@@ -537,10 +548,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Checkpoint", b =>
                 {
                     b.HasOne("backend.Models.BreakBeamSensor", "BreakBeamSensor")
-                        .WithMany()
-                        .HasForeignKey("BreakBeamSensorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithOne("Checkpoint")
+                        .HasForeignKey("backend.Models.Checkpoint", "BreakBeamSensorId");
 
                     b.HasOne("backend.Models.Circuit", "Circuit")
                         .WithMany("Checkpoints")
@@ -619,13 +628,11 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.SeasonEvent", b =>
                 {
                     b.HasOne("backend.Models.Circuit", "Circuit")
-                        .WithMany()
-                        .HasForeignKey("CircuitId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithOne("SeasonEvent")
+                        .HasForeignKey("backend.Models.SeasonEvent", "CircuitId");
 
                     b.HasOne("backend.Models.Season", "Season")
-                        .WithMany()
+                        .WithMany("Events")
                         .HasForeignKey("SeasonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -676,6 +683,12 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("backend.Models.BreakBeamSensor", b =>
+                {
+                    b.Navigation("Checkpoint")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("backend.Models.Car", b =>
                 {
                     b.Navigation("OfficialName");
@@ -688,6 +701,9 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Circuit", b =>
                 {
                     b.Navigation("Checkpoints");
+
+                    b.Navigation("SeasonEvent")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("backend.Models.Owner", b =>
@@ -702,6 +718,8 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Season", b =>
                 {
+                    b.Navigation("Events");
+
                     b.Navigation("Standings");
 
                     b.Navigation("TeamStandings");

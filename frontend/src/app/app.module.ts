@@ -14,6 +14,7 @@ import { ToastModule } from 'primeng/toast';
 import { TableModule } from 'primeng/table';
 import { CalendarModule } from 'primeng/calendar';
 import { DialogModule } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -32,7 +33,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PicosSyncStatusComponent } from './components/layout/sidebar/picos-sync-status/picos-sync-status.component';
 import { SeasonDetailsComponent } from './components/seasons/season-details/season-details.component';
 import { SeasonEventComponent } from './components/seasons/season-event/season-event.component';
-import { NewSeasonEventComponent } from './components/seasons/season-event/new-season-event/new-season-event.component';
+import { NewSeasonEventFormComponent } from './components/seasons/season-event/new-season-event-form/new-season-event-form.component';
+import { CircuitFormComponent } from './components/circuit/circuit-form/circuit-form.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -54,7 +56,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     PicosSyncStatusComponent,
     SeasonDetailsComponent,
     SeasonEventComponent,
-    NewSeasonEventComponent,
+    NewSeasonEventFormComponent,
+    CircuitFormComponent,
   ],
   imports: [
     BrowserModule,
@@ -64,6 +67,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CalendarModule,
     DialogModule,
     ButtonModule,
+    DropdownModule,
     ConfirmPopupModule,
     RadioButtonModule,
     RippleModule,

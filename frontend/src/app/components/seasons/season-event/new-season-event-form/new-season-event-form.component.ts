@@ -4,11 +4,11 @@ import { SeasonEventDto } from 'src/app/services/seasons.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
-  selector: 'app-new-season-event',
-  templateUrl: './new-season-event.component.html',
-  styleUrls: ['./new-season-event.component.css'],
+  selector: 'app-new-season-event-form',
+  templateUrl: './new-season-event-form.component.html',
+  styleUrls: ['./new-season-event-form.component.css'],
 })
-export class NewSeasonEventComponent {
+export class NewSeasonEventFormComponent {
   @Output() newSeasonEvent: EventEmitter<SeasonEventDto> = new EventEmitter();
 
   protected isSubmitButtonLoading = false;
@@ -31,6 +31,8 @@ export class NewSeasonEventComponent {
     const endDate = new Date(this.form.controls.endDate.value ?? '');
 
     this.isSubmitButtonLoading = true;
-    this.newSeasonEvent.emit(new SeasonEventDto(name, startDate, endDate));
+    this.newSeasonEvent.emit(
+      new SeasonEventDto(name, startDate, endDate, undefined)
+    );
   }
 }

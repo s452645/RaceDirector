@@ -119,11 +119,21 @@ namespace backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BreakBeamSensorId")
+                    b.Property<Guid?>("BreakBeamSensorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CircuitId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -359,7 +369,9 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CircuitId");
+                    b.HasIndex("CircuitId")
+                        .IsUnique()
+                        .HasFilter("[CircuitId] IS NOT NULL");
 
                     b.HasIndex("SeasonId");
 
@@ -536,9 +548,7 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.BreakBeamSensor", "BreakBeamSensor")
                         .WithMany()
-                        .HasForeignKey("BreakBeamSensorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BreakBeamSensorId");
 
                     b.HasOne("backend.Models.Circuit", "Circuit")
                         .WithMany("Checkpoints")
@@ -617,8 +627,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.SeasonEvent", b =>
                 {
                     b.HasOne("backend.Models.Circuit", "Circuit")
-                        .WithMany()
-                        .HasForeignKey("CircuitId");
+                        .WithOne("SeasonEvent")
+                        .HasForeignKey("backend.Models.SeasonEvent", "CircuitId");
 
                     b.HasOne("backend.Models.Season", "Season")
                         .WithMany("Events")
@@ -684,6 +694,9 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Circuit", b =>
                 {
                     b.Navigation("Checkpoints");
+
+                    b.Navigation("SeasonEvent")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("backend.Models.Owner", b =>

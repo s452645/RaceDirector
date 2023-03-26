@@ -11,4 +11,12 @@ export class UtilsService {
 
     return nullable;
   }
+
+  public getUndefinedableOrThrow<T>(udefinedable: T | undefined): T {
+    if (udefinedable === undefined) {
+      throw new Error('Undefinedable is undefined');
+    }
+
+    return udefinedable;
+  }
 }
