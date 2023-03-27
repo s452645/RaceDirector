@@ -49,13 +49,18 @@
 
           <p-dropdown
             appendTo="body"
-            formControlName="sensorId"
-            [options]="breakBeamSensors"
-            optionLabel="name"
+            formControlName="sensor"
+            optionLabel="label"
+            [options]="groupedBreakBeamSensors"
             [placeholder]="'Checkpoint ' + i + ' sensor'"
-            class="w-10"
+            [group]="true"
+            class="w-9"
             styleClass="w-full"
-          ></p-dropdown>
+          >
+            <ng-template let-group pTemplate="group">
+              <span>{{ group.label }}</span>
+            </ng-template>
+          </p-dropdown>
         </div>
       </div>
     </div>
@@ -78,7 +83,7 @@
         type="submit"
         label="Submit"
         styleClass="p-button-success p-button-text"
-        [disabled]="!form.valid"
+        [disabled]="form.invalid"
         [loading]="isSubmitButtonLoading"
       ></p-button>
     </div>

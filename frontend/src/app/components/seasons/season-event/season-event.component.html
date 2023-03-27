@@ -4,12 +4,16 @@
     (onClick)="handleOpenCircuitForm()"
   ></p-button>
 
-  <p>Circuit: {{ seasonEvent.circuit?.name }}</p>
-  <p>Checkpoints: {{ seasonEvent.circuit?.checkpoints?.length }}</p>
+  <span>
+    Circuit: {{ seasonEvent.circuit?.name }}<br />
+    Checkpoints: {{ seasonEvent.circuit?.checkpoints?.length }}
+  </span>
 
-  <p *ngFor="let checkpoint of seasonEvent.circuit?.checkpoints">
-    {{ checkpoint.position }}. {{ checkpoint.name }}
-  </p>
+  <div class="flex flex-column" [ngStyle]="{ gap: '0.5rem' }">
+    <span *ngFor="let checkpoint of seasonEvent.circuit?.checkpoints">
+      {{ checkpoint.position }}. {{ checkpoint.name }}
+    </span>
+  </div>
 </div>
 
 <p-dialog
@@ -20,5 +24,8 @@
   [(visible)]="isCircuitFormOpen"
   [style]="{ width: '50vw' }"
 >
-  <app-circuit-form (submittedForm)="handleSubmittedCircuit($event)" />
+  <app-circuit-form
+    [circuitDto]="seasonEvent.circuit"
+    (submittedForm)="handleSubmittedCircuit($event)"
+  />
 </p-dialog>

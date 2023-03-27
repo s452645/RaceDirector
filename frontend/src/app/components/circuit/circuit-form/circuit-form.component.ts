@@ -1,11 +1,13 @@
 import {
   Component,
   EventEmitter,
+  Input,
   OnDestroy,
   OnInit,
   Output,
 } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SelectItem, SelectItemGroup } from 'primeng/api';
 import { Subscription } from 'rxjs';
 import {
   CheckpointDto,
@@ -20,21 +22,19 @@ interface CheckpointTypeForm {
   code: number;
 }
 
-interface BreakBeamSensorForm {
-  name: string;
-  sensorId: string;
-}
-
 @Component({
   selector: 'app-circuit-form',
   templateUrl: './circuit-form.component.html',
   styleUrls: ['./circuit-form.component.css'],
 })
 export class CircuitFormComponent implements OnInit, OnDestroy {
+  @Input()
+  public circuitDto: CircuitDto | undefined;
+
   @Output()
   public submittedForm: EventEmitter<CircuitDto> = new EventEmitter();
 
-  breakBeamSensors: BreakBeamSensorForm[] = [];
+  groupedBreakBeamSensors: SelectItemGroup[] = [];
 
   checkpointTypes: CheckpointTypeForm[] = [
     { name: 'Continue', code: CheckpointType.Continue },
@@ -53,7 +53,7 @@ export class CircuitFormComponent implements OnInit, OnDestroy {
     return this.form.get('checkpoints') as FormArray;
   }
 
-  isSubmitButtonLoading = false;
+  public isSubmitButtonLoading = false;
 
   private subscription = new Subscription();
 
@@ -63,23 +63,25 @@ export class CircuitFormComponent implements OnInit, OnDestroy {
     private picoBoardsService: PicoBoardsService
   ) {}
 
-  // this shit will backfire
   ngOnInit(): void {
     this.subscription.add(
-      this.picoBoardsService.getBoards().subscribe(
-        boards =>
-          (this.breakBeamSensors = boards
-            .map(board => {
-              const boardName = board.name;
-              return board.breakBeamSensors.map(bbs => {
+      this.picoBoardsService
+        .getBoards()
+        .subscribe(boards => {
+          this.groupedBreakBeamSensors = boards.map(board => {
+            return {
+              label: board.name,
+              value: this.utils.getUndefinedableOrThrow(board.id),
+              items: board.breakBeamSensors.map(sensor => {
                 return {
-                  name: `${boardName} - ${bbs.name} (pin ${bbs.pin})`,
-                  sensorId: this.utils.getUndefinedableOrThrow(bbs.id),
+                  label: `${sensor.name} (pin ${sensor.pin})`,
+                  value: this.utils.getUndefinedableOrThrow(sensor.id),
                 };
-              });
-            })
-            .flat())
-      )
+              }),
+            };
+          });
+        })
+        .add(() => this.parseDtoToForm())
     );
   }
 
@@ -89,18 +91,22 @@ export class CircuitFormComponent implements OnInit, OnDestroy {
 
   refreshForm(): void {
     this.form.reset();
+
     this.form.controls.checkpoints = this.fb.array([
       this.createCheckpointFormGroup(),
     ]);
-    this.isSubmitButtonLoading = false;
+
+    this.parseDtoToForm();
   }
 
   addCheckpoint(): void {
     this.checkpoints.push(this.createCheckpointFormGroup());
+    this.form.updateValueAndValidity();
   }
 
   removeCheckpoint(): void {
     this.checkpoints.removeAt(-1);
+    this.form.updateValueAndValidity();
   }
 
   onSubmit(): void {
@@ -117,23 +123,69 @@ export class CircuitFormComponent implements OnInit, OnDestroy {
       const typeForm = checkpoint.get('type')?.value as CheckpointTypeForm;
       const type = typeForm.code;
 
-      const sensorForm = checkpoint.get('sensorId')
-        ?.value as BreakBeamSensorForm;
-      const sensorId = sensorForm.sensorId;
-
-      return new CheckpointDto(name, idx, type, sensorId);
+      const sensor = checkpoint.get('sensor')?.value as SelectItem;
+      return new CheckpointDto(name, idx, type, sensor.value);
     });
 
     const circuit = new CircuitDto(circuitName, checkpoints);
-
     this.submittedForm.emit(circuit);
   }
 
-  private createCheckpointFormGroup(): FormGroup {
-    return this.fb.group({
+  private createCheckpointFormGroup(
+    name?: string,
+    type?: CheckpointType,
+    sensorId?: string
+  ): FormGroup {
+    const formGroup = this.fb.group({
       checkpointName: ['', Validators.required],
-      type: ['', Validators.required],
-      sensorId: ['', Validators.required],
+      type: [null as CheckpointTypeForm | null, Validators.required],
+      sensor: [null as SelectItem | null, Validators.required],
     });
+
+    if (name !== undefined) {
+      formGroup.controls.checkpointName.setValue(name);
+    }
+
+    if (type !== undefined) {
+      formGroup.controls.type.setValue(
+        this.checkpointTypes.find(
+          formType => formType.code === type.valueOf()
+        ) ?? null
+      );
+    }
+
+    if (sensorId !== undefined) {
+      formGroup.controls.sensor.setValue(
+        this.groupedBreakBeamSensors
+          .map(group => group.items)
+          .flat()
+          .find(item => item.value === sensorId) ?? null
+      );
+    }
+
+    return formGroup;
+  }
+
+  private parseDtoToForm(): void {
+    if (this.circuitDto) {
+      this.form.controls.name.setValue(this.circuitDto.name);
+
+      this.form.controls.checkpoints.clear();
+      this.circuitDto.checkpoints
+        .map(checkpoint =>
+          this.createCheckpointFormGroup(
+            checkpoint.name,
+            checkpoint.type,
+            checkpoint.breakBeamSensorId
+          )
+        )
+        .forEach(checkpoint => this.form.controls.checkpoints.push(checkpoint));
+
+      this.form.updateValueAndValidity();
+    }
+
+    this.form.controls.checkpoints.valueChanges.subscribe(() =>
+      this.form.updateValueAndValidity({ onlySelf: true })
+    );
   }
 }

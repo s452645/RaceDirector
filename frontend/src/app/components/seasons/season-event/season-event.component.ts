@@ -50,14 +50,7 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscription.add(
-      this.seasonsService
-        .getSeasonEventById(this.seasonId, this.seasonEventId)
-        .subscribe(seasonEvent => {
-          this.routeTitleService.setRouteTitle(seasonEvent.name);
-          this.seasonEventNullable = seasonEvent;
-        })
-    );
+    this.subscription.add(this.refreshData());
   }
 
   ngOnDestroy(): void {
@@ -65,6 +58,7 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
   }
 
   handleOpenCircuitForm(): void {
+    this.circuitFormCmp.refreshForm();
     this.isCircuitFormOpen = true;
   }
 
@@ -74,8 +68,8 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
         .addCircuit(this.seasonEventId, circuit)
         .subscribe(() => this.refreshData())
         .add(() => {
+          this.circuitFormCmp.isSubmitButtonLoading = false;
           this.isCircuitFormOpen = false;
-          this.circuitFormCmp.refreshForm();
         })
     );
   }
@@ -84,7 +78,15 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
     this.subscription.add(
       this.seasonsService
         .getSeasonEventById(this.seasonId, this.seasonEventId)
-        .subscribe(seasonEvent => (this.seasonEventNullable = seasonEvent))
+        .subscribe(seasonEvent => {
+          this.routeTitleService.setRouteTitle(seasonEvent.name);
+
+          seasonEvent.circuit?.checkpoints.sort(
+            (a, b) => a.position - b.position
+          );
+
+          this.seasonEventNullable = seasonEvent;
+        })
     );
   }
 }
