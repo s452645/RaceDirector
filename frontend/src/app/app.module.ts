@@ -16,6 +16,9 @@ import { CalendarModule } from 'primeng/calendar';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { ChipsModule } from 'primeng/chips';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -35,6 +38,7 @@ import { SeasonDetailsComponent } from './components/seasons/season-details/seas
 import { SeasonEventComponent } from './components/seasons/season-event/season-event.component';
 import { NewSeasonEventFormComponent } from './components/seasons/season-event/new-season-event-form/new-season-event-form.component';
 import { CircuitFormComponent } from './components/circuit/circuit-form/circuit-form.component';
+import { SeasonEventScoreRulesFormComponent } from './components/seasons/season-event/season-event-score-rules-form/season-event-score-rules-form.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -58,6 +62,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     SeasonEventComponent,
     NewSeasonEventFormComponent,
     CircuitFormComponent,
+    SeasonEventScoreRulesFormComponent,
   ],
   imports: [
     BrowserModule,
@@ -76,8 +81,11 @@ export function HttpLoaderFactory(http: HttpClient) {
     TableModule,
     AppRoutingModule,
     ButtonModule,
+    InputNumberModule,
     HttpClientModule,
     ReactiveFormsModule,
+    ChipsModule,
+    SelectButtonModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {

@@ -17,6 +17,24 @@ export class SeasonDto {
   // TODO: standings
 }
 
+export class SeasonEventScoreRulesDto {
+  id: string | undefined;
+
+  constructor(
+    public timeMultiplier: number,
+    public distanceMultiplier: number,
+    public availableBonuses: number[],
+    public unfinishedSectorPenaltyPoints: number,
+    public theMoreTheBetter: boolean,
+    public seasonEventId: string
+  ) {}
+}
+
+export enum SeasonEventType {
+  Race,
+  TimeTrial,
+}
+
 export class SeasonEventDto {
   id: string | undefined;
 
@@ -24,6 +42,8 @@ export class SeasonEventDto {
     public name: string,
     public startDate: Date | undefined,
     public endDate: Date | undefined,
+    public type: SeasonEventType,
+    public scoreRules: SeasonEventScoreRulesDto | undefined,
     public circuit: CircuitDto | undefined
   ) {}
 }

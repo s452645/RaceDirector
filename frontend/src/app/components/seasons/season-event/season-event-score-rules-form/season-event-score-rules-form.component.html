@@ -1,0 +1,86 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div
+    class="flex flex-column pt-4 align-items-center"
+    [ngStyle]="{ gap: '3rem' }"
+  >
+    <span class="p-float-label w-4">
+      <p-inputNumber
+        inputId="timeMultiplier"
+        mode="decimal"
+        [minFractionDigits]="2"
+        formControlName="timeMultiplier"
+        class="w-full"
+        styleClass="w-full"
+      >
+      </p-inputNumber>
+      <label htmlFor="timeMultiplier">Time multiplier</label>
+    </span>
+
+    <span class="p-float-label w-4">
+      <p-inputNumber
+        inputId="distanceMultiplier"
+        mode="decimal"
+        [minFractionDigits]="2"
+        formControlName="distanceMultiplier"
+        class="w-full"
+        styleClass="w-full"
+      >
+      </p-inputNumber>
+      <label htmlFor="distanceMultiplier">Distance multiplier</label>
+    </span>
+
+    <div class="w-4">
+      <span class="flex justify-content-center p-float-label w-full">
+        <p-chips
+          inputId="availableBonuses"
+          formControlName="availableBonuses"
+          separator=","
+          placeholder="Hint: -3, 3, 5"
+          class="w-full"
+          styleClass="w-full"
+        ></p-chips>
+        <label htmlFor="availableBonuses">Available bonuses</label>
+      </span>
+      <span
+        *ngIf="form.controls.availableBonuses.invalid"
+        class="text-xs mt-2 text-error"
+        >Invalid values:
+        {{
+        form.controls.availableBonuses.errors?.['invalidValues'].value
+        }}</span
+      >
+    </div>
+
+    <span class="p-float-label w-4">
+      <p-inputNumber
+        inputId="unfinishedSectorPenaltyPoints"
+        mode="decimal"
+        [minFractionDigits]="2"
+        formControlName="unfinishedSectorPenaltyPoints"
+        class="w-full"
+        styleClass="w-full"
+      >
+      </p-inputNumber>
+      <label htmlFor="unfinishedSectorPenaltyPoints"
+        >Unfinished sector penalty</label
+      >
+    </span>
+
+    <div class="flex flex-column align-items-center" [ngStyle]="{ gap: '6px' }">
+      <span class="text-xs text-gray-300">The ..., the better</span>
+      <p-selectButton
+        [options]="theMoreTheBetterOptions"
+        formControlName="theMoreTheBetter"
+        optionLabel="label"
+        optionValue="value"
+      ></p-selectButton>
+    </div>
+
+    <p-button
+      type="submit"
+      label="Submit"
+      [disabled]="!form.valid"
+      [loading]="isSubmitButtonLoading"
+    ></p-button>
+  </div>
+</form>

@@ -7,6 +7,8 @@
         public string? Name { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
+        public SeasonEventType Type { get; set; }
+        public SeasonEventScoreRulesDto? ScoreRules { get; set; }
         public CircuitDto? Circuit { get; set; }
 
         public Guid? SeasonId { get; set; }
@@ -20,8 +22,10 @@
             Guid id, 
             string? name, 
             DateTime startDate, 
-            DateTime endDate, 
-            CircuitDto circuit, 
+            DateTime endDate,
+            SeasonEventType type,
+            SeasonEventScoreRulesDto? scoreRules,
+            CircuitDto? circuit,
             Guid? seasonId
         )
         {
@@ -29,6 +33,8 @@
             Name = name;
             StartDate = startDate;
             EndDate = endDate;
+            Type = type;
+            ScoreRules = scoreRules;
             Circuit = circuit;
             SeasonId = seasonId;
         }
@@ -39,6 +45,12 @@
             Name = seasonEvent.Name;
             StartDate = seasonEvent.StartDate;
             EndDate = seasonEvent.EndDate;
+            Type = seasonEvent.Type;
+
+            if (seasonEvent.ScoreRules != null)
+            {
+                ScoreRules = new SeasonEventScoreRulesDto(seasonEvent.ScoreRules);
+            }
 
             if (seasonEvent.Circuit != null)
             {
@@ -55,6 +67,12 @@
             seasonEvent.Name = Name ?? string.Empty;
             seasonEvent.StartDate = StartDate;
             seasonEvent.EndDate = EndDate;
+            seasonEvent.Type = Type;
+
+            if (ScoreRules != null)
+            {
+                seasonEvent.ScoreRules = ScoreRules.ToEntity();
+            }
 
             if (Circuit != null) 
             {

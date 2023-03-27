@@ -5,10 +5,12 @@ import { CircuitDto, CircuitService } from 'src/app/services/circuit.service';
 import { RouteTitleService } from 'src/app/services/route-title.service';
 import {
   SeasonEventDto,
+  SeasonEventScoreRulesDto,
   SeasonsService,
 } from 'src/app/services/seasons.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { CircuitFormComponent } from '../../circuit/circuit-form/circuit-form.component';
+import { SeasonEventScoreRulesFormComponent } from './season-event-score-rules-form/season-event-score-rules-form.component';
 
 @Component({
   selector: 'app-season-event',
@@ -18,6 +20,9 @@ import { CircuitFormComponent } from '../../circuit/circuit-form/circuit-form.co
 export class SeasonEventComponent implements OnInit, OnDestroy {
   @ViewChild(CircuitFormComponent, { static: true })
   private circuitFormCmp!: CircuitFormComponent;
+
+  @ViewChild(SeasonEventScoreRulesFormComponent, { static: true })
+  private scoreRulesFormCmp!: SeasonEventScoreRulesFormComponent;
 
   private seasonIdNullable: string | null = null;
   private seasonEventIdNullable: string | null = null;
@@ -37,6 +42,7 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
   }
 
   isCircuitFormOpen = false;
+  isScoreRulesFormOpen = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -62,6 +68,10 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
     this.isCircuitFormOpen = true;
   }
 
+  handleOpenScoreRulesForm(): void {
+    this.isScoreRulesFormOpen = true;
+  }
+
   handleSubmittedCircuit(circuit: CircuitDto): void {
     this.subscription.add(
       this.circuitService
@@ -72,6 +82,11 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
           this.isCircuitFormOpen = false;
         })
     );
+  }
+
+  handleSubmittedScoreRules(scoreRules: SeasonEventScoreRulesDto): void {
+    // TODO
+    console.warn(scoreRules);
   }
 
   private refreshData(): void {

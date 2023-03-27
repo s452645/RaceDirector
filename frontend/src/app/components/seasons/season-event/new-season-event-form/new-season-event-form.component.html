@@ -3,16 +3,37 @@
     class="flex flex-column pt-4 align-items-center"
     [ngStyle]="{ gap: '3rem' }"
   >
-    <span class="p-float-label">
-      <input pInputText id="name" formControlName="name" />
+    <span class="p-float-label w-4">
+      <input pInputText id="name" formControlName="name" class="w-full" />
       <label htmlFor="name">Name</label>
     </span>
-    <span class="p-float-label">
-      <p-calendar id="startDate" appendTo="body" formControlName="startDate" />
+
+    <p-dropdown
+      appendTo="body"
+      formControlName="type"
+      [options]="seasonEventTypes"
+      optionLabel="label"
+      [placeholder]="'Season event type'"
+      class="w-4"
+      styleClass="w-full"
+    ></p-dropdown>
+
+    <span class="p-float-label w-4">
+      <p-calendar
+        id="startDate"
+        appendTo="body"
+        formControlName="startDate"
+        styleClass="w-full"
+      />
       <label htmlFor="startDate">Start date</label>
     </span>
-    <span class="p-float-label">
-      <p-calendar id="endDate" appendTo="body" formControlName="endDate" />
+    <span class="p-float-label w-4">
+      <p-calendar
+        id="endDate"
+        appendTo="body"
+        formControlName="endDate"
+        styleClass="w-full"
+      />
       <label htmlFor="endDate">End date</label>
     </span>
   </div>

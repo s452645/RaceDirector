@@ -29,7 +29,7 @@ interface CheckpointTypeForm {
 })
 export class CircuitFormComponent implements OnInit, OnDestroy {
   @Input()
-  public circuitDto: CircuitDto | undefined;
+  public circuitDto: CircuitDto | null | undefined;
 
   @Output()
   public submittedForm: EventEmitter<CircuitDto> = new EventEmitter();

@@ -72,5 +72,12 @@ namespace backend.Controllers
             await _seasonService.DeleteSeasonEvent(seasonId, seasonEventId);
             return NoContent();
         }
+
+        [HttpPost("{seasonEventId}/score-rules")]
+        public async Task<ActionResult<SeasonEventDto>> AddScoreRules(Guid seasonEventId, SeasonEventScoreRulesDto scoreRulesDto)
+        {
+            var seasonEvent = await _seasonService.AddScoreRules(seasonEventId, scoreRulesDto);
+            return Ok(seasonEvent);
+        }
     }
 }

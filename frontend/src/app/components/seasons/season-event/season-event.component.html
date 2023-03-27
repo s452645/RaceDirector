@@ -1,8 +1,15 @@
 <div class="flex align-items-center flex-column w-full my-6" style="gap: 3rem">
-  <p-button
-    label="Configure circuit"
-    (onClick)="handleOpenCircuitForm()"
-  ></p-button>
+  <div class="flex" [ngStyle]="{ gap: '1rem' }">
+    <p-button
+      label="Configure circuit"
+      (onClick)="handleOpenCircuitForm()"
+    ></p-button>
+
+    <p-button
+      label="Configure score rules"
+      (onClick)="handleOpenScoreRulesForm()"
+    ></p-button>
+  </div>
 
   <span>
     Circuit: {{ seasonEvent.circuit?.name }}<br />
@@ -27,5 +34,18 @@
   <app-circuit-form
     [circuitDto]="seasonEvent.circuit"
     (submittedForm)="handleSubmittedCircuit($event)"
+  />
+</p-dialog>
+
+<p-dialog
+  header="Confiugure score rules"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [(visible)]="isScoreRulesFormOpen"
+  [style]="{ width: '50vw' }"
+>
+  <app-season-event-score-rules-form
+    (submittedScoreRules)="handleSubmittedScoreRules($event)"
   />
 </p-dialog>
