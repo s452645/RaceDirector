@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backenend.Models;
 
@@ -11,9 +12,10 @@ using backenend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    partial class BackendContextModelSnapshot : ModelSnapshot
+    [Migration("20230326173632_AddCheckpointPosition")]
+    partial class AddCheckpointPosition
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -361,17 +363,11 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("ScoreRulesId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("SeasonId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -379,40 +375,9 @@ namespace backend.Migrations
                         .IsUnique()
                         .HasFilter("[CircuitId] IS NOT NULL");
 
-                    b.HasIndex("ScoreRulesId")
-                        .IsUnique()
-                        .HasFilter("[ScoreRulesId] IS NOT NULL");
-
                     b.HasIndex("SeasonId");
 
                     b.ToTable("SeasonEvents");
-                });
-
-            modelBuilder.Entity("backend.Models.SeasonEventScoreRules", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AvailableBonuses")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("DistanceMultiplier")
-                        .HasColumnType("real");
-
-                    b.Property<bool>("TheMoreTheBetter")
-                        .HasColumnType("bit");
-
-                    b.Property<float>("TimeMultiplier")
-                        .HasColumnType("real");
-
-                    b.Property<float>("UnfinishedSectorPenaltyPoints")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("SeasonEventScoreRules");
                 });
 
             modelBuilder.Entity("backend.Models.SeasonTeamStanding", b =>
@@ -667,10 +632,6 @@ namespace backend.Migrations
                         .WithOne("SeasonEvent")
                         .HasForeignKey("backend.Models.SeasonEvent", "CircuitId");
 
-                    b.HasOne("backend.Models.SeasonEventScoreRules", "ScoreRules")
-                        .WithOne("SeasonEvent")
-                        .HasForeignKey("backend.Models.SeasonEvent", "ScoreRulesId");
-
                     b.HasOne("backend.Models.Season", "Season")
                         .WithMany("Events")
                         .HasForeignKey("SeasonId")
@@ -678,8 +639,6 @@ namespace backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Circuit");
-
-                    b.Navigation("ScoreRules");
 
                     b.Navigation("Season");
                 });
@@ -759,12 +718,6 @@ namespace backend.Migrations
                     b.Navigation("Standings");
 
                     b.Navigation("TeamStandings");
-                });
-
-            modelBuilder.Entity("backend.Models.SeasonEventScoreRules", b =>
-                {
-                    b.Navigation("SeasonEvent")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("backend.Models.Series", b =>

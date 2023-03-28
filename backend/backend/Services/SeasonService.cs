@@ -56,9 +56,11 @@ namespace backend.Services
             return new SeasonDto(season);
         }
 
-        public List<SeasonEventDto> GetSeasonEvents(Guid seasonId)
+        public async Task<List<SeasonEventDto>> GetSeasonEvents(Guid seasonId)
         {
-            var season = _context.Seasons.Include(s => s.Events).ToList().Find(s => s.Id == seasonId);
+            var season = await _context.Seasons
+                .Include(s => s.Events)
+                .FirstOrDefaultAsync(s => s.Id == seasonId);
 
             if (season == null)
             {
@@ -68,9 +70,12 @@ namespace backend.Services
             return season.Events.Select(e => new SeasonEventDto(e)).ToList();
         }
 
-        public SeasonEventDto GetSeasonEventById(Guid seasonId, Guid seasonEventId)
+        public async Task<SeasonEventDto> GetSeasonEventById(Guid seasonId, Guid seasonEventId)
         {
-            var season = _context.Seasons.Include(s => s.Events).ToList().Find(s => s.Id == seasonId);
+            var season = await _context.Seasons
+                .Include(s => s.Events).ThenInclude(e => e.ScoreRules)
+                .Include(s => s.Events).ThenInclude(e => e.Circuit!).ThenInclude(c => c.Checkpoints).ThenInclude(c => c.BreakBeamSensor)
+                .FirstOrDefaultAsync(s => s.Id == seasonId);
 
             if (season == null)
             {
@@ -121,6 +126,31 @@ namespace backend.Services
             }
 
             _context.SeasonEvents.Remove(seasonEvent);
+            await _context.SaveChangesAsync();
+
+            return new SeasonEventDto(seasonEvent);
+        }
+
+        public async Task<SeasonEventDto> AddScoreRules(Guid seasonEventId, SeasonEventScoreRulesDto scoreRulesDto)
+        {
+            var seasonEvent = _context.SeasonEvents.Include(se => se.ScoreRules).FirstOrDefault(se => se.Id == seasonEventId);
+
+            if (seasonEvent == null)
+            {
+                throw new NotFoundException($"Adding Score Rules for Season Event [{seasonEventId}] failed: Season Event not found");
+            }
+
+            if (seasonEvent.ScoreRules != null)
+            {
+                throw new BadRequestException(
+                    $"Adding Score Rules for SeasonEvent [{seasonEvent.Name}] failed: Score Rules [{seasonEvent.ScoreRules.Id}] are already assinged"
+                );
+            }
+
+            var scoreRules = scoreRulesDto.ToEntity();
+
+            _context.SeasonEventScoreRules.Add(scoreRules);
+            seasonEvent.ScoreRules = scoreRules;
             await _context.SaveChangesAsync();
 
             return new SeasonEventDto(seasonEvent);

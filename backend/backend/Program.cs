@@ -25,6 +25,8 @@ builder.Services.AddSingleton<BoardsManager>();
 builder.Services.AddSingleton<BoardEventsService>();
 
 builder.Services.AddScoped<SeasonService>();
+builder.Services.AddScoped<CircuitService>();
+builder.Services.AddScoped<PicoBoardsService>();
 
 builder.Services.AddControllers();
 

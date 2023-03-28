@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BackendService } from './backend.service';
+import { CircuitDto } from './circuit.service';
 
 const URL = 'https://localhost:7219/api/Seasons';
 
@@ -16,16 +17,35 @@ export class SeasonDto {
   // TODO: standings
 }
 
+export class SeasonEventScoreRulesDto {
+  id: string | undefined;
+
+  constructor(
+    public timeMultiplier: number,
+    public distanceMultiplier: number,
+    public availableBonuses: number[],
+    public unfinishedSectorPenaltyPoints: number,
+    public theMoreTheBetter: boolean,
+    public seasonEventId: string
+  ) {}
+}
+
+export enum SeasonEventType {
+  Race,
+  TimeTrial,
+}
+
 export class SeasonEventDto {
   id: string | undefined;
 
   constructor(
     public name: string,
     public startDate: Date | undefined,
-    public endDate: Date | undefined
+    public endDate: Date | undefined,
+    public type: SeasonEventType,
+    public scoreRules: SeasonEventScoreRulesDto | undefined,
+    public circuit: CircuitDto | undefined
   ) {}
-
-  // TODO: circuit
 }
 
 @Injectable({
@@ -47,7 +67,7 @@ export class SeasonsService {
   }
 
   public deleteSeason(seasonId: string): Observable<SeasonDto> {
-    return this.backendService.delete<SeasonDto>(URL, seasonId);
+    return this.backendService.delete<SeasonDto>(`${URL}/${seasonId}`);
   }
 
   public getSeasonEvents(seasonId: string): Observable<SeasonEventDto[]> {
@@ -80,8 +100,17 @@ export class SeasonsService {
     seasonEventId: string
   ): Observable<SeasonEventDto> {
     return this.backendService.delete<SeasonEventDto>(
-      `${URL}/${seasonId}/season-events`,
-      seasonEventId
+      `${URL}/${seasonId}/season-events/${seasonEventId}`
+    );
+  }
+
+  public addSeasonEventScoreRules(
+    seasonEventId: string,
+    scoreRules: SeasonEventScoreRulesDto
+  ): Observable<SeasonEventDto> {
+    return this.backendService.post<SeasonEventScoreRulesDto, SeasonEventDto>(
+      `${URL}/${seasonEventId}/score-rules`,
+      scoreRules
     );
   }
 }

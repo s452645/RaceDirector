@@ -12,8 +12,8 @@ using backenend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    [Migration("20230324010542_SeasonEventFixes")]
-    partial class SeasonEventFixes
+    [Migration("20230328105833_FixScoreRulesTypo")]
+    partial class FixScoreRulesTypo
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -121,11 +121,21 @@ namespace backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BreakBeamSensorId")
+                    b.Property<Guid?>("BreakBeamSensorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CircuitId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -353,19 +363,58 @@ namespace backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid?>("ScoreRulesId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("SeasonId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("CircuitId");
+                    b.HasIndex("CircuitId")
+                        .IsUnique()
+                        .HasFilter("[CircuitId] IS NOT NULL");
+
+                    b.HasIndex("ScoreRulesId")
+                        .IsUnique()
+                        .HasFilter("[ScoreRulesId] IS NOT NULL");
 
                     b.HasIndex("SeasonId");
 
                     b.ToTable("SeasonEvents");
+                });
+
+            modelBuilder.Entity("backend.Models.SeasonEventScoreRules", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AvailableBonuses")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("DistanceMultiplier")
+                        .HasColumnType("real");
+
+                    b.Property<bool>("TheMoreTheBetter")
+                        .HasColumnType("bit");
+
+                    b.Property<float>("TimeMultiplier")
+                        .HasColumnType("real");
+
+                    b.Property<float>("UnfinishedSectorPenaltyPoints")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SeasonEventScoreRules");
                 });
 
             modelBuilder.Entity("backend.Models.SeasonTeamStanding", b =>
@@ -538,9 +587,7 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.BreakBeamSensor", "BreakBeamSensor")
                         .WithMany()
-                        .HasForeignKey("BreakBeamSensorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BreakBeamSensorId");
 
                     b.HasOne("backend.Models.Circuit", "Circuit")
                         .WithMany("Checkpoints")
@@ -619,8 +666,12 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.SeasonEvent", b =>
                 {
                     b.HasOne("backend.Models.Circuit", "Circuit")
-                        .WithMany()
-                        .HasForeignKey("CircuitId");
+                        .WithOne("SeasonEvent")
+                        .HasForeignKey("backend.Models.SeasonEvent", "CircuitId");
+
+                    b.HasOne("backend.Models.SeasonEventScoreRules", "ScoreRules")
+                        .WithOne("SeasonEvent")
+                        .HasForeignKey("backend.Models.SeasonEvent", "ScoreRulesId");
 
                     b.HasOne("backend.Models.Season", "Season")
                         .WithMany("Events")
@@ -629,6 +680,8 @@ namespace backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Circuit");
+
+                    b.Navigation("ScoreRules");
 
                     b.Navigation("Season");
                 });
@@ -686,6 +739,9 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Circuit", b =>
                 {
                     b.Navigation("Checkpoints");
+
+                    b.Navigation("SeasonEvent")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("backend.Models.Owner", b =>
@@ -705,6 +761,12 @@ namespace backend.Migrations
                     b.Navigation("Standings");
 
                     b.Navigation("TeamStandings");
+                });
+
+            modelBuilder.Entity("backend.Models.SeasonEventScoreRules", b =>
+                {
+                    b.Navigation("SeasonEvent")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("backend.Models.Series", b =>

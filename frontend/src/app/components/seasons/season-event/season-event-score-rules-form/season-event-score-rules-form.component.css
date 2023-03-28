@@ -1,0 +1,9 @@
+/* magic shit to make chips input 100% width */
+:host ::ng-deep ul.p-inputtext {
+  width: 100%;
+}
+
+/* the color of invalid labels, there should be a better way */
+.text-error {
+  color: #fca5a5;
+}

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { PicoWBoardDto } from 'src/app/services/pico-boards.service';
+import { DEPPicoWBoardDto } from 'src/app/services/pico-boards.service';
 import { BaseContainerComponent } from '../base-container/base-container.component';
 
 @Component({
@@ -14,19 +14,19 @@ export class SettingsComponent
   public boardId = '';
   public ipAddress = '';
 
-  boards: PicoWBoardDto[] = [];
+  boards: DEPPicoWBoardDto[] = [];
 
   override ngOnInit(): void {
     super.ngOnInit();
 
     this.picoBoardsService
-      .getBoards()
+      .DEPgetBoards()
       .subscribe(boards => (this.boards = boards));
   }
 
   public handleClick(): void {
     this.picoBoardsService
-      .addBoard(this.boardId, this.ipAddress)
+      .DEPaddBoard(this.boardId, this.ipAddress)
       .subscribe(resp => console.log(JSON.stringify(resp)));
 
     this.boardId = '';
@@ -35,7 +35,7 @@ export class SettingsComponent
 
   public refreshBoards(): void {
     this.picoBoardsService
-      .getBoards()
+      .DEPgetBoards()
       .subscribe(boards => (this.boards = boards));
   }
 

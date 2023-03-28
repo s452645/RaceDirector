@@ -48,15 +48,15 @@ namespace backend.Controllers
         }
 
         [HttpGet("{seasonId}/season-events")]
-        public ActionResult<List<SeasonEventDto>> GetSeasonEvents(Guid seasonId)
+        public async Task<ActionResult<List<SeasonEventDto>>> GetSeasonEvents(Guid seasonId)
         {
-            return _seasonService.GetSeasonEvents(seasonId);
+            return await _seasonService.GetSeasonEvents(seasonId);
         }
 
         [HttpGet("{seasonId}/season-events/{seasonEventId}")]
-        public ActionResult<SeasonEventDto> GetSeasonEventById(Guid seasonId, Guid seasonEventId)
+        public async Task<ActionResult<SeasonEventDto>> GetSeasonEventById(Guid seasonId, Guid seasonEventId)
         {
-            return _seasonService.GetSeasonEventById(seasonId, seasonEventId);
+            return await _seasonService.GetSeasonEventById(seasonId, seasonEventId);
         }
 
         [HttpPost("{seasonId}/season-events")]
@@ -71,6 +71,13 @@ namespace backend.Controllers
         {
             await _seasonService.DeleteSeasonEvent(seasonId, seasonEventId);
             return NoContent();
+        }
+
+        [HttpPost("{seasonEventId}/score-rules")]
+        public async Task<ActionResult<SeasonEventDto>> AddScoreRules(Guid seasonEventId, SeasonEventScoreRulesDto scoreRulesDto)
+        {
+            var seasonEvent = await _seasonService.AddScoreRules(seasonEventId, scoreRulesDto);
+            return Ok(seasonEvent);
         }
     }
 }

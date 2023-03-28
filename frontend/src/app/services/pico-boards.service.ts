@@ -3,7 +3,32 @@ import { Observable, of } from 'rxjs';
 import { MOCK_BACKEND } from '../globals';
 import { BackendService } from './backend.service';
 
-export interface PicoWBoardDto {
+export class BreakBeamSensorDto {
+  public id: string | undefined;
+
+  constructor(
+    public name: string,
+    public pin: number,
+    public boardId: string
+  ) {}
+}
+
+export class PicoBoardDto {
+  public id: string | undefined;
+
+  constructor(
+    public name: string,
+    public ipAddress: string,
+    public breakBeamSensors: BreakBeamSensorDto[]
+  ) {}
+}
+
+const URL = 'https://localhost:7219/api/PicoBoards';
+
+// =========== OLD ============
+
+// TODO: remove?
+export interface DEPPicoWBoardDto {
   id: string;
   address: string;
   isConnected: boolean;
@@ -15,17 +40,35 @@ export interface PicoWBoardDto {
 export class PicoBoardsService {
   constructor(private backendService: BackendService) {}
 
-  public getBoards(): Observable<PicoWBoardDto[]> {
+  public getBoards(): Observable<PicoBoardDto[]> {
+    return this.backendService.get<PicoBoardDto[]>(URL);
+  }
+
+  public addBoard(picoBoardDto: PicoBoardDto): Observable<PicoBoardDto> {
+    return this.backendService.post<PicoBoardDto, PicoBoardDto>(
+      URL,
+      picoBoardDto
+    );
+  }
+
+  public deleteBoard(picoBoardId: string): Observable<void> {
+    return this.backendService.delete(`${URL}/${picoBoardId}`);
+  }
+
+  public DEPgetBoards(): Observable<DEPPicoWBoardDto[]> {
     if (MOCK_BACKEND) {
       return of(this.getMockBoards());
     }
 
-    return this.backendService.get<PicoWBoardDto[]>(
+    return this.backendService.get<DEPPicoWBoardDto[]>(
       'https://localhost:7219/api/Board'
     );
   }
 
-  public addBoard(boardId: string, boardAddress: string): Observable<string> {
+  public DEPaddBoard(
+    boardId: string,
+    boardAddress: string
+  ): Observable<string> {
     const requestBody = {
       id: boardId,
       address: boardAddress,
@@ -37,7 +80,7 @@ export class PicoBoardsService {
     );
   }
 
-  private getMockBoards(): PicoWBoardDto[] {
+  private getMockBoards(): DEPPicoWBoardDto[] {
     return [
       {
         id: 'mock-board-0-id',

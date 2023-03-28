@@ -1,19 +1,35 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { SeasonEventDto } from 'src/app/services/seasons.service';
+import { SelectItem } from 'primeng/api';
+import {
+  SeasonEventDto,
+  SeasonEventType,
+} from 'src/app/services/seasons.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
-  selector: 'app-new-season-event',
-  templateUrl: './new-season-event.component.html',
-  styleUrls: ['./new-season-event.component.css'],
+  selector: 'app-new-season-event-form',
+  templateUrl: './new-season-event-form.component.html',
+  styleUrls: ['./new-season-event-form.component.css'],
 })
-export class NewSeasonEventComponent {
+export class NewSeasonEventFormComponent {
   @Output() newSeasonEvent: EventEmitter<SeasonEventDto> = new EventEmitter();
 
   protected isSubmitButtonLoading = false;
+  protected seasonEventTypes: SelectItem[] = [
+    {
+      label: 'Race',
+      value: SeasonEventType.Race,
+    },
+    {
+      label: 'Time Trial',
+      value: SeasonEventType.TimeTrial,
+    },
+  ];
+
   protected form = this.fb.group({
     name: ['', Validators.required],
+    type: [null as SelectItem | null, Validators.required],
     startDate: [''],
     endDate: [''],
   });
@@ -30,7 +46,12 @@ export class NewSeasonEventComponent {
     const startDate = new Date(this.form.controls.startDate.value ?? '');
     const endDate = new Date(this.form.controls.endDate.value ?? '');
 
+    const typeItem = this.form.controls.type.value as SelectItem;
+    const type = typeItem.value;
+
     this.isSubmitButtonLoading = true;
-    this.newSeasonEvent.emit(new SeasonEventDto(name, startDate, endDate));
+    this.newSeasonEvent.emit(
+      new SeasonEventDto(name, startDate, endDate, type, undefined, undefined)
+    );
   }
 }

@@ -6,6 +6,8 @@
         public string Name { get; set; }
         public List<Checkpoint> Checkpoints { get; set; }
 
+        public SeasonEvent SeasonEvent { get; set; }
+
         // TODO: point calculation rules, bonuses, etc.
     }
 }

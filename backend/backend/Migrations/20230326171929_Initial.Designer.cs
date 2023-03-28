@@ -12,8 +12,8 @@ using backenend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    [Migration("20230324012819_SeasonEventFixes2")]
-    partial class SeasonEventFixes2
+    [Migration("20230326171929_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -121,15 +121,24 @@ namespace backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("BreakBeamSensorId")
+                    b.Property<Guid?>("BreakBeamSensorId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("CircuitId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("BreakBeamSensorId");
+                    b.HasIndex("BreakBeamSensorId")
+                        .IsUnique()
+                        .HasFilter("[BreakBeamSensorId] IS NOT NULL");
 
                     b.HasIndex("CircuitId");
 
@@ -361,7 +370,9 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CircuitId");
+                    b.HasIndex("CircuitId")
+                        .IsUnique()
+                        .HasFilter("[CircuitId] IS NOT NULL");
 
                     b.HasIndex("SeasonId");
 
@@ -537,10 +548,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Checkpoint", b =>
                 {
                     b.HasOne("backend.Models.BreakBeamSensor", "BreakBeamSensor")
-                        .WithMany()
-                        .HasForeignKey("BreakBeamSensorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithOne("Checkpoint")
+                        .HasForeignKey("backend.Models.Checkpoint", "BreakBeamSensorId");
 
                     b.HasOne("backend.Models.Circuit", "Circuit")
                         .WithMany("Checkpoints")
@@ -619,8 +628,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.SeasonEvent", b =>
                 {
                     b.HasOne("backend.Models.Circuit", "Circuit")
-                        .WithMany()
-                        .HasForeignKey("CircuitId");
+                        .WithOne("SeasonEvent")
+                        .HasForeignKey("backend.Models.SeasonEvent", "CircuitId");
 
                     b.HasOne("backend.Models.Season", "Season")
                         .WithMany("Events")
@@ -674,6 +683,12 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("backend.Models.BreakBeamSensor", b =>
+                {
+                    b.Navigation("Checkpoint")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("backend.Models.Car", b =>
                 {
                     b.Navigation("OfficialName");
@@ -686,6 +701,9 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Circuit", b =>
                 {
                     b.Navigation("Checkpoints");
+
+                    b.Navigation("SeasonEvent")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("backend.Models.Owner", b =>
