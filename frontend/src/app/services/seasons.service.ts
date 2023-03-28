@@ -103,4 +103,14 @@ export class SeasonsService {
       `${URL}/${seasonId}/season-events/${seasonEventId}`
     );
   }
+
+  public addSeasonEventScoreRules(
+    seasonEventId: string,
+    scoreRules: SeasonEventScoreRulesDto
+  ): Observable<SeasonEventDto> {
+    return this.backendService.post<SeasonEventScoreRulesDto, SeasonEventDto>(
+      `${URL}/${seasonEventId}/score-rules`,
+      scoreRules
+    );
+  }
 }

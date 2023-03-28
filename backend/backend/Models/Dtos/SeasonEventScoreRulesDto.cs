@@ -3,7 +3,7 @@
     public class SeasonEventScoreRulesDto
     {
         public Guid Id { get; set; }
-        public float TimeMultipiler { get; set; }
+        public float TimeMultiplier { get; set; }
         public float DistanceMultiplier { get; set; }
         public List<int> AvailableBonuses { get; set; }
         public float UnfinishedSectorPenaltyPoints { get; set; }
@@ -19,7 +19,7 @@
 
         public SeasonEventScoreRulesDto(
             Guid id, 
-            float timeMultipiler, 
+            float timeMultiplier, 
             float distanceMultiplier, 
             List<int> availableBonuses, 
             float unfinishedSectorPenaltyPoints, 
@@ -28,7 +28,7 @@
         )
         {
             Id = id;
-            TimeMultipiler = timeMultipiler;
+            TimeMultiplier = timeMultiplier;
             DistanceMultiplier = distanceMultiplier;
             AvailableBonuses = availableBonuses;
             UnfinishedSectorPenaltyPoints = unfinishedSectorPenaltyPoints;
@@ -39,7 +39,7 @@
         public SeasonEventScoreRulesDto(SeasonEventScoreRules scoreRules)
         {
             Id = scoreRules.Id;
-            TimeMultipiler = scoreRules.TimeMultipiler;
+            TimeMultiplier = scoreRules.TimeMultiplier;
             DistanceMultiplier = scoreRules.DistanceMultiplier;
             AvailableBonuses= scoreRules.AvailableBonuses.ToList();
             UnfinishedSectorPenaltyPoints = scoreRules.UnfinishedSectorPenaltyPoints;
@@ -51,7 +51,7 @@
         {
             var scoreRules = new SeasonEventScoreRules();
             scoreRules.Id = Id;
-            scoreRules.TimeMultipiler = TimeMultipiler;
+            scoreRules.TimeMultiplier = TimeMultiplier;
             scoreRules.DistanceMultiplier = DistanceMultiplier;
             scoreRules.AvailableBonuses = AvailableBonuses.ToArray();
             scoreRules.UnfinishedSectorPenaltyPoints = UnfinishedSectorPenaltyPoints;

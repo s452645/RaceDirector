@@ -42,11 +42,11 @@
         <label htmlFor="availableBonuses">Available bonuses</label>
       </span>
       <span
-        *ngIf="form.controls.availableBonuses.invalid"
+        *ngIf="form.controls['availableBonuses'].invalid"
         class="text-xs mt-2 text-error"
         >Invalid values:
         {{
-        form.controls.availableBonuses.errors?.['invalidValues'].value
+        form.controls['availableBonuses'].errors?.['invalidValues'].value
         }}</span
       >
     </div>

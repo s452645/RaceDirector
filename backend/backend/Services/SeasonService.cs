@@ -133,7 +133,7 @@ namespace backend.Services
 
         public async Task<SeasonEventDto> AddScoreRules(Guid seasonEventId, SeasonEventScoreRulesDto scoreRulesDto)
         {
-            var seasonEvent = await _context.SeasonEvents.FindAsync(seasonEventId);
+            var seasonEvent = _context.SeasonEvents.Include(se => se.ScoreRules).FirstOrDefault(se => se.Id == seasonEventId);
 
             if (seasonEvent == null)
             {

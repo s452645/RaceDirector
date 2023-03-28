@@ -69,6 +69,7 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
   }
 
   handleOpenScoreRulesForm(): void {
+    this.scoreRulesFormCmp.refreshForm();
     this.isScoreRulesFormOpen = true;
   }
 
@@ -85,8 +86,15 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
   }
 
   handleSubmittedScoreRules(scoreRules: SeasonEventScoreRulesDto): void {
-    // TODO
-    console.warn(scoreRules);
+    this.subscription.add(
+      this.seasonsService
+        .addSeasonEventScoreRules(this.seasonEventId, scoreRules)
+        .subscribe(() => this.refreshData())
+        .add(() => {
+          this.scoreRulesFormCmp.isSubmitButtonLoading = false;
+          this.isScoreRulesFormOpen = false;
+        })
+    );
   }
 
   private refreshData(): void {

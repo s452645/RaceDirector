@@ -3,7 +3,7 @@
     public class SeasonEventScoreRules
     {
         public Guid Id { get; set; }
-        public float TimeMultipiler { get; set; }
+        public float TimeMultiplier { get; set; }
         public float DistanceMultiplier { get; set; }
         public int[] AvailableBonuses { get; set; }
         public float UnfinishedSectorPenaltyPoints { get; set; }

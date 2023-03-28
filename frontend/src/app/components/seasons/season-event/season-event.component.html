@@ -46,6 +46,8 @@
   [style]="{ width: '50vw' }"
 >
   <app-season-event-score-rules-form
+    [seasonEventId]="seasonEventId"
+    [scoreRulesDto]="seasonEvent.scoreRules"
     (submittedScoreRules)="handleSubmittedScoreRules($event)"
   />
 </p-dialog>
