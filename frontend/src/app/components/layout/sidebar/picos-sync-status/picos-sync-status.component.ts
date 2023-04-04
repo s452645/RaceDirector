@@ -3,11 +3,11 @@ import { Subscription } from 'rxjs';
 import {
   PicoBoardsService,
   DEPPicoWBoardDto,
-} from 'src/app/services/pico-boards.service';
+} from 'src/app/services/hardware/pico-boards.service';
 import {
   SyncBoardResponse,
   SyncDataService,
-} from 'src/app/services/sync-data.service';
+} from 'src/app/services/hardware/sync-data.service';
 
 class SyncedPicoWBoardDto implements DEPPicoWBoardDto {
   public id: string;

@@ -8,7 +8,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { SelectItem } from 'primeng/api';
-import { SeasonEventScoreRulesDto } from 'src/app/services/seasons.service';
+import { SeasonEventScoreRulesDto } from 'src/app/services/seasons/seasons.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({

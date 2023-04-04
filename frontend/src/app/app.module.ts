@@ -39,6 +39,8 @@ import { SeasonEventComponent } from './components/seasons/season-event/season-e
 import { NewSeasonEventFormComponent } from './components/seasons/season-event/new-season-event-form/new-season-event-form.component';
 import { CircuitFormComponent } from './components/circuit/circuit-form/circuit-form.component';
 import { SeasonEventScoreRulesFormComponent } from './components/seasons/season-event/season-event-score-rules-form/season-event-score-rules-form.component';
+import { RoundFormComponent } from './components/seasons/season-event-round/round-form/round-form.component';
+import { RaceFormComponent } from './components/seasons/season-event-round/round-form/race-form/race-form.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -63,6 +65,8 @@ export function HttpLoaderFactory(http: HttpClient) {
     NewSeasonEventFormComponent,
     CircuitFormComponent,
     SeasonEventScoreRulesFormComponent,
+    RoundFormComponent,
+    RaceFormComponent,
   ],
   imports: [
     BrowserModule,

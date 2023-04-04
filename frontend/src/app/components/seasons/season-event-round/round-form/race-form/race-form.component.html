@@ -1,0 +1,42 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div
+    class="flex flex-column align-items-center w-full"
+    [ngStyle]="{ gap: '0.5rem' }"
+  >
+    <p>Race {{ raceOrder + 1 }}</p>
+
+    <div class="flex-auto">
+      <label class="mb-2 block" for="participantsCount"
+        >Participants count</label
+      >
+      <p-inputNumber
+        formControlName="participantsCount"
+        [showButtons]="true"
+        inputId="participantsCount"
+      >
+      </p-inputNumber>
+    </div>
+
+    <div class="flex-auto">
+      <label class="mb-2 block" for="instantAdvancements"
+        >Instant advancements</label
+      >
+      <p-inputNumber
+        formControlName="instantAdvancements"
+        [showButtons]="true"
+        inputId="instantAdvancements"
+      >
+      </p-inputNumber>
+    </div>
+
+    <div class="flex-auto">
+      <label class="mb-2 block" for="secondChances">Second chances</label>
+      <p-inputNumber
+        formControlName="secondChances"
+        [showButtons]="true"
+        inputId="secondChances"
+      >
+      </p-inputNumber>
+    </div>
+  </div>
+</form>

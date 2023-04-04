@@ -1,16 +1,24 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { CircuitDto, CircuitService } from 'src/app/services/circuit.service';
+import { Observable, Subscription, map, mergeMap, of } from 'rxjs';
+import {
+  CircuitDto,
+  CircuitService,
+} from 'src/app/services/seasons/events/circuit.service';
 import { RouteTitleService } from 'src/app/services/route-title.service';
 import {
   SeasonEventDto,
   SeasonEventScoreRulesDto,
   SeasonsService,
-} from 'src/app/services/seasons.service';
+} from 'src/app/services/seasons/seasons.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { CircuitFormComponent } from '../../circuit/circuit-form/circuit-form.component';
 import { SeasonEventScoreRulesFormComponent } from './season-event-score-rules-form/season-event-score-rules-form.component';
+import {
+  SeasonEventRoundDto,
+  SeasonEventRoundsService,
+} from 'src/app/services/seasons/events/rounds/season-event-rounds.service';
+import { RoundFormComponent } from '../season-event-round/round-form/round-form.component';
 
 @Component({
   selector: 'app-season-event',
@@ -23,6 +31,9 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
 
   @ViewChild(SeasonEventScoreRulesFormComponent, { static: true })
   private scoreRulesFormCmp!: SeasonEventScoreRulesFormComponent;
+
+  @ViewChild(RoundFormComponent, { static: true })
+  private newRoundFormCmp!: RoundFormComponent;
 
   private seasonIdNullable: string | null = null;
   private seasonEventIdNullable: string | null = null;
@@ -43,13 +54,20 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
 
   isCircuitFormOpen = false;
   isScoreRulesFormOpen = false;
+  isNewRoundFormOpen = false;
+
+  nextRoundParticipantsCount = 0;
+  nextRoundOrder = 0;
+
+  rounds: SeasonEventRoundDto[] = [];
 
   constructor(
     private route: ActivatedRoute,
     private routeTitleService: RouteTitleService,
     private seasonsService: SeasonsService,
     private utils: UtilsService,
-    private circuitService: CircuitService
+    private circuitService: CircuitService,
+    private roundsService: SeasonEventRoundsService
   ) {
     this.seasonIdNullable = this.route.snapshot.paramMap.get('seasonId');
     this.seasonEventIdNullable = this.route.snapshot.paramMap.get('eventId');
@@ -71,6 +89,17 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
   handleOpenScoreRulesForm(): void {
     this.scoreRulesFormCmp.refreshForm();
     this.isScoreRulesFormOpen = true;
+  }
+
+  handleOpenNewRoundForm(): void {
+    this.subscription.add(
+      this.getNewRoundParticipantsCount().subscribe(count => {
+        this.nextRoundParticipantsCount = count;
+
+        this.newRoundFormCmp.refreshForm();
+        this.isNewRoundFormOpen = true;
+      })
+    );
   }
 
   handleSubmittedCircuit(circuit: CircuitDto): void {
@@ -97,6 +126,18 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
     );
   }
 
+  handleSubmittedRound(round: SeasonEventRoundDto): void {
+    this.subscription.add(
+      this.roundsService
+        .addRound(this.seasonEventId, round)
+        .subscribe(() => this.refreshData())
+        .add(() => {
+          this.newRoundFormCmp.isSubmitButtonLoading = false;
+          this.isNewRoundFormOpen = false;
+        })
+    );
+  }
+
   private refreshData(): void {
     this.subscription.add(
       this.seasonsService
@@ -109,7 +150,33 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
           );
 
           this.seasonEventNullable = seasonEvent;
+
+          // run this request in parallel
+          this.subscription.add(
+            this.roundsService
+              .getRounds(this.seasonEventId)
+              .subscribe(
+                rounds =>
+                  (this.rounds = rounds.sort((a, b) => a.order - b.order))
+              )
+          );
         })
+    );
+  }
+
+  private getNewRoundParticipantsCount(): Observable<number> {
+    return this.roundsService.getRounds(this.seasonEventId).pipe(
+      mergeMap(rounds => {
+        this.nextRoundOrder = rounds.length;
+
+        const lastRound = rounds.sort((a, b) => a.order - b.order).at(-1);
+
+        if (!lastRound) {
+          return of(this.seasonEvent.participantsCount ?? 0);
+        }
+
+        return of(lastRound?.advancesCount ?? 0);
+      })
     );
   }
 }

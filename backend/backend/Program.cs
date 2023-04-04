@@ -1,8 +1,10 @@
-using backend.Exceptions;
-using backend.Services;
-using backend.Services.Boards;
-using backend.Services.Boards.Comms;
-using backenend.Models;
+using backend.Models;
+using backend.Services.Cars;
+using backend.Services.Hardware;
+using backend.Services.Hardware.Comms;
+using backend.Services.Seasons;
+using backend.Services.Seasons.Events.Circuits;
+using backend.Services.Seasons.Events.Rounds;
 using Microsoft.EntityFrameworkCore;
 
 var customOriginsConfig = "_customOriginsConfig";
@@ -27,6 +29,8 @@ builder.Services.AddSingleton<BoardEventsService>();
 builder.Services.AddScoped<SeasonService>();
 builder.Services.AddScoped<CircuitService>();
 builder.Services.AddScoped<PicoBoardsService>();
+builder.Services.AddScoped<CarService>();
+builder.Services.AddScoped<SeasonEventRoundService>();
 
 builder.Services.AddControllers();
 

@@ -4,7 +4,7 @@ import { SelectItem } from 'primeng/api';
 import {
   SeasonEventDto,
   SeasonEventType,
-} from 'src/app/services/seasons.service';
+} from 'src/app/services/seasons/seasons.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 @Component({
@@ -51,7 +51,15 @@ export class NewSeasonEventFormComponent {
 
     this.isSubmitButtonLoading = true;
     this.newSeasonEvent.emit(
-      new SeasonEventDto(name, startDate, endDate, type, undefined, undefined)
+      new SeasonEventDto(
+        name,
+        startDate,
+        endDate,
+        type,
+        undefined,
+        undefined,
+        undefined
+      )
     );
   }
 }
