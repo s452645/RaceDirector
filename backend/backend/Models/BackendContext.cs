@@ -1,10 +1,19 @@
-﻿using backend.Models;
+﻿using backend.Models.Cars;
+using backend.Models.Hardware;
+using backend.Models.Misc;
+using backend.Models.Owners;
+using backend.Models.Seasons;
+using backend.Models.Seasons.Events;
+using backend.Models.Seasons.Events.Circuits;
+using backend.Models.Seasons.Events.Rounds;
+using backend.Models.Seasons.Events.Rounds.Races;
+using backend.Models.Seasons.Events.Rounds.Races.Heats;
+using backend.Models.Teams;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace backenend.Models;
+namespace backend.Models;
 
 public class BackendContext : DbContext
 {
