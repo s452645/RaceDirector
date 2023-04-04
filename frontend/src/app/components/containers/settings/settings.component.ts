@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DEPPicoWBoardDto } from 'src/app/services/pico-boards.service';
+import { DEPPicoWBoardDto } from 'src/app/services/hardware/pico-boards.service';
 import { BaseContainerComponent } from '../base-container/base-container.component';
 
 @Component({

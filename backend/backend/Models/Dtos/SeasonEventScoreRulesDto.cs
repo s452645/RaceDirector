@@ -5,7 +5,7 @@
         public Guid Id { get; set; }
         public float TimeMultiplier { get; set; }
         public float DistanceMultiplier { get; set; }
-        public List<int> AvailableBonuses { get; set; }
+        public List<float> AvailableBonuses { get; set; }
         public float UnfinishedSectorPenaltyPoints { get; set; }
         public bool TheMoreTheBetter { get; set; }
 
@@ -14,14 +14,14 @@
         public SeasonEventScoreRulesDto()
         {
             Id = Guid.NewGuid();
-            AvailableBonuses = new List<int>();
+            AvailableBonuses = new List<float>();
         }
 
         public SeasonEventScoreRulesDto(
             Guid id, 
             float timeMultiplier, 
             float distanceMultiplier, 
-            List<int> availableBonuses, 
+            List<float> availableBonuses, 
             float unfinishedSectorPenaltyPoints, 
             bool theMoreTheBetter, 
             Guid seasonEventId

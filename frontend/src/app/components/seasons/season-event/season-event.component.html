@@ -9,16 +9,26 @@
       label="Configure score rules"
       (onClick)="handleOpenScoreRulesForm()"
     ></p-button>
+
+    <p-button label="Add round" (onClick)="handleOpenNewRoundForm()"></p-button>
   </div>
 
   <span>
     Circuit: {{ seasonEvent.circuit?.name }}<br />
-    Checkpoints: {{ seasonEvent.circuit?.checkpoints?.length }}
+    Checkpoints: {{ seasonEvent.circuit?.checkpoints?.length }}<br />
+    Rounds: {{ rounds.length }}
   </span>
 
   <div class="flex flex-column" [ngStyle]="{ gap: '0.5rem' }">
     <span *ngFor="let checkpoint of seasonEvent.circuit?.checkpoints">
       {{ checkpoint.position }}. {{ checkpoint.name }}
+    </span>
+  </div>
+
+  <div class="flex flex-column" [ngStyle]="{ gap: '0.5rem' }">
+    <span *ngFor="let round of rounds">
+      Round {{ round.order + 1 }}: {{ round.participantsCount }} ->
+      {{ round.advancesCount }}
     </span>
   </div>
 </div>
@@ -49,5 +59,20 @@
     [seasonEventId]="seasonEventId"
     [scoreRulesDto]="seasonEvent.scoreRules"
     (submittedScoreRules)="handleSubmittedScoreRules($event)"
+  />
+</p-dialog>
+
+<p-dialog
+  header="Confiugure rounds"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [(visible)]="isNewRoundFormOpen"
+  [style]="{ width: '50vw' }"
+>
+  <app-round-form
+    [participantsCount]="nextRoundParticipantsCount"
+    [roundOrder]="nextRoundOrder"
+    (submittedRound)="handleSubmittedRound($event)"
   />
 </p-dialog>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backenend.Models;
 
@@ -11,9 +12,10 @@ using backenend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    partial class BackendContextModelSnapshot : ModelSnapshot
+    [Migration("20230404030445_MakeSecondChanceRulesOptional")]
+    partial class MakeSecondChanceRulesOptional
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -403,9 +405,6 @@ namespace backend.Migrations
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
-                    b.Property<int>("ParticipantsCount")
-                        .HasColumnType("int");
-
                     b.Property<int>("PointsStrategy")
                         .HasColumnType("int");
 
@@ -439,9 +438,6 @@ namespace backend.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ParticipantsCount")
                         .HasColumnType("int");
 
                     b.Property<Guid>("RoundId")

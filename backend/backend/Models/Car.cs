@@ -18,6 +18,11 @@
         public CarSize? Size { get; set; }
         public string? Note { get; set; }
 
+        public List<SeasonEvent> SeasonEvents { get; set; }
+        public List<SeasonEventRound> SeasonEventRounds { get; set; }
+        public List<SeasonEventRoundRaceResult> RaceResults { get; set; }
+        public List<SeasonEventRoundRaceHeatResult> HeatResults { get; set; }
+
         // multiple Pots, as in many seasons one car will be in different teams
         // each Pot is associated with one Team, and one Team with a single Season
         // maybe there should be some sort of validation that only one Pot from a single Season

@@ -27,6 +27,8 @@ builder.Services.AddSingleton<BoardEventsService>();
 builder.Services.AddScoped<SeasonService>();
 builder.Services.AddScoped<CircuitService>();
 builder.Services.AddScoped<PicoBoardsService>();
+builder.Services.AddScoped<CarService>();
+builder.Services.AddScoped<SeasonEventRoundService>();
 
 builder.Services.AddControllers();
 

@@ -11,6 +11,8 @@
         public SeasonEventScoreRulesDto? ScoreRules { get; set; }
         public CircuitDto? Circuit { get; set; }
 
+        public int? ParticipantsCount { get; set; }
+
         public Guid? SeasonId { get; set; }
 
         public SeasonEventDto()
@@ -26,7 +28,8 @@
             SeasonEventType type,
             SeasonEventScoreRulesDto? scoreRules,
             CircuitDto? circuit,
-            Guid? seasonId
+            Guid? seasonId,
+            int? participantsCount
         )
         {
             Id = id;
@@ -37,6 +40,7 @@
             ScoreRules = scoreRules;
             Circuit = circuit;
             SeasonId = seasonId;
+            ParticipantsCount = participantsCount;
         }
 
         public SeasonEventDto(SeasonEvent seasonEvent)
@@ -58,6 +62,8 @@
             }
 
             SeasonId = seasonEvent.SeasonId;
+
+            ParticipantsCount = seasonEvent.Participants?.Count;
         }
 
         public SeasonEvent ToEntity()
@@ -68,6 +74,8 @@
             seasonEvent.StartDate = StartDate;
             seasonEvent.EndDate = EndDate;
             seasonEvent.Type = Type;
+
+            seasonEvent.Rounds = new List<SeasonEventRound>();
 
             if (ScoreRules != null)
             {

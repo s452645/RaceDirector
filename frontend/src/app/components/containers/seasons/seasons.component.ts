@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SeasonDto } from 'src/app/services/seasons.service';
+import { SeasonDto } from 'src/app/services/seasons/seasons.service';
 import { BaseContainerComponent } from '../base-container/base-container.component';
 
 @Component({

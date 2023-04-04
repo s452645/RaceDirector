@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BackendService } from './backend.service';
-import { CircuitDto } from './circuit.service';
+import { BackendService } from '../backend.service';
+import { CircuitDto } from './events/circuit.service';
 
 const URL = 'https://localhost:7219/api/Seasons';
 
@@ -44,7 +44,8 @@ export class SeasonEventDto {
     public endDate: Date | undefined,
     public type: SeasonEventType,
     public scoreRules: SeasonEventScoreRulesDto | undefined,
-    public circuit: CircuitDto | undefined
+    public circuit: CircuitDto | undefined,
+    public participantsCount: number | undefined
   ) {}
 }
 

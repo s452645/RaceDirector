@@ -20,9 +20,10 @@
         public Guid? CircuitId { get; set; }
         public Circuit? Circuit { get; set; }
 
+        public List<SeasonEventRound> Rounds { get; set; }
+        public List<Car> Participants { get; set; }
+
         public Guid SeasonId { get; set; }
         public Season Season { get; set; }
-
-        // TODO: rounds
     }
 }

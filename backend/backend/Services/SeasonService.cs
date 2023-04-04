@@ -73,6 +73,7 @@ namespace backend.Services
         public async Task<SeasonEventDto> GetSeasonEventById(Guid seasonId, Guid seasonEventId)
         {
             var season = await _context.Seasons
+                .Include(s => s.Events).ThenInclude(e => e.Participants)
                 .Include(s => s.Events).ThenInclude(e => e.ScoreRules)
                 .Include(s => s.Events).ThenInclude(e => e.Circuit!).ThenInclude(c => c.Checkpoints).ThenInclude(c => c.BreakBeamSensor)
                 .FirstOrDefaultAsync(s => s.Id == seasonId);
@@ -103,6 +104,7 @@ namespace backend.Services
 
             var eventEntity = seasonEvent.ToEntity();
             eventEntity.Season = season;
+            eventEntity.Participants = _context.Cars.Where(c => true).ToList();
 
             _context.SeasonEvents.Add(eventEntity);
 

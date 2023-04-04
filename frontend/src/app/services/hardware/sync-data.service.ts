@@ -1,7 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { Subject, Subscription } from 'rxjs';
-import { MOCK_BACKEND } from '../globals';
-import { WebSocketMsg, WebSocketService } from './websocket.service';
+import { MOCK_BACKEND } from '../../globals';
+import { WebSocketMsg, WebSocketService } from '../websocket.service';
 
 const SYNC_WEB_SOCKET_ROUTE = 'sync';
 

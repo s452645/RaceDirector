@@ -7,7 +7,7 @@ import {
   SeasonDto,
   SeasonEventDto,
   SeasonsService,
-} from 'src/app/services/seasons.service';
+} from 'src/app/services/seasons/seasons.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { NewSeasonEventFormComponent } from '../season-event/new-season-event-form/new-season-event-form.component';
 

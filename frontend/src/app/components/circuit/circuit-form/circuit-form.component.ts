@@ -13,8 +13,8 @@ import {
   CheckpointDto,
   CheckpointType,
   CircuitDto,
-} from 'src/app/services/circuit.service';
-import { PicoBoardsService } from 'src/app/services/pico-boards.service';
+} from 'src/app/services/seasons/events/circuit.service';
+import { PicoBoardsService } from 'src/app/services/hardware/pico-boards.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
 interface CheckpointTypeForm {

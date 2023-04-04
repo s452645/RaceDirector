@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { MOCK_BACKEND } from '../globals';
-import { BackendService } from './backend.service';
+import { MOCK_BACKEND } from '../../globals';
+import { BackendService } from '../backend.service';
 
 export class BreakBeamSensorDto {
   public id: string | undefined;
