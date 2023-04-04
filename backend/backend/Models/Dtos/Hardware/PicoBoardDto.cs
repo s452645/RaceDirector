@@ -5,6 +5,7 @@ namespace backend.Models.Dtos.Hardware
     public class PicoBoardDto
     {
         public Guid Id { get; set; }
+        public PicoBoardType Type { get; set; }
         public string Name { get; set; }
 
         public string IPAddress { get; set; }
@@ -18,9 +19,10 @@ namespace backend.Models.Dtos.Hardware
             BreakBeamSensors = new List<BreakBeamSensorDto>();
         }
 
-        public PicoBoardDto(Guid id, string name, string iPAddress, List<BreakBeamSensorDto> breakBeamSensors)
+        public PicoBoardDto(Guid id, PicoBoardType type, string name, string iPAddress, List<BreakBeamSensorDto> breakBeamSensors)
         {
             Id = id;
+            Type = type;
             Name = name;
             IPAddress = iPAddress;
             BreakBeamSensors = breakBeamSensors;
@@ -29,6 +31,7 @@ namespace backend.Models.Dtos.Hardware
         public PicoBoardDto(PicoBoard picoBoard)
         {
             Id = picoBoard.Id;
+            Type = picoBoard.Type;
             Name = picoBoard.Name;
             IPAddress = picoBoard.IPAddress;
             BreakBeamSensors = picoBoard.BreakBeamSensors.Select(bbs => new BreakBeamSensorDto(bbs)).ToList();
@@ -38,6 +41,7 @@ namespace backend.Models.Dtos.Hardware
         {
             var picoBoard = new PicoBoard();
             picoBoard.Id = Id;
+            picoBoard.Type = Type;
             picoBoard.Name = Name;
             picoBoard.IPAddress = IPAddress;
             picoBoard.BreakBeamSensors = BreakBeamSensors.Select(bbs => bbs.ToEntity()).ToList();

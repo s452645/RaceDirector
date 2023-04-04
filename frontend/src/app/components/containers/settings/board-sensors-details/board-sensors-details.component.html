@@ -1,0 +1,59 @@
+<form [formGroup]="form" (ngSubmit)="handleSubmit()">
+  <div
+    class="flex flex-column w-full align-items-center mt-4"
+    [ngStyle]="{ gap: '2rem' }"
+  >
+    <div>
+      <span class="p-float-label">
+        <input formControlName="name" id="name" type="text" pInputText />
+        <label for="name">Sensor name</label>
+      </span>
+    </div>
+
+    <span class="p-float-label">
+      <p-inputNumber
+        inputId="pin"
+        formControlName="pin"
+        class="w-full"
+        styleClass="w-full"
+      >
+      </p-inputNumber>
+      <label for="pin">Sensor pin</label>
+    </span>
+
+    <button
+      pButton
+      type="submit"
+      label="Add sensor"
+      class="p-button-sm mt-4"
+      [disabled]="form.invalid"
+    ></button>
+  </div>
+</form>
+
+<div class="flex flex-column align-items-center mt-4">
+  <p-table [value]="sensors" [tableStyle]="{ minWidth: '24rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Pin</th>
+        <th>Delete</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-sensor>
+      <tr>
+        <td>{{ sensor.name }}</td>
+        <td>{{ sensor.pin }}</td>
+        <td>
+          <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            (click)="handleDeleteSensor(sensor.id)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

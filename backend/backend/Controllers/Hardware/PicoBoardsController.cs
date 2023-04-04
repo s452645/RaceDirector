@@ -37,5 +37,26 @@ namespace backend.Controllers.Hardware
             await _picoBoardsService.DeletePicoBoard(id);
             return NoContent();
         }
+
+        // GET: api/PicoBoards/5/sensors
+        [HttpGet("{id}/sensors")]
+        public async Task<ActionResult<IEnumerable<BreakBeamSensorDto>>> GetBoardBreakBeamSensors(Guid id)
+        {
+            return await _picoBoardsService.GetBoardBreakBeamSensors(id);
+        }
+
+        // POST: api/PicoBoard/5/sensors
+        [HttpPost("{id}/sensors")]
+        public async Task<ActionResult<PicoBoardDto>> AddBreakBeamSensor(Guid id, [FromBody] BreakBeamSensorDto sensorDto)
+        {
+            return await _picoBoardsService.AddBreakBeamSensor(id, sensorDto);
+        }
+
+        // DELETE: api/PicoBoard/5/sensors
+        [HttpDelete("{boardId}/sensors/{sensorId}")]
+        public async Task<ActionResult<PicoBoardDto>> RemoveBreakBeamSensor(Guid boardId, Guid sensorId)
+        {
+            return await _picoBoardsService.RemoveBreakBeamSensor(boardId, sensorId);
+        }
     }
 }

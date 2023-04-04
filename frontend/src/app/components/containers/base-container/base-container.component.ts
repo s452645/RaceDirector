@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { BackendService } from 'src/app/services/backend.service';
@@ -9,6 +10,7 @@ import {
 } from 'src/app/services/route-title.service';
 import { SeasonsService } from 'src/app/services/seasons/seasons.service';
 import { ToastMessageService } from 'src/app/services/toast-message.service';
+import { UtilsService } from 'src/app/services/utils.service';
 import { WebSocketService } from 'src/app/services/websocket.service';
 
 @Component({
@@ -27,7 +29,9 @@ export class BaseContainerComponent implements OnInit, OnDestroy {
     protected toastMessageService: ToastMessageService,
     public backendService: BackendService,
     public webSocketService: WebSocketService,
-    public picoBoardsService: PicoBoardsService
+    public picoBoardsService: PicoBoardsService,
+    protected fb: FormBuilder,
+    protected utils: UtilsService
   ) {}
 
   ngOnInit(): void {

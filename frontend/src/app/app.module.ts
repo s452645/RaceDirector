@@ -41,6 +41,7 @@ import { CircuitFormComponent } from './components/circuit/circuit-form/circuit-
 import { SeasonEventScoreRulesFormComponent } from './components/seasons/season-event/season-event-score-rules-form/season-event-score-rules-form.component';
 import { RoundFormComponent } from './components/seasons/season-event-round/round-form/round-form.component';
 import { RaceFormComponent } from './components/seasons/season-event-round/round-form/race-form/race-form.component';
+import { BoardSensorsDetailsComponent } from './components/containers/settings/board-sensors-details/board-sensors-details.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -67,6 +68,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     SeasonEventScoreRulesFormComponent,
     RoundFormComponent,
     RaceFormComponent,
+    BoardSensorsDetailsComponent,
   ],
   imports: [
     BrowserModule,
