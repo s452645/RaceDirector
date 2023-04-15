@@ -1,5 +1,11 @@
-using backend.Services;
-using backenend.Models;
+using backend.Models;
+using backend.Services.Cars;
+using backend.Services.Hardware;
+using backend.Services.Hardware.Comms;
+using backend.Services.Seasons;
+using backend.Services.Seasons.Events.Circuits;
+using backend.Services.Seasons.Events.Rounds;
+using backend.Services.Seasons.Events.Rounds.Races;
 using Microsoft.EntityFrameworkCore;
 
 var customOriginsConfig = "_customOriginsConfig";
@@ -17,7 +23,19 @@ builder.Services.AddCors(options =>
 
 // Add services to the container.
 builder.Services.AddSingleton<HardwareCommunicationService>();
+builder.Services.AddSingleton<TimeSyncService>();
+builder.Services.AddSingleton<BoardsManager>();
+builder.Services.AddSingleton<BoardEventsService>();
+builder.Services.AddSingleton<SeasonEventRoundRaceService>();
+
+builder.Services.AddScoped<SeasonService>();
+builder.Services.AddScoped<CircuitService>();
+builder.Services.AddScoped<PicoBoardsService>();
+builder.Services.AddScoped<CarService>();
+builder.Services.AddScoped<SeasonEventRoundService>();
+
 builder.Services.AddControllers();
+
 builder.Services.AddDbContext<BackendContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("BackendContext"))
 );
@@ -37,10 +55,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/error");
+}
+
 app.UseCors(customOriginsConfig);
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseWebSockets();
 
 app.Run();

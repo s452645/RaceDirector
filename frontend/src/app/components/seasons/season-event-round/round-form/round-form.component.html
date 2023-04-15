@@ -1,0 +1,122 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div
+    class="flex flex-column align-items-center w-full"
+    [ngStyle]="{ gap: '1rem' }"
+  >
+    <p class="text-center">
+      Round {{ roundOrder + 1 }}<br />
+      Participants count: {{ participantsCount }}
+    </p>
+
+    <div class="w-4">
+      <p class="select-label">Round type</p>
+      <p-dropdown
+        appendTo="body"
+        formControlName="type"
+        [options]="roundTypeOptions"
+        optionLabel="label"
+        placeholder="Round type"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <div class="w-5">
+      <p class="select-label">Points strategy</p>
+
+      <p-dropdown
+        appendTo="body"
+        formControlName="pointsStrategy"
+        [options]="pointsStrategyOptions"
+        optionLabel="label"
+        placeholder="Points strategy"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <div class="w-6">
+      <p class="select-label">Dropped cars position definement</p>
+
+      <p-dropdown
+        appendTo="body"
+        formControlName="droppedCarsPositionDefinementStrategy"
+        [options]="droppedPositionDefinementStrategyOptions"
+        optionLabel="label"
+        placeholder="Dropped cars position definement"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <div class="w-6">
+      <p class="select-label">Dropped cars points strategy</p>
+
+      <p-dropdown
+        appendTo="body"
+        formControlName="droppedCarsPointsStrategy"
+        [options]="pointsStrategyOptions"
+        optionLabel="label"
+        placeholder="Dropped cars points strategy"
+        styleClass="w-full"
+      ></p-dropdown>
+    </div>
+
+    <span class="p-float-label w-6 mt-4">
+      <p-inputNumber
+        inputId="carsPerRaceHelper"
+        formControlName="carsPerRaceHelper"
+        class="w-full"
+        styleClass="w-full"
+      >
+      </p-inputNumber>
+      <label htmlFor="carsPerRaceHelper">Default cars per race</label>
+    </span>
+
+    <span class="p-float-label w-6 mt-4">
+      <p-inputNumber
+        inputId="instantAdvancementsHelper"
+        formControlName="instantAdvancementsHelper"
+        class="w-full"
+        styleClass="w-full"
+      >
+      </p-inputNumber>
+      <label htmlFor="instantAdvancementsHelper"
+        >Default instant advancements</label
+      >
+    </span>
+
+    <span class="p-float-label w-6 mt-4">
+      <p-inputNumber
+        inputId="secondChancesHelper"
+        formControlName="secondChancesHelper"
+        class="w-full"
+        styleClass="w-full"
+      >
+      </p-inputNumber>
+      <label htmlFor="secondChancesHelper">Default second chances</label>
+    </span>
+
+    <div
+      *ngFor="let race of racesParticipantsCount; let i = index"
+      class="flex flex-column align-items-center border-round bg-blue-800 w-6 py-4"
+      [ngStyle]="{ gap: '2rem' }"
+    >
+      <app-race-form
+        [suggestedParticipantsCount]="race"
+        [raceOrder]="i"
+        [suggestedInstantAdvancements]="
+          form.controls['instantAdvancementsHelper'].value ?? 0
+        "
+        [suggestedSecondChances]="
+          form.controls['secondChancesHelper'].value ?? 0
+        "
+        (submittedRace)="handleRaceSubmitted($event)"
+      />
+    </div>
+
+    <p-button
+      type="submit"
+      label="Submit"
+      [disabled]="!form.valid"
+      [loading]="isSubmitButtonLoading"
+    ></p-button>
+  </div>
+</form>

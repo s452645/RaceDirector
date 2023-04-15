@@ -1,0 +1,80 @@
+<div class="flex align-items-center flex-column w-full my-6" style="gap: 3rem">
+  <div class="flex" [ngStyle]="{ gap: '1rem' }">
+    <p-button
+      label="Configure circuit"
+      (onClick)="handleOpenCircuitForm()"
+    ></p-button>
+
+    <p-button
+      label="Configure score rules"
+      (onClick)="handleOpenScoreRulesForm()"
+    ></p-button>
+
+    <p-button label="Add round" (onClick)="handleOpenNewRoundForm()"></p-button>
+
+    <p-button label="Go to first round" (onClick)="goToFirstRound()"></p-button>
+  </div>
+
+  <span>
+    Circuit: {{ seasonEvent.circuit?.name }}<br />
+    Checkpoints: {{ seasonEvent.circuit?.checkpoints?.length }}<br />
+    Rounds: {{ rounds.length }}
+  </span>
+
+  <div class="flex flex-column" [ngStyle]="{ gap: '0.5rem' }">
+    <span *ngFor="let checkpoint of seasonEvent.circuit?.checkpoints">
+      {{ checkpoint.position }}. {{ checkpoint.name }}
+    </span>
+  </div>
+
+  <div class="flex flex-column" [ngStyle]="{ gap: '0.5rem' }">
+    <span *ngFor="let round of rounds">
+      Round {{ round.order + 1 }}: {{ round.participantsCount }} ->
+      {{ round.advancesCount }}
+    </span>
+  </div>
+</div>
+
+<p-dialog
+  header="Confiugure circuit"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [(visible)]="isCircuitFormOpen"
+  [style]="{ width: '50vw' }"
+>
+  <app-circuit-form
+    [circuitDto]="seasonEvent.circuit"
+    (submittedForm)="handleSubmittedCircuit($event)"
+  />
+</p-dialog>
+
+<p-dialog
+  header="Confiugure score rules"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [(visible)]="isScoreRulesFormOpen"
+  [style]="{ width: '50vw' }"
+>
+  <app-season-event-score-rules-form
+    [seasonEventId]="seasonEventId"
+    [scoreRulesDto]="seasonEvent.scoreRules"
+    (submittedScoreRules)="handleSubmittedScoreRules($event)"
+  />
+</p-dialog>
+
+<p-dialog
+  header="Confiugure rounds"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [(visible)]="isNewRoundFormOpen"
+  [style]="{ width: '50vw' }"
+>
+  <app-round-form
+    [participantsCount]="nextRoundParticipantsCount"
+    [roundOrder]="nextRoundOrder"
+    (submittedRound)="handleSubmittedRound($event)"
+  />
+</p-dialog>

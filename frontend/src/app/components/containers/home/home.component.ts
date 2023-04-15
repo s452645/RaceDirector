@@ -7,9 +7,9 @@ import { BaseContainerComponent } from '../base-container/base-container.compone
   styleUrls: ['./home.component.css'],
 })
 export class HomeComponent extends BaseContainerComponent {
-  public makeTestRequest(message: string): void {
-    this.backendService
-      .textRequest(message)
+  public sendCommand(message: string): void {
+    this.elevatorService
+      .sendCommand(message)
       .subscribe(response => console.log(response));
   }
 }

@@ -1,1 +1,69 @@
-<p>seasons works!</p>
+<div
+  class="flex flex-column align-items-center justify-content-evenly mt-6"
+  [ngStyle]="{ gap: '2rem' }"
+>
+  <span class="p-float-label">
+    <input pInputText id="seasonName" [(ngModel)]="newSeasonName" />
+    <label htmlFor="seasonName">Season Name</label>
+  </span>
+
+  <span class="p-float-label">
+    <p-calendar
+      id="seasonStartDate"
+      [(ngModel)]="newSeasonStartDate"
+    ></p-calendar>
+    <label htmlFor="seasonStartDate">Season Start</label>
+  </span>
+
+  <span class="p-float-label">
+    <p-calendar id="seasonEndDate" [(ngModel)]="newSeasonEndDate"></p-calendar>
+    <label htmlFor="seasonEndDate">Season End</label>
+  </span>
+
+  <button
+    pButton
+    type="button"
+    label="Add season"
+    class="p-button-sm"
+    (click)="handleAddSeason()"
+  ></button>
+</div>
+
+<div class="flex justify-content-center w-full my-6">
+  <p-table [value]="seasons" [ngStyle]="{ width: '50%' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Name</th>
+        <th>Start date</th>
+        <th>End date</th>
+        <th>Enter</th>
+        <th>Delete</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-season>
+      <tr>
+        <td>{{ season.name }}</td>
+        <td>{{ season.startDate }}</td>
+        <td>{{ season.endDate }}</td>
+        <td>
+          <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-chevron-circle-right"
+            (click)="handleEnterSeason(season.id)"
+          ></button>
+        </td>
+        <td>
+          <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-trash"
+            (click)="handleDeleteSeason(season.id)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using backenend.Models;
+using backend.Models;
 
 #nullable disable
 
@@ -17,12 +17,12 @@ namespace backend.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.13")
+                .HasAnnotation("ProductVersion", "6.0.15")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("backend.Models.Car", b =>
+            modelBuilder.Entity("backend.Models.Cars.Car", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -53,7 +53,7 @@ namespace backend.Migrations
                     b.ToTable("Cars");
                 });
 
-            modelBuilder.Entity("backend.Models.CarSize", b =>
+            modelBuilder.Entity("backend.Models.Cars.CarSize", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -90,7 +90,7 @@ namespace backend.Migrations
                     b.ToTable("CarSizes");
                 });
 
-            modelBuilder.Entity("backend.Models.OfficialName", b =>
+            modelBuilder.Entity("backend.Models.Cars.OfficialName", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -125,34 +125,138 @@ namespace backend.Migrations
                     b.ToTable("OfficialNames");
                 });
 
-            modelBuilder.Entity("backend.Models.Owner", b =>
+            modelBuilder.Entity("backend.Models.Cars.Series", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("BirthDate")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("FirstLevelName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecondLevelName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Series");
+                });
+
+            modelBuilder.Entity("backend.Models.Hardware.BoardEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Broken")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("PicoLocalTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ReceivedTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("SensorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SensorId");
+
+                    b.ToTable("BoardEvents");
+                });
+
+            modelBuilder.Entity("backend.Models.Hardware.BreakBeamSensor", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("BoardId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("PhotoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Prefix")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Pin")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PhotoId");
+                    b.HasIndex("BoardId");
 
-                    b.ToTable("Owners");
+                    b.ToTable("BreakBeamSensors");
                 });
 
-            modelBuilder.Entity("backend.Models.Photo", b =>
+            modelBuilder.Entity("backend.Models.Hardware.PicoBoard", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Connected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("IPAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PicoBoards");
+                });
+
+            modelBuilder.Entity("backend.Models.Hardware.SyncBoardResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long?>("ClockAdjustedPicoTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CurrentSyncOffset")
+                        .HasColumnType("bigint");
+
+                    b.Property<float?>("LastTenOffsetsAvg")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("NewClockOffset")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("PicoBoardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("SyncFinishedTimestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SyncResult")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PicoBoardId");
+
+                    b.ToTable("SyncBoardResults");
+                });
+
+            modelBuilder.Entity("backend.Models.Misc.Photo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -190,26 +294,350 @@ namespace backend.Migrations
                     b.ToTable("Photos");
                 });
 
-            modelBuilder.Entity("backend.Models.Pot", b =>
+            modelBuilder.Entity("backend.Models.Misc.UnitValue", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("Hierarchy")
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Unit")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("TeamId")
+                    b.Property<int>("Value")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UnitValues");
+                });
+
+            modelBuilder.Entity("backend.Models.Owners.Owner", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("BirthDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("PhotoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Prefix")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PhotoId");
+
+                    b.ToTable("Owners");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Circuits.Checkpoint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("BreakBeamSensorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CircuitId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BreakBeamSensorId");
+
+                    b.HasIndex("CircuitId");
+
+                    b.ToTable("Checkpoints");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Circuits.Circuit", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Circuits");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RaceId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TeamId");
+                    b.HasIndex("RaceId");
 
-                    b.ToTable("Pots");
+                    b.ToTable("SeasonEventRoundRaceHeats");
                 });
 
-            modelBuilder.Entity("backend.Models.Season", b =>
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeatResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<float>("AdvantagePoints")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Bonuses")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<float>("DistancePoints")
+                        .HasColumnType("real");
+
+                    b.Property<float>("FullTime")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("HeatId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<float>("PointsSummed")
+                        .HasColumnType("real");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SectorTimes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("TimePoints")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarId");
+
+                    b.HasIndex("HeatId");
+
+                    b.ToTable("SeasonEventRoundRaceHeatResults");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("InstantAdvancements")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ParticipantsCount")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("RoundId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("SecondChances")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoundId");
+
+                    b.ToTable("SeasonEventRoundRaces");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRaceResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<float>("Points")
+                        .HasColumnType("real");
+
+                    b.Property<int?>("Position")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RaceOutcome")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SeasonEventRoundRaceId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarId");
+
+                    b.HasIndex("SeasonEventRoundRaceId");
+
+                    b.ToTable("SeasonEventRoundRaceResults");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.SeasonEventRound", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("DroppedCarsPointsStrategy")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DroppedCarsPositionDefinementStrategy")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ParticipantsCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PointsStrategy")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("SeasonEventId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("SecondChanceRulesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SeasonEventId");
+
+                    b.HasIndex("SecondChanceRulesId")
+                        .IsUnique()
+                        .HasFilter("[SecondChanceRulesId] IS NOT NULL");
+
+                    b.ToTable("SeasonEventRounds");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.SecondChanceRules", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AdvancesCount")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PointsStrategy")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SecondChanceRules");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.SeasonEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CircuitId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("ScoreRulesId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SeasonId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CircuitId")
+                        .IsUnique()
+                        .HasFilter("[CircuitId] IS NOT NULL");
+
+                    b.HasIndex("ScoreRulesId")
+                        .IsUnique()
+                        .HasFilter("[ScoreRulesId] IS NOT NULL");
+
+                    b.HasIndex("SeasonId");
+
+                    b.ToTable("SeasonEvents");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.SeasonEventScoreRules", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AvailableBonuses")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("DistanceMultiplier")
+                        .HasColumnType("real");
+
+                    b.Property<bool>("TheMoreTheBetter")
+                        .HasColumnType("bit");
+
+                    b.Property<float>("TimeMultiplier")
+                        .HasColumnType("real");
+
+                    b.Property<float>("UnfinishedSectorPenaltyPoints")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SeasonEventScoreRules");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Season", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -230,7 +658,7 @@ namespace backend.Migrations
                     b.ToTable("Seasons");
                 });
 
-            modelBuilder.Entity("backend.Models.SeasonCarStanding", b =>
+            modelBuilder.Entity("backend.Models.Seasons.SeasonCarStanding", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -257,7 +685,7 @@ namespace backend.Migrations
                     b.ToTable("SeasonCarStandings");
                 });
 
-            modelBuilder.Entity("backend.Models.SeasonTeamStanding", b =>
+            modelBuilder.Entity("backend.Models.Seasons.SeasonTeamStanding", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -284,25 +712,26 @@ namespace backend.Migrations
                     b.ToTable("SeasonTeamStandings");
                 });
 
-            modelBuilder.Entity("backend.Models.Series", b =>
+            modelBuilder.Entity("backend.Models.Teams.Pot", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("FirstLevelName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Hierarchy")
+                        .HasColumnType("int");
 
-                    b.Property<string>("SecondLevelName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Series");
+                    b.HasIndex("TeamId");
+
+                    b.ToTable("Pots");
                 });
 
-            modelBuilder.Entity("backend.Models.Team", b =>
+            modelBuilder.Entity("backend.Models.Teams.Team", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -326,27 +755,6 @@ namespace backend.Migrations
                     b.ToTable("Teams");
                 });
 
-            modelBuilder.Entity("backend.Models.UnitValue", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Unit")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Value")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UnitValues");
-                });
-
             modelBuilder.Entity("CarPot", b =>
                 {
                     b.Property<Guid>("CarsId")
@@ -362,13 +770,43 @@ namespace backend.Migrations
                     b.ToTable("CarPot");
                 });
 
-            modelBuilder.Entity("backend.Models.Car", b =>
+            modelBuilder.Entity("CarSeasonEvent", b =>
                 {
-                    b.HasOne("backend.Models.Photo", "MainPhoto")
+                    b.Property<Guid>("ParticipantsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SeasonEventsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ParticipantsId", "SeasonEventsId");
+
+                    b.HasIndex("SeasonEventsId");
+
+                    b.ToTable("CarSeasonEvent");
+                });
+
+            modelBuilder.Entity("CarSeasonEventRound", b =>
+                {
+                    b.Property<Guid>("ParticipantsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SeasonEventRoundsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ParticipantsId", "SeasonEventRoundsId");
+
+                    b.HasIndex("SeasonEventRoundsId");
+
+                    b.ToTable("CarSeasonEventRound");
+                });
+
+            modelBuilder.Entity("backend.Models.Cars.Car", b =>
+                {
+                    b.HasOne("backend.Models.Misc.Photo", "MainPhoto")
                         .WithMany()
                         .HasForeignKey("MainPhotoId");
 
-                    b.HasOne("backend.Models.Owner", "Owner")
+                    b.HasOne("backend.Models.Owners.Owner", "Owner")
                         .WithMany("Cars")
                         .HasForeignKey("OwnerId");
 
@@ -377,27 +815,27 @@ namespace backend.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("backend.Models.CarSize", b =>
+            modelBuilder.Entity("backend.Models.Cars.CarSize", b =>
                 {
-                    b.HasOne("backend.Models.Car", "Car")
+                    b.HasOne("backend.Models.Cars.Car", "Car")
                         .WithOne("Size")
-                        .HasForeignKey("backend.Models.CarSize", "CarId")
+                        .HasForeignKey("backend.Models.Cars.CarSize", "CarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.UnitValue", "Height")
+                    b.HasOne("backend.Models.Misc.UnitValue", "Height")
                         .WithMany()
                         .HasForeignKey("HeightId");
 
-                    b.HasOne("backend.Models.UnitValue", "Length")
+                    b.HasOne("backend.Models.Misc.UnitValue", "Length")
                         .WithMany()
                         .HasForeignKey("LengthId");
 
-                    b.HasOne("backend.Models.UnitValue", "Weight")
+                    b.HasOne("backend.Models.Misc.UnitValue", "Weight")
                         .WithMany()
                         .HasForeignKey("WeightId");
 
-                    b.HasOne("backend.Models.UnitValue", "Width")
+                    b.HasOne("backend.Models.Misc.UnitValue", "Width")
                         .WithMany()
                         .HasForeignKey("WidthId");
 
@@ -412,15 +850,15 @@ namespace backend.Migrations
                     b.Navigation("Width");
                 });
 
-            modelBuilder.Entity("backend.Models.OfficialName", b =>
+            modelBuilder.Entity("backend.Models.Cars.OfficialName", b =>
                 {
-                    b.HasOne("backend.Models.Car", "Car")
+                    b.HasOne("backend.Models.Cars.Car", "Car")
                         .WithOne("OfficialName")
-                        .HasForeignKey("backend.Models.OfficialName", "CarId")
+                        .HasForeignKey("backend.Models.Cars.OfficialName", "CarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.Series", "Series")
+                    b.HasOne("backend.Models.Cars.Series", "Series")
                         .WithMany("OfficialNames")
                         .HasForeignKey("SeriesId");
 
@@ -429,42 +867,181 @@ namespace backend.Migrations
                     b.Navigation("Series");
                 });
 
-            modelBuilder.Entity("backend.Models.Owner", b =>
+            modelBuilder.Entity("backend.Models.Hardware.BoardEvent", b =>
                 {
-                    b.HasOne("backend.Models.Photo", "Photo")
+                    b.HasOne("backend.Models.Hardware.BreakBeamSensor", "Sensor")
+                        .WithMany()
+                        .HasForeignKey("SensorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sensor");
+                });
+
+            modelBuilder.Entity("backend.Models.Hardware.BreakBeamSensor", b =>
+                {
+                    b.HasOne("backend.Models.Hardware.PicoBoard", "Board")
+                        .WithMany("BreakBeamSensors")
+                        .HasForeignKey("BoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Board");
+                });
+
+            modelBuilder.Entity("backend.Models.Hardware.SyncBoardResult", b =>
+                {
+                    b.HasOne("backend.Models.Hardware.PicoBoard", "PicoBoard")
+                        .WithMany("SyncBoardResults")
+                        .HasForeignKey("PicoBoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PicoBoard");
+                });
+
+            modelBuilder.Entity("backend.Models.Misc.Photo", b =>
+                {
+                    b.HasOne("backend.Models.Cars.Car", null)
+                        .WithMany("Photos")
+                        .HasForeignKey("CarId");
+                });
+
+            modelBuilder.Entity("backend.Models.Owners.Owner", b =>
+                {
+                    b.HasOne("backend.Models.Misc.Photo", "Photo")
                         .WithMany()
                         .HasForeignKey("PhotoId");
 
                     b.Navigation("Photo");
                 });
 
-            modelBuilder.Entity("backend.Models.Photo", b =>
+            modelBuilder.Entity("backend.Models.Seasons.Events.Circuits.Checkpoint", b =>
                 {
-                    b.HasOne("backend.Models.Car", null)
-                        .WithMany("Photos")
-                        .HasForeignKey("CarId");
-                });
+                    b.HasOne("backend.Models.Hardware.BreakBeamSensor", "BreakBeamSensor")
+                        .WithMany()
+                        .HasForeignKey("BreakBeamSensorId");
 
-            modelBuilder.Entity("backend.Models.Pot", b =>
-                {
-                    b.HasOne("backend.Models.Team", "Team")
-                        .WithMany("Pots")
-                        .HasForeignKey("TeamId")
+                    b.HasOne("backend.Models.Seasons.Events.Circuits.Circuit", "Circuit")
+                        .WithMany("Checkpoints")
+                        .HasForeignKey("CircuitId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Team");
+                    b.Navigation("BreakBeamSensor");
+
+                    b.Navigation("Circuit");
                 });
 
-            modelBuilder.Entity("backend.Models.SeasonCarStanding", b =>
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", b =>
                 {
-                    b.HasOne("backend.Models.Car", "Car")
+                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", "Race")
+                        .WithMany("Heats")
+                        .HasForeignKey("RaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Race");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeatResult", b =>
+                {
+                    b.HasOne("backend.Models.Cars.Car", "Car")
+                        .WithMany("HeatResults")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", "Heat")
+                        .WithMany("Results")
+                        .HasForeignKey("HeatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Car");
+
+                    b.Navigation("Heat");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", b =>
+                {
+                    b.HasOne("backend.Models.Seasons.Events.Rounds.SeasonEventRound", "Round")
+                        .WithMany("Races")
+                        .HasForeignKey("RoundId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Round");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRaceResult", b =>
+                {
+                    b.HasOne("backend.Models.Cars.Car", "Car")
+                        .WithMany("RaceResults")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", "SeasonEventRoundRace")
+                        .WithMany("Results")
+                        .HasForeignKey("SeasonEventRoundRaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Car");
+
+                    b.Navigation("SeasonEventRoundRace");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.SeasonEventRound", b =>
+                {
+                    b.HasOne("backend.Models.Seasons.Events.SeasonEvent", "SeasonEvent")
+                        .WithMany("Rounds")
+                        .HasForeignKey("SeasonEventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.Seasons.Events.Rounds.SecondChanceRules", "SecondChanceRules")
+                        .WithOne("Round")
+                        .HasForeignKey("backend.Models.Seasons.Events.Rounds.SeasonEventRound", "SecondChanceRulesId");
+
+                    b.Navigation("SeasonEvent");
+
+                    b.Navigation("SecondChanceRules");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.SeasonEvent", b =>
+                {
+                    b.HasOne("backend.Models.Seasons.Events.Circuits.Circuit", "Circuit")
+                        .WithOne("SeasonEvent")
+                        .HasForeignKey("backend.Models.Seasons.Events.SeasonEvent", "CircuitId");
+
+                    b.HasOne("backend.Models.Seasons.Events.SeasonEventScoreRules", "ScoreRules")
+                        .WithOne("SeasonEvent")
+                        .HasForeignKey("backend.Models.Seasons.Events.SeasonEvent", "ScoreRulesId");
+
+                    b.HasOne("backend.Models.Seasons.Season", "Season")
+                        .WithMany("Events")
+                        .HasForeignKey("SeasonId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Circuit");
+
+                    b.Navigation("ScoreRules");
+
+                    b.Navigation("Season");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.SeasonCarStanding", b =>
+                {
+                    b.HasOne("backend.Models.Cars.Car", "Car")
                         .WithMany()
                         .HasForeignKey("CarId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.Season", "Season")
+                    b.HasOne("backend.Models.Seasons.Season", "Season")
                         .WithMany("Standings")
                         .HasForeignKey("SeasonId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -475,13 +1052,13 @@ namespace backend.Migrations
                     b.Navigation("Season");
                 });
 
-            modelBuilder.Entity("backend.Models.SeasonTeamStanding", b =>
+            modelBuilder.Entity("backend.Models.Seasons.SeasonTeamStanding", b =>
                 {
-                    b.HasOne("backend.Models.Season", null)
+                    b.HasOne("backend.Models.Seasons.Season", null)
                         .WithMany("TeamStandings")
                         .HasForeignKey("SeasonId");
 
-                    b.HasOne("backend.Models.Team", "Team")
+                    b.HasOne("backend.Models.Teams.Team", "Team")
                         .WithMany()
                         .HasForeignKey("TeamId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -490,9 +1067,20 @@ namespace backend.Migrations
                     b.Navigation("Team");
                 });
 
-            modelBuilder.Entity("backend.Models.Team", b =>
+            modelBuilder.Entity("backend.Models.Teams.Pot", b =>
                 {
-                    b.HasOne("backend.Models.Season", "Season")
+                    b.HasOne("backend.Models.Teams.Team", "Team")
+                        .WithMany("Pots")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Team");
+                });
+
+            modelBuilder.Entity("backend.Models.Teams.Team", b =>
+                {
+                    b.HasOne("backend.Models.Seasons.Season", "Season")
                         .WithMany()
                         .HasForeignKey("SeasonId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -503,46 +1091,131 @@ namespace backend.Migrations
 
             modelBuilder.Entity("CarPot", b =>
                 {
-                    b.HasOne("backend.Models.Car", null)
+                    b.HasOne("backend.Models.Cars.Car", null)
                         .WithMany()
                         .HasForeignKey("CarsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.Pot", null)
+                    b.HasOne("backend.Models.Teams.Pot", null)
                         .WithMany()
                         .HasForeignKey("PotsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("backend.Models.Car", b =>
+            modelBuilder.Entity("CarSeasonEvent", b =>
                 {
+                    b.HasOne("backend.Models.Cars.Car", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.Seasons.Events.SeasonEvent", null)
+                        .WithMany()
+                        .HasForeignKey("SeasonEventsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CarSeasonEventRound", b =>
+                {
+                    b.HasOne("backend.Models.Cars.Car", null)
+                        .WithMany()
+                        .HasForeignKey("ParticipantsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Models.Seasons.Events.Rounds.SeasonEventRound", null)
+                        .WithMany()
+                        .HasForeignKey("SeasonEventRoundsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("backend.Models.Cars.Car", b =>
+                {
+                    b.Navigation("HeatResults");
+
                     b.Navigation("OfficialName");
 
                     b.Navigation("Photos");
 
+                    b.Navigation("RaceResults");
+
                     b.Navigation("Size");
                 });
 
-            modelBuilder.Entity("backend.Models.Owner", b =>
+            modelBuilder.Entity("backend.Models.Cars.Series", b =>
+                {
+                    b.Navigation("OfficialNames");
+                });
+
+            modelBuilder.Entity("backend.Models.Hardware.PicoBoard", b =>
+                {
+                    b.Navigation("BreakBeamSensors");
+
+                    b.Navigation("SyncBoardResults");
+                });
+
+            modelBuilder.Entity("backend.Models.Owners.Owner", b =>
                 {
                     b.Navigation("Cars");
                 });
 
-            modelBuilder.Entity("backend.Models.Season", b =>
+            modelBuilder.Entity("backend.Models.Seasons.Events.Circuits.Circuit", b =>
                 {
+                    b.Navigation("Checkpoints");
+
+                    b.Navigation("SeasonEvent")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", b =>
+                {
+                    b.Navigation("Results");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", b =>
+                {
+                    b.Navigation("Heats");
+
+                    b.Navigation("Results");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.SeasonEventRound", b =>
+                {
+                    b.Navigation("Races");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.SecondChanceRules", b =>
+                {
+                    b.Navigation("Round")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.SeasonEvent", b =>
+                {
+                    b.Navigation("Rounds");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.SeasonEventScoreRules", b =>
+                {
+                    b.Navigation("SeasonEvent")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Season", b =>
+                {
+                    b.Navigation("Events");
+
                     b.Navigation("Standings");
 
                     b.Navigation("TeamStandings");
                 });
 
-            modelBuilder.Entity("backend.Models.Series", b =>
-                {
-                    b.Navigation("OfficialNames");
-                });
-
-            modelBuilder.Entity("backend.Models.Team", b =>
+            modelBuilder.Entity("backend.Models.Teams.Team", b =>
                 {
                     b.Navigation("Pots");
                 });

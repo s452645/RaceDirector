@@ -14,13 +14,15 @@ export enum RouteTitle {
   providedIn: 'root',
 })
 export class RouteTitleService {
-  private $routeTitleSubject = new BehaviorSubject(RouteTitle.APP);
+  private $routeTitleSubject: BehaviorSubject<string> = new BehaviorSubject(
+    RouteTitle.APP as string
+  );
 
-  public getRouteTitle(): Observable<RouteTitle> {
+  public getRouteTitle(): Observable<string> {
     return this.$routeTitleSubject.asObservable();
   }
 
-  public setRouteTitle(title: RouteTitle): void {
+  public setRouteTitle(title: string): void {
     this.$routeTitleSubject.next(title);
   }
 }

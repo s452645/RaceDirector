@@ -1,0 +1,9 @@
+<div class="flex h-3rem justify-content-evenly">
+  <div
+    *ngFor="let offset of boardsOffsetDict.values()"
+    class="width-30 h-full flex justify-content-center align-items-center text-xs font-bold"
+    [ngClass]="getNgClassForOffset(offset)"
+  >
+    {{ offset }}
+  </div>
+</div>

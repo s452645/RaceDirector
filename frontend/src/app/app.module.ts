@@ -6,6 +6,19 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
+import { CheckboxModule } from 'primeng/checkbox';
+import { RadioButtonModule } from 'primeng/radiobutton';
+import { RippleModule } from 'primeng/ripple';
+import { ToastModule } from 'primeng/toast';
+import { TableModule } from 'primeng/table';
+import { CalendarModule } from 'primeng/calendar';
+import { DialogModule } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { ChipsModule } from 'primeng/chips';
+import { SelectButtonModule } from 'primeng/selectbutton';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -19,6 +32,19 @@ import { OwnersComponent } from './components/containers/owners/owners.component
 import { BaseContainerComponent } from './components/containers/base-container/base-container.component';
 import SeasonsComponent from './components/containers/seasons/seasons.component';
 import { SettingsComponent } from './components/containers/settings/settings.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PicosSyncStatusComponent } from './components/layout/sidebar/picos-sync-status/picos-sync-status.component';
+import { SeasonDetailsComponent } from './components/seasons/season-details/season-details.component';
+import { SeasonEventComponent } from './components/seasons/season-event/season-event.component';
+import { NewSeasonEventFormComponent } from './components/seasons/season-event/new-season-event-form/new-season-event-form.component';
+import { CircuitFormComponent } from './components/circuit/circuit-form/circuit-form.component';
+import { SeasonEventScoreRulesFormComponent } from './components/seasons/season-event/season-event-score-rules-form/season-event-score-rules-form.component';
+import { RoundFormComponent } from './components/seasons/season-event-round/round-form/round-form.component';
+import { RaceFormComponent } from './components/seasons/season-event-round/round-form/race-form/race-form.component';
+import { BoardSensorsDetailsComponent } from './components/containers/settings/board-sensors-details/board-sensors-details.component';
+import { SeasonEventRoundComponent } from './components/seasons/season-event-round/season-event-round/season-event-round.component';
+import { SeasonEventRoundRaceComponent } from './components/seasons/season-event-round-race/season-event-round-race.component';
+import { RaceHeatViewComponent } from './components/seasons/season-event-round-race/race-heat-view/race-heat-view.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -37,13 +63,41 @@ export function HttpLoaderFactory(http: HttpClient) {
     OwnersComponent,
     SettingsComponent,
     BaseContainerComponent,
+    PicosSyncStatusComponent,
+    SeasonDetailsComponent,
+    SeasonEventComponent,
+    NewSeasonEventFormComponent,
+    CircuitFormComponent,
+    SeasonEventScoreRulesFormComponent,
+    RoundFormComponent,
+    RaceFormComponent,
+    BoardSensorsDetailsComponent,
+    SeasonEventRoundComponent,
+    SeasonEventRoundRaceComponent,
+    RaceHeatViewComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    InputTextModule,
+    CheckboxModule,
+    CalendarModule,
+    DialogModule,
+    ButtonModule,
+    DropdownModule,
+    ConfirmPopupModule,
+    RadioButtonModule,
+    RippleModule,
+    FormsModule,
+    ToastModule,
+    TableModule,
     AppRoutingModule,
     ButtonModule,
+    InputNumberModule,
     HttpClientModule,
+    ReactiveFormsModule,
+    ChipsModule,
+    SelectButtonModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
