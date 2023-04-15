@@ -82,5 +82,7 @@ public class BackendContext : DbContext
     public DbSet<SeasonEventRoundRaceResult> SeasonEventRoundRaceResults => Set<SeasonEventRoundRaceResult>();
     public DbSet<SeasonEventRoundRaceHeat> SeasonEventRoundRaceHeats => Set<SeasonEventRoundRaceHeat>();
     public DbSet<SeasonEventRoundRaceHeatResult> SeasonEventRoundRaceHeatResults => Set<SeasonEventRoundRaceHeatResult>();
+    public DbSet<SyncBoardResult> SyncBoardResults => Set<SyncBoardResult>();
+    public DbSet<BoardEvent> BoardEvents => Set<BoardEvent>();
 
 }

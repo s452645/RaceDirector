@@ -19,7 +19,62 @@ export enum DroppedCarsPositionDefinementStrategy {
   OnlyPoints,
 }
 
+export enum RaceOutcome {
+  Undetermined,
+  Advanced,
+  Dropped,
+
+  SecondChanceUndetermined,
+  SecondChanceAdvanced,
+  SecondChanceDropped,
+}
+
 const URL = `https://localhost:7219/api/SeasonEventRounds`;
+
+export class CarDto {
+  public id: string | undefined;
+
+  constructor(public name: string) {}
+}
+
+export class SeasonEventRoundRaceHeatResultDto {
+  public id: string | undefined;
+
+  constructor(
+    public carId: string,
+    public car: CarDto,
+    public sectorTimes: number[],
+    public fullTime: number,
+    public timePoints: number,
+    public advantagePoints: number,
+    public distancePoints: number,
+    public bonuses: number[],
+    public pointsSummed: number,
+    public position: number
+  ) {}
+}
+
+export class SeasonEventRoundRaceHeatDto {
+  public id: string | undefined;
+
+  constructor(
+    public raceId: string,
+    public results: SeasonEventRoundRaceHeatResultDto[]
+  ) {}
+}
+
+export class SeasonEventRoundRaceResultDto {
+  public id: string | undefined;
+
+  constructor(
+    public carId: string,
+    public car: CarDto,
+    public raceId: string,
+    public position: number | null,
+    public points: number,
+    public raceOutcome: RaceOutcome
+  ) {}
+}
 
 export class SeasonEventRoundRaceDto {
   public id: string | undefined;
@@ -27,6 +82,8 @@ export class SeasonEventRoundRaceDto {
   constructor(
     public order: number,
     public participantsCount: number,
+    public results: SeasonEventRoundRaceResultDto[],
+    public heats: SeasonEventRoundRaceHeatDto[],
     public instantAdvancements: number,
     public secondChances: number,
     public roundId?: string
@@ -62,6 +119,15 @@ export class SeasonEventRoundsService {
     );
   }
 
+  public getRound(
+    seasonEventId: string,
+    roundId: string
+  ): Observable<SeasonEventRoundDto> {
+    return this.backendService.get<SeasonEventRoundDto>(
+      `${URL}/${roundId}?seasonEventId=${seasonEventId}`
+    );
+  }
+
   public addRound(
     seasonEventId: string,
     roundDto: SeasonEventRoundDto
@@ -69,6 +135,13 @@ export class SeasonEventRoundsService {
     return this.backendService.post<SeasonEventRoundDto, SeasonEventRoundDto>(
       `${URL}?seasonEventId=${seasonEventId}`,
       roundDto
+    );
+  }
+
+  public drawRaces(roundId: string): Observable<SeasonEventRoundDto> {
+    return this.backendService.post<unknown, SeasonEventRoundDto>(
+      `${URL}/${roundId}/draw`,
+      null
     );
   }
 

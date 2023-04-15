@@ -1,0 +1,25 @@
+<div class="p-4">
+  <p-button label="Draw races" (onClick)="drawRaces()"></p-button>
+
+  <div class="flex flex-wrap mt-4" [ngStyle]="{ gap: '2rem' }">
+    <div
+      *ngFor="let race of roundDto.races"
+      class="border-1 border-blue-400 border-round p-4 w-2 text-xs"
+    >
+      <p>Race {{ race.order + 1 }}:</p>
+
+      <p>Results:</p>
+      <div *ngFor="let result of race.results">
+        <p>
+          {{ (result.position ?? -1) + 1 }}. {{ result.car.name }} -
+          {{ result.points.toFixed(3) }}
+        </p>
+      </div>
+
+      <p-button
+        label="Go to race"
+        (onClick)="goToRace(race.id ?? '')"
+      ></p-button>
+    </div>
+  </div>
+</div>

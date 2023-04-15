@@ -17,11 +17,9 @@ export interface WebSocketMsg {
 export class WebSocketService {
   constructor(private toastMessageService: ToastMessageService) {}
 
-  public createSyncWebSocket(route: string): Subject<WebSocketMsg> {
-    return <Subject<WebSocketMsg>>this.connect(
-      `wss://localhost:7219/${route}`
-    ).pipe(
-      map((response: MessageEvent): WebSocketMsg => {
+  public createSyncWebSocket<T>(route: string): Subject<T> {
+    return <Subject<T>>this.connect(`wss://localhost:7219/${route}`).pipe(
+      map((response: MessageEvent): T => {
         return response.data;
       })
     );

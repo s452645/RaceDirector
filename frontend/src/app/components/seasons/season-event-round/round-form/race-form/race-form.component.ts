@@ -86,6 +86,8 @@ export class RaceFormComponent implements OnInit, OnDestroy {
     const raceDto = new SeasonEventRoundRaceDto(
       this.raceOrder,
       participantsCount,
+      [],
+      [],
       instantAdvancements,
       secondChances
     );

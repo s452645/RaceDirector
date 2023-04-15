@@ -1,5 +1,6 @@
-﻿using backend.Models.Hardware;
-using backend.Services.Hardware;
+﻿using backend.Services.Hardware;
+using backend.Services.Hardware.Comms;
+using backend.Services.Seasons.Events.Rounds.Races;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers.Misc
@@ -8,10 +9,12 @@ namespace backend.Controllers.Misc
     public class WebSocketController : ControllerBase
     {
         private readonly BoardsManager _boardsManager;
+        private readonly SeasonEventRoundRaceService _raceService;
 
-        public WebSocketController(BoardsManager boardsManager)
+        public WebSocketController(BoardsManager boardsManager, SeasonEventRoundRaceService raceService)
         {
             _boardsManager = boardsManager;
+            _raceService = raceService;
         }
 
         [Route("/sync")]
@@ -22,7 +25,8 @@ namespace backend.Controllers.Misc
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
                 var socketFinishedTcs = new TaskCompletionSource<object>();
 
-                _boardsManager.LaunchSyncAllBoards(webSocket, socketFinishedTcs);
+                var observer = new TimeSyncObserver(webSocket, socketFinishedTcs);
+                _boardsManager.RegisterTimeSyncObserver(observer);
 
                 await socketFinishedTcs.Task;
             }
@@ -43,7 +47,28 @@ namespace backend.Controllers.Misc
             using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
             var socketFinishedTcs = new TaskCompletionSource<object>();
 
-            _boardsManager.LaunchEventHandlingAllBoards(webSocket, socketFinishedTcs);
+            var observer = new BoardEventWebsocketObserver(webSocket, socketFinishedTcs);
+            _boardsManager.RegisterEventObserver(observer);
+
+            await socketFinishedTcs.Task;
+        }
+
+        [Route("/heat")]
+        public async Task ListenToHeat()
+        {
+            if (!HttpContext.WebSockets.IsWebSocketRequest)
+            {
+                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+            }
+
+            using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+            var socketFinishedTcs = new TaskCompletionSource<object>();
+
+
+            var observer = new HeatWebSocketObserver(webSocket, socketFinishedTcs);
+            _raceService.RegisterHeatObserver(observer);
+
+            await socketFinishedTcs.Task;
         }
     }
 }

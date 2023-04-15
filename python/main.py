@@ -1,3 +1,6 @@
+import json
+import time
+
 from threading import Thread
 
 from SocketController import SocketController
@@ -28,8 +31,18 @@ class MainProgram:
             return
 
     def serial_received_data_handler(self, data: str):
-        # self.socket_controller.send(data)
-        # for the time being
+        timestamp = round(time.time() * 1000)
+
+        msg = None
+        if "car_detected_state" in data.strip().lower():
+            msg = "car_detected"
+        elif "release_state" in data.strip().lower():
+            msg = "release"
+
+        if msg is not None:
+            print("Sending message " + msg)
+            self.socket_controller.send(json.dumps({'msg': msg, 'timestamp': timestamp}))
+
         print(data)
 
     def run(self):

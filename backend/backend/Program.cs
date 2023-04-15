@@ -5,6 +5,7 @@ using backend.Services.Hardware.Comms;
 using backend.Services.Seasons;
 using backend.Services.Seasons.Events.Circuits;
 using backend.Services.Seasons.Events.Rounds;
+using backend.Services.Seasons.Events.Rounds.Races;
 using Microsoft.EntityFrameworkCore;
 
 var customOriginsConfig = "_customOriginsConfig";
@@ -25,6 +26,7 @@ builder.Services.AddSingleton<HardwareCommunicationService>();
 builder.Services.AddSingleton<TimeSyncService>();
 builder.Services.AddSingleton<BoardsManager>();
 builder.Services.AddSingleton<BoardEventsService>();
+builder.Services.AddSingleton<SeasonEventRoundRaceService>();
 
 builder.Services.AddScoped<SeasonService>();
 builder.Services.AddScoped<CircuitService>();

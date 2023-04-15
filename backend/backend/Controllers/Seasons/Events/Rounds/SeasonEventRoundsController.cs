@@ -22,6 +22,13 @@ namespace backend.Controllers.Seasons.Events.Rounds
             return Ok(_roundsService.GetSeasonEventRounds(seasonEventId));
         }
 
+        // GET: api/SeasonEventRounds/5
+        [HttpGet("{id}")]
+        public ActionResult<List<SeasonEventRoundDto>> GetRound(Guid id, [FromQuery] Guid seasonEventId)
+        {
+            return Ok(_roundsService.GetRound(seasonEventId, id));
+        }
+
         // POST: api/SeasonEventRounds
         [HttpPost]
         public async Task<ActionResult<SeasonEventRoundDto>> PostRound([FromQuery] Guid seasonEventId, [FromBody] SeasonEventRoundDto roundDto)
@@ -29,6 +36,13 @@ namespace backend.Controllers.Seasons.Events.Rounds
             return await _roundsService.AddSeasonEventRound(seasonEventId, roundDto);
         }
 
+        // POST: api/SeasonEventRounds
+        [HttpPost("{id}/draw")]
+        public async Task<ActionResult<SeasonEventRoundDto>> DrawRaces(Guid id)
+        {
+            return await _roundsService.DrawRaces(id);
+        }        
+        
         // DELETE: api/SeasonEventRounds/5
         [HttpDelete("{roundId}")]
         public async Task<IActionResult> DeleteRound(Guid roundId, [FromQuery] Guid seasonEventId)

@@ -17,11 +17,19 @@ class EventHandler:
         self.writer = writer
         self.sensors: list[BreakBeamSensor] = []
         self.timer = LocalTimer()
+        self.messages_to_send_queue = []
 
     async def run(self):
+        uasyncio.create_task(self._send_queued_msgs())
+
         while True:
-            command = await recv(self.reader, self.timer, "[command]")
-            uasyncio.create_task(self._process_command(command))
+            try:
+                _, command = await recv(self.reader, self.timer, "[command]")
+                uasyncio.create_task(self._process_command(command))
+
+            except Exception as e:
+                print("Error processing command")
+                print(e)
 
     async def _process_command(self, command):
         try:
@@ -31,11 +39,11 @@ class EventHandler:
             print(msg)
             await send(self.writer, self.timer, "[err]", msg)
 
-        if command.command == "ADD_SENSOR":
+        if command["command"] == "ADD_SENSOR":
             print("Processing ADD_SENSOR command...")
-            self.add_sensor(command.sensor_pin, command.sensor_id)
+            self.add_sensor(command["sensor_pin"], command["sensor_id"])
 
-            msg = f"Sensor {command.sensor_id} added for pin {command.sensor_pin}"
+            msg = f"Sensor {command['sensor_id']} added for pin {command['sensor_pin']}"
             print(msg)
             await send(self.writer, self.timer, "[command-resp]", msg)
 
@@ -44,14 +52,32 @@ class EventHandler:
         sensor.set_handler_with_ID(self._break_beam_sensor_handler)
         self.sensors.append(sensor)
 
-    # TODO: can it be async?
-    async def _break_beam_sensor_handler(self, pin: Pin, pin_id: str):
+    def _break_beam_sensor_handler(self, pin: Pin, sensor_id: str):
         timestamp = self.timer.get_current_time()
 
         response = {
-            "pin_id": pin_id,
-            "broken": pin.value() == 0,
-            "local_timestamp": timestamp,
+            "SensorId": sensor_id,
+            "Broken": pin.value() == 0,
+            "PicoLocalTimestamp": timestamp,
         }
 
-        await send(self.writer, self.timer, "[event]", json.dumps(response))
+        self.messages_to_send_queue.append(json.dumps(response))
+
+    async def _send_queued_msgs(self):
+        while True:
+            await uasyncio.sleep_ms(5)
+            while len(self.messages_to_send_queue) > 0:
+                await send(
+                    self.writer,
+                    self.timer,
+                    "[event]",
+                    self.messages_to_send_queue[0],
+                )
+
+                try:
+                    _ = await recv(self.reader, self.timer, "[ready]")
+                    self.messages_to_send_queue.pop(0)
+
+                except AssertionError as error:
+                    print("Error while sending event")
+                    print(error)

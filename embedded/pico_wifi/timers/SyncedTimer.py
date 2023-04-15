@@ -8,12 +8,18 @@ SYNC_SUSPICIOUS = "SYNC_SUSPICIOUS"
 
 class TimerSyncResponse:
     def __init__(
-        self, result: str, offset: int, avg_offset: float, new_clock_offset: int
+        self,
+        result: str,
+        offset: int,
+        avg_offset: float,
+        new_clock_offset: int,
+        clock_adjusted_pico_timestamp: int | None,
     ):
         self.result = result
         self.offset = offset
         self.avg_offset = avg_offset
         self.new_clock_offset = new_clock_offset
+        self.clock_adjusted_pico_timestamp = clock_adjusted_pico_timestamp
 
 
 class SyncedTimer(AbstractTimer):
@@ -39,14 +45,14 @@ class SyncedTimer(AbstractTimer):
             if previous_offsets_count > 5:
                 print("Assuming it's not representative. No time adjustments.")
                 return TimerSyncResponse(
-                    SYNC_DROPPED, offset, avg_offset, self.clock_offset
+                    SYNC_DROPPED, offset, avg_offset, self.clock_offset, None
                 )
 
             self.clock_offset = self.clock_offset + offset
 
             print("New offset is ", str(self.clock_offset), "\n")
             return TimerSyncResponse(
-                SYNC_SUCCESS, offset, avg_offset, self.clock_offset
+                SYNC_SUCCESS, offset, avg_offset, self.clock_offset, None
             )
 
         # TODO: enter sus mode (request more syncs)
@@ -60,7 +66,7 @@ class SyncedTimer(AbstractTimer):
                         "Suspicious. Avg probably could be trusted more. No time adjustments."
                     )
                     return TimerSyncResponse(
-                        SYNC_SUSPICIOUS, offset, avg_offset, self.clock_offset
+                        SYNC_SUSPICIOUS, offset, avg_offset, self.clock_offset, None
                     )
 
         self.previous_offsets.append((offset))
@@ -74,10 +80,14 @@ class SyncedTimer(AbstractTimer):
         print("Average offset: ", avg_offset)
 
         self.clock_offset = self.clock_offset + int(avg_offset)
+        clock_adjusted_timestamp = self.get_current_local_time()
+
         print("New offset is ", str(self.clock_offset), "\n")
 
-        return TimerSyncResponse(SYNC_SUCCESS, offset, avg_offset, self.clock_offset)
+        return TimerSyncResponse(SYNC_SUCCESS, offset, avg_offset, self.clock_offset, clock_adjusted_timestamp)
 
     def get_current_time(self):
         return time.ticks_ms() - self.clock_offset
 
+    def get_current_local_time(self):
+        return time.ticks_ms()

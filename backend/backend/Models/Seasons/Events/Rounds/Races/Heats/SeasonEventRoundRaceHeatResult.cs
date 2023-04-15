@@ -9,6 +9,9 @@ namespace backend.Models.Seasons.Events.Rounds.Races.Heats
         public Guid CarId { get; set; }
         public Car Car { get; set; }
 
+        public Guid HeatId { get; set; }
+        public SeasonEventRoundRaceHeat Heat { get; set; }
+
         public float[] SectorTimes { get; set; }
         public float FullTime { get; set; }
 

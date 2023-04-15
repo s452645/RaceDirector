@@ -1,0 +1,21 @@
+<div class="p-4">
+  <p>Heats:</p>
+  <div class="flex flex-column" [ngStyle]="{ gap: '2rem' }">
+    <div
+      *ngFor="let heat of raceDto.heats"
+      class="p-4 flex flex-column border-1 border-blue-400 border-round w-4"
+      [ngStyle]="{ gap: '1rem' }"
+    >
+      <div *ngFor="let result of heat.results">
+        <p>
+          {{ result.position + 1 }}. {{ result.car.name }} -
+          {{ result.pointsSummed.toFixed(3) }}
+        </p>
+      </div>
+      <p-button
+        label="Go to heat"
+        (onClick)="goToHeat(heat.id ?? '')"
+      ></p-button>
+    </div>
+  </div>
+</div>
