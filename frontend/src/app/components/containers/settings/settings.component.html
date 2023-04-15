@@ -40,13 +40,6 @@
           class="p-button-sm mt-4"
           [disabled]="newBoardForm.invalid"
         ></button>
-        <button
-          pButton
-          type="button"
-          label="Sync"
-          class="p-button-info p-button-sm mt-4"
-          (click)="createSyncWebSocket()"
-        ></button>
       </div>
     </div>
   </form>
@@ -54,14 +47,20 @@
   <div class="flex flex-column align-items-center mt-8">
     <p-table
       [value]="boards"
-      [tableStyle]="{ 'min-width': '50rem', width: '50%' }"
+      [tableStyle]="{ 'min-width': '50rem', width: '100%' }"
     >
       <ng-template pTemplate="header">
         <tr>
           <th>Type</th>
           <th>Name</th>
           <th>Address</th>
+          <th>Active</th>
+          <th>Connected</th>
+          <th>Last sync date</th>
+          <th>Last sync offset</th>
+          <th>Last sync result</th>
           <th>Sensors</th>
+          <th>Connect</th>
           <th>Delete</th>
         </tr>
       </ng-template>
@@ -70,6 +69,11 @@
           <td>{{ board.typeText }}</td>
           <td>{{ board.name }}</td>
           <td>{{ board.ipAddress }}</td>
+          <td>{{ board.active }}</td>
+          <td>{{ board.connected }}</td>
+          <td>{{ board.lastSyncLocaleDate }}</td>
+          <td>{{ board.lastSyncOffset }}</td>
+          <td>{{ board.lastSyncResult }}</td>
           <td>
             <button
               type="button"
@@ -77,6 +81,15 @@
               pRipple
               icon="pi pi-sitemap"
               (click)="handleOpenSensorsDialog(board.id)"
+            ></button>
+          </td>
+          <td>
+            <button
+              type="button"
+              pButton
+              pRipple
+              icon="pi pi-sync"
+              (click)="connect(board.id)"
             ></button>
           </td>
           <td>
@@ -94,9 +107,9 @@
     <button
       pButton
       type="button"
-      label="Refresh"
-      class="p-button-info mt-4"
-      (click)="refreshBoards()"
+      label="Sync"
+      class="p-button-info p-button-sm mt-4"
+      (click)="createSyncWebSocket()"
     ></button>
   </div>
 </div>

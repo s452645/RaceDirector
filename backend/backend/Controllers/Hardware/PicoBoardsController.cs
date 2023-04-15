@@ -30,6 +30,21 @@ namespace backend.Controllers.Hardware
             return await _picoBoardsService.AddPicoBoard(picoBoardDto);
         }
 
+        // POST: api/PicoBoard/5/connect
+        [HttpPost("{id}/connect")]
+        public async Task<ActionResult<PicoBoardDto>> ConnectPicoBoard(Guid id)
+        {
+            return await _picoBoardsService.ConnectPicoBoard(id);
+        }
+
+        // POST: api/PicoBoard/5/sync-once
+        [HttpPost("{id}/sync-once")]
+        public ActionResult SyncPicoBoardsOnce(Guid id)
+        {
+            _picoBoardsService.RunOnePicoBoardSync(id);
+            return Ok();
+        }
+
         // DELETE: api/PicoBoard/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePicoBoardDto(Guid id)

@@ -1,5 +1,6 @@
 ﻿using backend.Exceptions;
 using backend.Models;
+using backend.Models.Cars;
 using backend.Models.Dtos.Seasons;
 using backend.Models.Dtos.Seasons.Events;
 using Microsoft.EntityFrameworkCore;

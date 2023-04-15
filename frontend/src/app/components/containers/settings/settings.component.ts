@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   PicoBoardDto,
   PicoBoardType,
@@ -6,7 +6,6 @@ import {
 import { BaseContainerComponent } from '../base-container/base-container.component';
 import { AbstractControl, FormGroup, Validators } from '@angular/forms';
 import { SelectItem } from 'primeng/api';
-import { BoardSensorsDetailsComponent } from './board-sensors-details/board-sensors-details.component';
 
 @Component({
   selector: 'app-settings',
@@ -52,6 +51,27 @@ export class SettingsComponent
     this.isSensorsDialogOpen = true;
   }
 
+  public sync(boardId: string): void {
+    this.subscription.add(
+      this.picoBoardsService
+        .syncBoardOnce(boardId)
+        .subscribe(() => this.refreshBoards())
+    );
+  }
+
+  public connect(boardId: string): void {
+    this.subscription.add(
+      this.picoBoardsService
+        .connectBoard(boardId)
+        .subscribe(() => this.refreshBoards())
+    );
+  }
+
+  public createSyncWebSocket(): void {
+    // this.syncDataService.createSyncSocket();
+    // this.syncDataService.createEventsSocket();
+  }
+
   public handleDeleteBoard(boardId: string): void {
     this.subscription.add(
       this.picoBoardsService
@@ -87,7 +107,17 @@ export class SettingsComponent
       this.newBoardForm.get('ipAddress')?.value
     );
 
-    const boardDto = new PicoBoardDto(type, name, ipAddress, []);
+    const boardDto = new PicoBoardDto(
+      type,
+      name,
+      ipAddress,
+      false,
+      false,
+      [],
+      undefined,
+      undefined,
+      undefined
+    );
 
     this.subscription.add(
       this.picoBoardsService.addBoard(boardDto).subscribe(() => {
@@ -129,11 +159,11 @@ export class SettingsComponent
 
   // TODO: sometimes, there is a need to refresh the page before creating the socket
   // .NET doesn't even receive a request then (investigate)
-  public createSyncWebSocket() {
-    // this.webSocketService.createSyncWebSocket();
-    // const s = this.webSocketService.messages.subscribe(msg => {
-    //   console.log('Response from websocket: ' + msg);
-    // });
-    // this.subscription.add(s);
-  }
+  // public createSyncWebSocket() {
+  //   this.webSocketService.createSyncWebSocket('/sync');
+  //   const s = this.webSocketService.messages.subscribe(msg => {
+  //     console.log('Response from websocket: ' + msg);
+  //   });
+  //   this.subscription.add(s);
+  // }
 }

@@ -21,14 +21,14 @@ namespace backend.Controllers.Hardware
         {
             _boardsManager = boardsManager;
         }
-
+/*
         [HttpGet]
         public ActionResult<List<PicoWBoardDto>> GetBoards()
         {
             return Ok(_boardsManager.GetAllBoards());
-        }
+        }*/
 
-        // POST: BoardController/Create
+/*        // POST: BoardController/Create
         [HttpPost("addBoard")]
         public async Task<ActionResult> AddBoard(AddBoardRequest request)
         {
@@ -36,6 +36,6 @@ namespace backend.Controllers.Hardware
             var result = await _boardsManager.AddPicoWBoard(board);
 
             return result ? Ok() : BadRequest();
-        }
+        }*/
     }
 }

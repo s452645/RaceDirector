@@ -45,14 +45,17 @@ class ServerManager:
         print(f"[SYNC] Connection from {client_address}")
         self.pending -= 1
 
-        try:
-            syncer = Syncer(reader, writer)
-            await syncer.run()
+        while True:
+            try:
+                syncer = Syncer(reader, writer)
+                await syncer.run()
 
-        except Exception as e:
-            print("Error while running syncer:")
-            print(e)
-            await self._handle_server_error(writer, e)
+            except Exception as e:
+                print("Unknown Error while running syncer:")
+                print(e.with_traceback)
+
+                # for what?
+                # await self._handle_server_error(writer, e)
 
     async def _handle_event_connection(self, reader, writer):
         client_address = writer.get_extra_info("peername")
@@ -69,7 +72,7 @@ class ServerManager:
             await self._handle_server_error(writer, e)
 
     async def _handle_server_error(self, writer, err):
-        await send(writer, LocalTimer(), "[err]", str(err))
+        # await send(writer, LocalTimer(), "[err]", str(err))
         print("Closing connection")
         writer.close()
         print("Connection closed")

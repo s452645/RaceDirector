@@ -1,6 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { PicoBoardsService } from 'src/app/services/hardware/pico-boards.service';
 import {
   SyncBoardResponse,
   SyncDataService,
@@ -25,25 +24,14 @@ import {
   styleUrls: ['./picos-sync-status.component.css'],
 })
 export class PicosSyncStatusComponent implements OnInit, OnDestroy {
-  // public boards: SyncedPicoWBoardDto[] = [];
+  boardsOffsetDict = new Map<string, string>();
 
   private subscription = new Subscription();
 
-  constructor(
-    private picoBoardsService: PicoBoardsService,
-    private syncDataService: SyncDataService
-  ) {}
+  constructor(private syncDataService: SyncDataService) {}
 
   ngOnInit(): void {
-    // this.subscription.add(
-    //   this.picoBoardsService
-    //     .DEPgetBoards()
-    //     .subscribe(boards =>
-    //       boards.forEach(board =>
-    //         this.boards.push(new SyncedPicoWBoardDto(board))
-    //       )
-    //     )
-    // );
+    this.syncDataService.createSyncSocket();
 
     this.subscription.add(
       this.syncDataService.syncBoardResponses.subscribe(response =>
@@ -56,12 +44,24 @@ export class PicosSyncStatusComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  private processNewSyncResponse(response: SyncBoardResponse): void {
-    // const board = this.boards.find(board => board.id === response.boardId);
-    // if (!board) {
-    //   console.error(`Unrecognized board: ${response.boardId}`);
-    //   return;
-    // }
-    // board.lastOffset = response.currentSyncOffset;
+  getNgClassForOffset(value: string): string {
+    const offset = parseInt(value);
+
+    if (Math.abs(offset) < 10) {
+      return 'text-green-600';
+    }
+
+    if (Math.abs(offset) < 25) {
+      return 'text-yellow-600';
+    }
+
+    return 'text-pink-600';
+  }
+
+  private processNewSyncResponse(response: any): void {
+    this.boardsOffsetDict.set(
+      response.PicoBoardId,
+      response.CurrentSyncOffset?.toString() ?? '??'
+    );
   }
 }

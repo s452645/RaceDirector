@@ -1,123 +1,170 @@
-﻿using System.Text;
-using System.Net.WebSockets;
+﻿using System.Text.Json;
+using backend.Models;
 using backend.Models.Hardware;
-using System.Text.Json;
+using NuGet.Packaging.Signing;
 
 namespace backend.Services.Hardware.Comms
 {
-    public enum SyncBoardResult
+    public interface ITimeSyncObserver
     {
-        SYNC_SUCCESS,
-        SYNC_DROPPED,
-        SYNC_SUSPICIOUS,
-        SYNC_ERROR
+        void Notify(SyncBoardResult syncResult);
     }
-
-    public record SyncBoardResponse
-    (
-        string BoardId,
-        SyncBoardResult Result,
-        int? CurrentSyncOffset,
-        float? LastTenOffsetsAvg,
-        int? NewClockOffset,
-        string? Message
-    );
 
     public class TimeSyncService
     {
-        private WebSocket? _websocket;
-        private TaskCompletionSource<object>? _socketFinishedTcs;
+        private readonly IServiceScopeFactory scopeFactory;
+        private List<ITimeSyncObserver> Observers = new List<ITimeSyncObserver>();
+
+        private List<Task> tasks = new List<Task>();
+
+
+        public TimeSyncService(IServiceScopeFactory scopeFactory)
+        {
+            this.scopeFactory = scopeFactory;
+        }
+
+        public void Register(ITimeSyncObserver observer)
+        {
+            Observers.Add(observer);
+        }
+
+        public void Unregister(ITimeSyncObserver observer)
+        {
+            Observers.Remove(observer);
+        }
+
+        public void StartListening(PicoWBoard board)
+        {
+            tasks.Add(Task.Run(async () => await ListenForSyncs(board)));
+        }
+
+        private async Task ListenForSyncs(PicoWBoard board)
+        {
+            var syncSocket = board.SyncSocket;
+
+            while (true && syncSocket.IsConnected())
+            {
+                try
+                {
+                    var (response, _) = await syncSocket.Receive("[1]");
+
+                    if (response == "ready")
+                    {
+                        var result = await SyncBoard(board);
+                        var timestamp = DateTime.Now;
+
+                        using var scope = scopeFactory.CreateScope();
+                        var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
+
+                        result.PicoBoardId = board.PicoBoardDto.Id;
+
+                        if (result.SyncFinishedTimestamp == null)
+                        {
+                            result.SyncFinishedTimestamp = timestamp;
+                        }
+
+                        db.SyncBoardResults.Add(result);
+                        db.SaveChanges();
+
+                        Observers.ForEach(o => o.Notify(result));
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+        }
+
+
 
         // TODO: make syncing much more error-proof, inform frontend or at least log every problem
         // but always try to have a fallback and continue syncing process
-        public void StartSyncingAll(List<PicoWBoard> boards, WebSocket webSocket, TaskCompletionSource<object> socketFinishedTcs)
+        /*public void StartSyncing(PicoWBoard picoWBoard)
         {
-            if (boards.Any(board => !board.IsConnected()))
-            {
-                Console.WriteLine("Cannot start syncing boards: not all boards are connected.");
-                return;
-            }
-
-            _websocket = webSocket;
-            _socketFinishedTcs = socketFinishedTcs;
-
             var autoEvent = new AutoResetEvent(false);
-
             var stateTimer = new Timer(
-                (stateInfo) => SyncAllBoards(stateInfo, boards),
+                (stateInfo) => CreateSyncTask(picoWBoard),
                 autoEvent, 1000, 30000);
-        }
+        }*/
 
-        private void SyncAllBoards(object? stateInfo, List<PicoWBoard> boards)
+        /*public void CreateSyncTask(PicoWBoard picoWBoard)
         {
-            boards.ForEach(async (board) =>
-            {
-                // TODO: is it blocking the main thread?
-                var task = Task.Run(async () => await SyncBoard(board));
+            var task = Task.Run(async () => await SyncBoard(picoWBoard));
 
-                if (task.Wait(TimeSpan.FromSeconds(10)))
+            if (task.Wait(TimeSpan.FromSeconds(10)))
+            {
+                var timestamp = DateTime.Now;
+
+                using var scope = scopeFactory.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
+
+                var result = task.Result;
+                result.PicoBoardId = picoWBoard.PicoBoardDto.Id;
+
+                if (result.SyncFinishedTimestamp == null)
                 {
-                    SyncBoardResponse response = task.Result;
-                    var responseBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(response));
-                    var byteArraySegment = new ArraySegment<byte>(responseBytes, 0, responseBytes.Length);
-
-                    if (_websocket != null)
-                    {
-                        await _websocket.SendAsync(
-                            byteArraySegment,
-                            WebSocketMessageType.Text,
-                            true,
-                            CancellationToken.None
-                        );
-                    }
+                    result.SyncFinishedTimestamp = timestamp;
                 }
-            });
-        }
 
-        async private Task<SyncBoardResponse> SyncBoard(PicoWBoard picoWBoard)
-        {
-            var syncSocket = picoWBoard.SyncSocket;
+                db.SyncBoardResults.Add(result);
+                db.SaveChanges();
 
-            if (!syncSocket.IsConnected())
-            {
-                var msg = $"Sync board failed: Pico W Board [{picoWBoard.Id}] is not connected.";
-                return new SyncBoardResponse(picoWBoard.Id, SyncBoardResult.SYNC_ERROR, null, null, null, msg);
+                Observers.ForEach(o => o.Notify(result));
             }
+            // else timeout error in db?
+        }*/
+
+        private async Task<SyncBoardResult> SyncBoard(PicoWBoard picoBoard)
+        {
+            var syncSocket = picoBoard.SyncSocket;
 
             try
             {
-                _ = await syncSocket.Send("[-]", "sync");
-                var (response, _) = await syncSocket.Receive("[1]");
-
-                if (!response.Equals("ready"))
-                {
-                    var msg = $"Sync board failed: Pico W Board [{picoWBoard.Id}] sent an unexpected request";
-                    return new SyncBoardResponse(picoWBoard.Id, SyncBoardResult.SYNC_ERROR, null, null, null, msg);
-                }
-
                 Thread.Sleep(100);
 
                 var t1 = await syncSocket.Send("[1]", "-");
+
+                _ = await syncSocket.Receive("[ready-2]");
+
                 await syncSocket.Send("[2]", t1.ToString());
 
                 var (_, t4) = await syncSocket.Receive("[2]");
                 await syncSocket.Send("[3]", t4.ToString());
 
                 var (results, _) = await syncSocket.Receive("[3]");
-                var deserialized = JsonSerializer.Deserialize<SyncBoardResponse>(results);
+                var deserialized = JsonSerializer.Deserialize<SyncBoardResult>(results);
 
                 if (deserialized == null)
                 {
-                    return new SyncBoardResponse(picoWBoard.Id, SyncBoardResult.SYNC_ERROR, null, null, null, "Could not deserialize sync results.");
+                    var timestamp = DateTime.Now;
+                    var result = new SyncBoardResult();
+
+                    result.PicoBoardId = picoBoard.PicoBoardDto.Id;
+                    result.SyncResult = SyncResult.SYNC_ERROR;
+                    result.Message = "Could not deserialize sync results";
+                    result.SyncFinishedTimestamp = timestamp;
+
+                    return result;
                 }
 
                 return deserialized;
             }
             catch (Exception e)
             {
+                var timestamp = DateTime.Now;
+
                 Console.WriteLine("Error while syncing");
                 Console.WriteLine(e.ToString());
-                return new SyncBoardResponse(picoWBoard.Id, SyncBoardResult.SYNC_ERROR, null, null, null, $"Unexpected error: {e.ToString()}");
+
+                var result = new SyncBoardResult();
+
+                result.PicoBoardId = picoBoard.PicoBoardDto.Id;
+                result.SyncResult = SyncResult.SYNC_ERROR;
+                result.Message = $"Unexpected error: {e.ToString()}";
+                result.SyncFinishedTimestamp = timestamp;
+
+                return result;
             }
         }
     }

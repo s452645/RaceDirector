@@ -143,6 +143,31 @@ namespace backend.Migrations
                     b.ToTable("Series");
                 });
 
+            modelBuilder.Entity("backend.Models.Hardware.BoardEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Broken")
+                        .HasColumnType("bit");
+
+                    b.Property<long>("PicoLocalTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ReceivedTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("SensorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SensorId");
+
+                    b.ToTable("BoardEvents");
+                });
+
             modelBuilder.Entity("backend.Models.Hardware.BreakBeamSensor", b =>
                 {
                     b.Property<Guid>("Id")
@@ -172,6 +197,12 @@ namespace backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("Active")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Connected")
+                        .HasColumnType("bit");
+
                     b.Property<string>("IPAddress")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -186,6 +217,43 @@ namespace backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PicoBoards");
+                });
+
+            modelBuilder.Entity("backend.Models.Hardware.SyncBoardResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<long?>("ClockAdjustedPicoTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CurrentSyncOffset")
+                        .HasColumnType("bigint");
+
+                    b.Property<float?>("LastTenOffsetsAvg")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long?>("NewClockOffset")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("PicoBoardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("SyncFinishedTimestamp")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("SyncResult")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PicoBoardId");
+
+                    b.ToTable("SyncBoardResults");
                 });
 
             modelBuilder.Entity("backend.Models.Misc.Photo", b =>
@@ -358,14 +426,14 @@ namespace backend.Migrations
                     b.Property<float>("FullTime")
                         .HasColumnType("real");
 
+                    b.Property<Guid>("HeatId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<float>("PointsSummed")
                         .HasColumnType("real");
 
                     b.Property<int>("Position")
                         .HasColumnType("int");
-
-                    b.Property<Guid?>("SeasonEventRoundRaceHeatId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("SectorTimes")
                         .IsRequired()
@@ -378,7 +446,7 @@ namespace backend.Migrations
 
                     b.HasIndex("CarId");
 
-                    b.HasIndex("SeasonEventRoundRaceHeatId");
+                    b.HasIndex("HeatId");
 
                     b.ToTable("SeasonEventRoundRaceHeatResults");
                 });
@@ -799,6 +867,17 @@ namespace backend.Migrations
                     b.Navigation("Series");
                 });
 
+            modelBuilder.Entity("backend.Models.Hardware.BoardEvent", b =>
+                {
+                    b.HasOne("backend.Models.Hardware.BreakBeamSensor", "Sensor")
+                        .WithMany()
+                        .HasForeignKey("SensorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sensor");
+                });
+
             modelBuilder.Entity("backend.Models.Hardware.BreakBeamSensor", b =>
                 {
                     b.HasOne("backend.Models.Hardware.PicoBoard", "Board")
@@ -808,6 +887,17 @@ namespace backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Board");
+                });
+
+            modelBuilder.Entity("backend.Models.Hardware.SyncBoardResult", b =>
+                {
+                    b.HasOne("backend.Models.Hardware.PicoBoard", "PicoBoard")
+                        .WithMany("SyncBoardResults")
+                        .HasForeignKey("PicoBoardId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PicoBoard");
                 });
 
             modelBuilder.Entity("backend.Models.Misc.Photo", b =>
@@ -862,11 +952,15 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", null)
+                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", "Heat")
                         .WithMany("Results")
-                        .HasForeignKey("SeasonEventRoundRaceHeatId");
+                        .HasForeignKey("HeatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Car");
+
+                    b.Navigation("Heat");
                 });
 
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", b =>
@@ -1061,6 +1155,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Hardware.PicoBoard", b =>
                 {
                     b.Navigation("BreakBeamSensors");
+
+                    b.Navigation("SyncBoardResults");
                 });
 
             modelBuilder.Entity("backend.Models.Owners.Owner", b =>

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { BackendService } from '../backend.service';
+import { SyncBoardResult } from './sync-data.service';
 
 export enum PicoBoardType {
   USB,
@@ -24,7 +25,13 @@ export class PicoBoardDto {
     public type: PicoBoardType,
     public name: string,
     public ipAddress: string,
-    public breakBeamSensors: BreakBeamSensorDto[]
+    public active: boolean,
+    public connected: boolean,
+    public breakBeamSensors: BreakBeamSensorDto[],
+
+    public lastSyncDateTime: Date | undefined,
+    public lastSyncOffset: number | undefined,
+    public lastSyncResult: SyncBoardResult | undefined
   ) {}
 
   public static fromPayload(payload: PicoBoardDto): PicoBoardDto {
@@ -32,7 +39,12 @@ export class PicoBoardDto {
       payload.type,
       payload.name,
       payload.ipAddress,
-      payload.breakBeamSensors
+      payload.active,
+      payload.connected,
+      payload.breakBeamSensors,
+      new Date(`${payload.lastSyncDateTime}`),
+      payload.lastSyncOffset,
+      payload.lastSyncResult
     );
 
     board.id = payload.id;
@@ -42,6 +54,14 @@ export class PicoBoardDto {
   public get typeText(): string {
     if (this.type === PicoBoardType.USB) return 'USB';
     else if (this.type === PicoBoardType.WiFi) return 'WiFi';
+
+    return 'Unknown';
+  }
+
+  public get lastSyncLocaleDate(): string {
+    if (this.lastSyncDateTime) {
+      return this.lastSyncDateTime.toLocaleTimeString();
+    }
 
     return 'Unknown';
   }
@@ -66,6 +86,14 @@ export class PicoBoardsService {
       URL,
       picoBoardDto
     );
+  }
+
+  public connectBoard(picoBoardId: string): Observable<PicoBoardDto> {
+    return this.backendService.post(`${URL}/${picoBoardId}/connect`, null);
+  }
+
+  public syncBoardOnce(picoBoardId: string): Observable<void> {
+    return this.backendService.post(`${URL}/${picoBoardId}/sync-once`, null);
   }
 
   public deleteBoard(picoBoardId: string): Observable<void> {

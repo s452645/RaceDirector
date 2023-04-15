@@ -25,7 +25,7 @@ class SocketController:
             time.sleep(0.1)
 
     def send(self, data):
-        self.connection.send(data.encode())
+        self.connection.send(str(data).encode())
 
     def exit(self):
         self.connected = False

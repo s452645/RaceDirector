@@ -26,6 +26,8 @@ async def recv(
 
     data = request.split("->")
     if data[0] != expected_param:
+        print(f"Recv failed: expected {expected_param} param, got {data[0]}")
+
         raise (
             AssertionError(
                 f"Recv failed: expected {expected_param} param, got {data[0]}"

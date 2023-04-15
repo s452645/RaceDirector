@@ -1,0 +1,56 @@
+<div class="pl-4 flex flex-column" [ngStyle]="{ gap: '2rem' }">
+  <div *ngFor="let result of heatDto.results">
+    <p>Car: {{ result.car.name }}</p>
+    <p>Position: {{ result.position }}</p>
+    <p>Sector times: {{ displaySectorTimes(result.sectorTimes) }}</p>
+    <p>Full time: {{ result.fullTime.toFixed(3) }}</p>
+    <p>Time points: {{ result.timePoints.toFixed(3) }}</p>
+    <p>Advantage points: {{ result.advantagePoints.toFixed(3) }}</p>
+    <p>Distance points: {{ result.distancePoints.toFixed(3) }}</p>
+    <p>Bonuses: {{ displayBonuses(result.bonuses) }}</p>
+    <p class="text-xl">Total points: {{ result.pointsSummed.toFixed(3) }}</p>
+  </div>
+
+  <div class="flex flex-column">
+    <div class="flex-auto">
+      <label class="mb-2 block" for="distance">Distance</label>
+      <p-inputNumber
+        [(ngModel)]="distance"
+        inputId="distance"
+        mode="decimal"
+        [minFractionDigits]="2"
+      ></p-inputNumber>
+    </div>
+  </div>
+
+  <div>
+    <p>Bonuses</p>
+    <div class="flex" [ngStyle]="{ gap: '1rem' }">
+      <div *ngFor="let bonusOption of bonusesOptions" class="field-checkbox">
+        <p-checkbox
+          name="group"
+          [value]="bonusOption.value"
+          [(ngModel)]="selectedBonuses"
+          [inputId]="bonusOption.value"
+        ></p-checkbox>
+        <label [for]="bonusOption.value">{{ bonusOption.label }}</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex" [ngStyle]="{ gap: '1rem' }">
+    <p-button
+      label="Previous heat"
+      styleClass="p-button-secondary"
+      (onClick)="goToPrevious()"
+    ></p-button>
+    <p-button label="Start" (onClick)="startHeat()"></p-button>
+    <p-button label="Save" (onClick)="save()"></p-button>
+    <p-button label="End" (onClick)="endHeat()"></p-button>
+    <p-button
+      label="Next heat"
+      styleClass="p-button-secondary"
+      (onClick)="goToNext()"
+    ></p-button>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { Observable, Subscription, map, mergeMap, of } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, Subscription, first, map, mergeMap, of } from 'rxjs';
 import {
   CircuitDto,
   CircuitService,
@@ -67,7 +67,8 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
     private seasonsService: SeasonsService,
     private utils: UtilsService,
     private circuitService: CircuitService,
-    private roundsService: SeasonEventRoundsService
+    private roundsService: SeasonEventRoundsService,
+    private router: Router
   ) {
     this.seasonIdNullable = this.route.snapshot.paramMap.get('seasonId');
     this.seasonEventIdNullable = this.route.snapshot.paramMap.get('eventId');
@@ -135,6 +136,22 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
           this.newRoundFormCmp.isSubmitButtonLoading = false;
           this.isNewRoundFormOpen = false;
         })
+    );
+  }
+
+  goToFirstRound(): void {
+    this.subscription.add(
+      this.roundsService.getRounds(this.seasonEventId).subscribe(rounds => {
+        const firstRound = rounds.find(r => r.order === 0);
+
+        if (firstRound === undefined) {
+          return;
+        }
+
+        this.router.navigate([`rounds/${firstRound?.id}`], {
+          relativeTo: this.route,
+        });
+      })
     );
   }
 

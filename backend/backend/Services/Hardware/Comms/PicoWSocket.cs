@@ -2,7 +2,7 @@
 using System.Net;
 using System.Text;
 
-namespace backend.Models.Hardware
+namespace backend.Services.Hardware.Comms
 {
     public class PicoWSocket
     {
@@ -11,10 +11,10 @@ namespace backend.Models.Hardware
         private Socket? _socket;
 
 
-        public string BoardId { get; }
+        public Guid BoardId { get; }
         public readonly string Address;
 
-        public PicoWSocket(string boardId, string address, int port)
+        public PicoWSocket(Guid boardId, string address, int port)
         {
             BoardId = boardId;
             Address = address;
@@ -25,8 +25,8 @@ namespace backend.Models.Hardware
         {
             try
             {
-                IPAddress parsedAddress = IPAddress.Parse(this.Address);
-                IPEndPoint ipEndPoint = new IPEndPoint(parsedAddress, this._port);
+                IPAddress parsedAddress = IPAddress.Parse(Address);
+                IPEndPoint ipEndPoint = new IPEndPoint(parsedAddress, _port);
 
                 _socket = new Socket(ipEndPoint.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
                 await _socket.ConnectAsync(ipEndPoint);
@@ -44,12 +44,12 @@ namespace backend.Models.Hardware
 
         public bool IsConnected()
         {
-            return (this._socket != null) && (this._socket.Connected);
+            return _socket != null && _socket.Connected;
         }
 
         public async Task<long> Send(string Param, string Message)
         {
-            if (!this.IsConnected())
+            if (!IsConnected())
             {
                 return 0;
             }
@@ -59,7 +59,7 @@ namespace backend.Models.Hardware
             var msgBytes = Encoding.UTF8.GetBytes(msg);
 
             var timestamp = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds();
-            await this._socket!.SendAsync(msgBytes, SocketFlags.None);
+            await _socket!.SendAsync(msgBytes, SocketFlags.None);
             Console.WriteLine($"Sent {msg}");
 
             return timestamp;
@@ -68,16 +68,16 @@ namespace backend.Models.Hardware
 
         public async Task<Tuple<string, long>> Receive(string ExpectedParam)
         {
-            if (!this.IsConnected())
+            if (!IsConnected())
             {
-                Console.WriteLine($"[Pico_W-{this.BoardId}] Receive failed: socket is null or not connected");
+                Console.WriteLine($"[Pico_W-{BoardId}] Receive failed: socket is null or not connected");
                 throw new SocketException();
             }
 
-            var receivedByteCount = await _socket!.ReceiveAsync(this._buffer, SocketFlags.None);
+            var receivedByteCount = await _socket!.ReceiveAsync(_buffer, SocketFlags.None);
             var timestamp = ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds();
 
-            var received = Encoding.UTF8.GetString(this._buffer, 0, receivedByteCount);
+            var received = Encoding.UTF8.GetString(_buffer, 0, receivedByteCount);
             Console.WriteLine($"Received {received}");
 
             var splitted = received.Split("->");
@@ -85,7 +85,7 @@ namespace backend.Models.Hardware
 
             if (!ExpectedParam.Equals(param))
             {
-                Console.WriteLine($"[Pico_W-{this.BoardId}] Receive failed: was expecting {ExpectedParam} param, got {param}.");
+                Console.WriteLine($"[Pico_W-{BoardId}] Receive failed: was expecting {ExpectedParam} param, got {param}.");
                 throw new SocketException();
             }
 
