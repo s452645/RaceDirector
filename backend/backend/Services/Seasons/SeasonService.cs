@@ -3,6 +3,7 @@ using backend.Models;
 using backend.Models.Cars;
 using backend.Models.Dtos.Seasons;
 using backend.Models.Dtos.Seasons.Events;
+using backend.Models.Seasons.Events;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services.Seasons
@@ -112,6 +113,27 @@ namespace backend.Services.Seasons
 
             await _context.SaveChangesAsync();
             return seasonEvent;
+        }
+
+        public async Task<SeasonEventDto> UpdateSeasonEvent(Guid seasonId, SeasonEventDto newEventDto)
+        {
+            var season = await _context.Seasons.Include(s => s.Events).FirstOrDefaultAsync(s => s.Id == seasonId);
+            if (season == null)
+            {
+                throw new NotFoundException($"Season [{seasonId}] not found");
+            }
+
+            var existingSeasonEvent = season.Events.Find(e => e.Id == newEventDto.Id);
+            if (existingSeasonEvent == null)
+            {
+                throw new NotFoundException($"Season event [{newEventDto.Id}] not found in season [{seasonId}]");
+            }
+
+            newEventDto.ToEntity(existingSeasonEvent);
+            _context.SeasonEvents.Update(existingSeasonEvent);
+            await _context.SaveChangesAsync();
+
+            return new SeasonEventDto(existingSeasonEvent);
         }
 
         public async Task<SeasonEventDto> DeleteSeasonEvent(Guid seasonId, Guid seasonEventId)

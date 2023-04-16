@@ -67,6 +67,13 @@ namespace backend.Controllers.Seasons
             return Ok(createdEvent);
         }
 
+        [HttpPut("{seasonId}/season-events")]
+        public async Task<ActionResult<SeasonEventDto>> UpdateSeasonEvent(Guid seasonId, SeasonEventDto seasonEvent)
+        {
+            var updatedEvent = await _seasonService.UpdateSeasonEvent(seasonId, seasonEvent);
+            return Ok(updatedEvent);
+        }
+
         [HttpDelete("{seasonId}/season-events/{seasonEventId}")]
         public async Task<ActionResult<SeasonEventDto>> DeleteSeasonEvent(Guid seasonId, Guid seasonEventId)
         {
