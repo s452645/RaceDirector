@@ -159,18 +159,11 @@ namespace backend.Services.Seasons
 
         public async Task<SeasonEventDto> AddScoreRules(Guid seasonEventId, SeasonEventScoreRulesDto scoreRulesDto)
         {
-            var seasonEvent = _context.SeasonEvents.Include(se => se.ScoreRules).FirstOrDefault(se => se.Id == seasonEventId);
-
-            if (seasonEvent == null)
-            {
-                throw new NotFoundException($"Adding Score Rules for Season Event [{seasonEventId}] failed: Season Event not found");
-            }
+            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId);
 
             if (seasonEvent.ScoreRules != null)
             {
-                throw new BadRequestException(
-                    $"Adding Score Rules for SeasonEvent [{seasonEvent.Name}] failed: Score Rules [{seasonEvent.ScoreRules.Id}] are already assinged"
-                );
+                _context.SeasonEventScoreRules.Remove(seasonEvent.ScoreRules);
             }
 
             var scoreRules = scoreRulesDto.ToEntity();
@@ -180,6 +173,23 @@ namespace backend.Services.Seasons
             await _context.SaveChangesAsync();
 
             return new SeasonEventDto(seasonEvent);
+        }
+
+        private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId)
+        {
+            return await GetSeasonEventOrThrow(seasonEventId, $"Season Event [{seasonEventId}] not found");
+        }
+
+        private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId, string errorMessage)
+        {
+            var seasonEvent = await _context.SeasonEvents.Include(se => se.ScoreRules).FirstOrDefaultAsync(se => se.Id == seasonEventId);
+
+            if (seasonEvent == null)
+            {
+                throw new NotFoundException(errorMessage);
+            }
+
+            return seasonEvent;
         }
     }
 }

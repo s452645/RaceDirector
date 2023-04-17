@@ -36,6 +36,14 @@ namespace backend.Controllers.Seasons.Events.Rounds
             return await _roundsService.AddSeasonEventRound(seasonEventId, roundDto);
         }
 
+        // PUT: api/SeasonEventRounds
+        [HttpPut]
+        public async Task<ActionResult<SeasonEventRoundDto>> UpdateRound([FromQuery] Guid seasonEventId, [FromBody] SeasonEventRoundDto roundDto)
+        {
+            return await _roundsService.UpdateSeasonEventRound(seasonEventId, roundDto);
+        }
+
+
         // POST: api/SeasonEventRounds
         [HttpPost("{id}/draw")]
         public async Task<ActionResult<SeasonEventRoundDto>> DrawRaces(Guid id)

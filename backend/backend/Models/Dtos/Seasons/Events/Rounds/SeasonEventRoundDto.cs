@@ -65,8 +65,8 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds
             Order = seasonEventRound.Order;
             ParticipantsCount = seasonEventRound.ParticipantsCount;
             Type = seasonEventRound.Type;
-            ParticipantsIds = seasonEventRound.Participants.Select(p => p.Id).ToList();
-            Races = seasonEventRound.Races.Select(race => new SeasonEventRoundRaceDto(race)).ToList();
+            ParticipantsIds = seasonEventRound.Participants?.Select(p => p.Id).ToList() ?? new();
+            Races = seasonEventRound.Races?.Select(race => new SeasonEventRoundRaceDto(race)).ToList() ?? new();
             PointsStrategy = seasonEventRound.PointsStrategy;
             DroppedCarsPositionDefinementStrategy = seasonEventRound.DroppedCarsPositionDefinementStrategy;
             DroppedCarsPointsStrategy = seasonEventRound.DroppedCarsPointsStrategy;
@@ -84,23 +84,28 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds
             var round = new SeasonEventRound
             {
                 Id = Id,
-                ParticipantsCount = ParticipantsCount,
-                Order = Order,
-                Type = Type,
-
-                // dont map participants? make CarDto and then map?
-                // remove participants Ids as they will be added later?
-                // or maybe learn how to initialize lists in ef entities? xD
-                Participants = new List<Car>(),
-
-                Races = Races.Select(race => race.ToEntity()).ToList(),
-
-                PointsStrategy = PointsStrategy,
-                DroppedCarsPositionDefinementStrategy = DroppedCarsPositionDefinementStrategy,
-                DroppedCarsPointsStrategy = DroppedCarsPointsStrategy
             };
 
-            return round;
+            return ToEntity(round);
+        }
+
+        public SeasonEventRound ToEntity(SeasonEventRound entity)
+        {
+            entity.ParticipantsCount = ParticipantsCount;
+            entity.Order = Order;
+            entity.Type = Type;
+
+            // dont map participants? make CarDto and then map?
+            // remove participants Ids as they will be added later?
+            // or maybe learn how to initialize lists in ef entities? xD
+            entity.Participants = new List<Car>();
+
+            entity.Races = Races.Select(race => race.ToEntity()).ToList();
+            entity.PointsStrategy = PointsStrategy;
+            entity.DroppedCarsPositionDefinementStrategy = DroppedCarsPositionDefinementStrategy;
+            entity.DroppedCarsPointsStrategy = DroppedCarsPointsStrategy;
+
+            return entity;
         }
     }
 }

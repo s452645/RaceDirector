@@ -1,10 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription, mergeMap, of } from 'rxjs';
-import {
-  CircuitDto,
-  CircuitService,
-} from 'src/app/services/seasons/events/circuit.service';
 import { RouteTitleService } from 'src/app/services/route-title.service';
 import {
   SeasonEventDto,
@@ -12,13 +8,11 @@ import {
   SeasonsService,
 } from 'src/app/services/seasons/seasons.service';
 import { UtilsService } from 'src/app/services/utils.service';
-import { CircuitFormComponent } from '../../circuit/circuit-form/circuit-form.component';
-import { SeasonEventScoreRulesFormComponent } from './season-event-score-rules-form/season-event-score-rules-form.component';
 import {
   SeasonEventRoundDto,
   SeasonEventRoundsService,
 } from 'src/app/services/seasons/events/rounds/season-event-rounds.service';
-import { RoundFormComponent } from '../season-event-round/round-form/round-form.component';
+import { SeasonEventScoreRulesFormComponent } from './season-event-score-rules-form/season-event-score-rules-form.component';
 
 @Component({
   selector: 'app-season-event',
@@ -26,14 +20,8 @@ import { RoundFormComponent } from '../season-event-round/round-form/round-form.
   styleUrls: ['./season-event.component.css'],
 })
 export class SeasonEventComponent implements OnInit, OnDestroy {
-  @ViewChild(CircuitFormComponent, { static: true })
-  private circuitFormCmp!: CircuitFormComponent;
-
   @ViewChild(SeasonEventScoreRulesFormComponent, { static: true })
   private scoreRulesFormCmp!: SeasonEventScoreRulesFormComponent;
-
-  @ViewChild(RoundFormComponent, { static: true })
-  private newRoundFormCmp!: RoundFormComponent;
 
   private seasonIdNullable: string | null = null;
   private seasonEventIdNullable: string | null = null;
@@ -54,19 +42,19 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
 
   isCircuitFormOpen = false;
   isScoreRulesFormOpen = false;
-  isNewRoundFormOpen = false;
+  isRoundFormOpen = false;
 
   nextRoundParticipantsCount = 0;
   nextRoundOrder = 0;
 
-  rounds: SeasonEventRoundDto[] = [];
+  public rounds: SeasonEventRoundDto[] = [];
+  public chosenRound: SeasonEventRoundDto | undefined;
 
   constructor(
     private route: ActivatedRoute,
     private routeTitleService: RouteTitleService,
     private seasonsService: SeasonsService,
     private utils: UtilsService,
-    private circuitService: CircuitService,
     private roundsService: SeasonEventRoundsService,
     private router: Router
   ) {
@@ -92,24 +80,39 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
   }
 
   handleOpenNewRoundForm(): void {
+    this.chosenRound = undefined;
+
     this.subscription.add(
       this.getNewRoundParticipantsCount().subscribe(count => {
         this.nextRoundParticipantsCount = count;
-
-        this.newRoundFormCmp.refreshForm();
-        this.isNewRoundFormOpen = true;
+        this.isRoundFormOpen = true;
       })
     );
   }
 
-  handleSubmittedCircuit(circuit: CircuitDto): void {
+  handleEnterRound(roundId: string) {
+    this.router.navigate([`rounds/${roundId}`], {
+      relativeTo: this.route,
+    });
+  }
+
+  handleEditRound(roundId: string) {
+    this.chosenRound = this.utils.getUndefinedableOrThrow(
+      this.rounds.find(r => r.id === roundId)
+    );
+
+    this.nextRoundParticipantsCount = this.chosenRound.participantsCount;
+    this.nextRoundOrder = this.chosenRound.order;
+
+    this.isRoundFormOpen = true;
+  }
+
+  handleDeleteRound(roundId: string) {
     this.subscription.add(
-      this.circuitService
-        .addCircuit(this.seasonEventId, circuit)
-        .subscribe(() => this.refreshData())
-        .add(() => {
-          this.circuitFormCmp.isSubmitButtonLoading = false;
-          this.isCircuitFormOpen = false;
+      this.roundsService
+        .deleteRound(this.seasonEventId, roundId)
+        .subscribe(() => {
+          this.refreshData();
         })
     );
   }
@@ -126,37 +129,9 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
     );
   }
 
-  handleSubmittedRound(round: SeasonEventRoundDto): void {
-    this.subscription.add(
-      this.roundsService
-        .addRound(this.seasonEventId, round)
-        .subscribe(() => this.refreshData())
-        .add(() => {
-          this.newRoundFormCmp.isSubmitButtonLoading = false;
-          this.isNewRoundFormOpen = false;
-        })
-    );
-  }
-
-  goToFirstRound(): void {
-    this.subscription.add(
-      this.roundsService.getRounds(this.seasonEventId).subscribe(rounds => {
-        const firstRound = rounds.find(r => r.order === 0);
-
-        if (firstRound === undefined) {
-          return;
-        }
-
-        this.router.navigate([`rounds/${firstRound?.id}`], {
-          relativeTo: this.route,
-        });
-      })
-    );
-  }
-
   closeDialog(refreshData: boolean) {
     this.isCircuitFormOpen = false;
-    this.isNewRoundFormOpen = false;
+    this.isRoundFormOpen = false;
     this.isScoreRulesFormOpen = false;
 
     if (refreshData) {

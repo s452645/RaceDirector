@@ -54,11 +54,14 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races
             Id = race.Id;
             Order = race.Order;
             ParticipantsCount = race.ParticipantsCount;
-            Results = race.Results.Select(r => new SeasonEventRoundRaceResultDto(r)).ToList();
-            Heats = race.Heats.Select(h => new SeasonEventRoundRaceHeatDto(h)).ToList();
+         
+            // TODO: deal with not-included relationships better
+            Results = race.Results?.Select(r => new SeasonEventRoundRaceResultDto(r)).ToList() ?? new();
+            Heats = race.Heats?.Select(h => new SeasonEventRoundRaceHeatDto(h)).ToList() ?? new();
+            
             InstantAdvancements = race.InstantAdvancements;
             SecondChances = race.SecondChances;
-            RoundId = race.Round.Id;
+            RoundId = race.Round?.Id ?? Guid.Empty;
         }
 
         public SeasonEventRoundRace ToEntity()

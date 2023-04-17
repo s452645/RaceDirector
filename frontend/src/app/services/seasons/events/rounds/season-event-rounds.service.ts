@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { BackendService } from 'src/app/services/backend.service';
 
 export enum RoundType {
@@ -105,6 +105,39 @@ export class SeasonEventRoundDto {
     public seasonEventId: string | undefined,
     public advancesCount: number | undefined
   ) {}
+
+  public static fromPayload(payload: any): SeasonEventRoundDto {
+    const round = new SeasonEventRoundDto(
+      payload.order,
+      payload.type,
+      payload.participantsCount,
+      payload.participantsIds,
+      payload.races,
+      payload.pointsStrategy,
+      payload.droppedCarsPositionDefinementStrategy,
+      payload.droppedCarsPointsStrategy,
+      payload.seasonEventId,
+      payload.advancesCount
+    );
+
+    round.id = payload.id;
+    return round;
+  }
+
+  get typeText(): string {
+    switch (this.type) {
+      case RoundType.Ladder:
+        return 'Ladder';
+      case RoundType.Group:
+        return 'Group';
+      case RoundType.ClassicFinal:
+        return 'Classic Final';
+      case RoundType.CandidateFinal:
+        return 'Candidate Final';
+      default:
+        return 'Unknown';
+    }
+  }
 }
 
 @Injectable({
@@ -114,41 +147,54 @@ export class SeasonEventRoundsService {
   constructor(private backendService: BackendService) {}
 
   public getRounds(seasonEventId: string): Observable<SeasonEventRoundDto[]> {
-    return this.backendService.get<SeasonEventRoundDto[]>(
-      `${URL}?seasonEventId=${seasonEventId}`
-    );
+    return this.backendService
+      .get<SeasonEventRoundDto[]>(`${URL}?seasonEventId=${seasonEventId}`)
+      .pipe(
+        map(rounds =>
+          rounds.map(round => SeasonEventRoundDto.fromPayload(round))
+        )
+      );
   }
 
   public getRound(
     seasonEventId: string,
     roundId: string
   ): Observable<SeasonEventRoundDto> {
-    return this.backendService.get<SeasonEventRoundDto>(
-      `${URL}/${roundId}?seasonEventId=${seasonEventId}`
-    );
+    return this.backendService
+      .get<SeasonEventRoundDto>(
+        `${URL}/${roundId}?seasonEventId=${seasonEventId}`
+      )
+      .pipe(map(round => SeasonEventRoundDto.fromPayload(round)));
   }
 
   public addRound(
     seasonEventId: string,
     roundDto: SeasonEventRoundDto
   ): Observable<SeasonEventRoundDto> {
-    return this.backendService.post<SeasonEventRoundDto, SeasonEventRoundDto>(
-      `${URL}?seasonEventId=${seasonEventId}`,
-      roundDto
-    );
+    return this.backendService
+      .post<SeasonEventRoundDto, SeasonEventRoundDto>(
+        `${URL}?seasonEventId=${seasonEventId}`,
+        roundDto
+      )
+      .pipe(map(round => SeasonEventRoundDto.fromPayload(round)));
+  }
+
+  public updateRound(
+    seasonEventId: string,
+    roundDto: SeasonEventRoundDto
+  ): Observable<SeasonEventRoundDto> {
+    return this.backendService
+      .put(`${URL}?seasonEventId=${seasonEventId}`, roundDto)
+      .pipe(map(round => SeasonEventRoundDto.fromPayload(round)));
   }
 
   public drawRaces(roundId: string): Observable<SeasonEventRoundDto> {
-    return this.backendService.post<unknown, SeasonEventRoundDto>(
-      `${URL}/${roundId}/draw`,
-      null
-    );
+    return this.backendService
+      .post<unknown, SeasonEventRoundDto>(`${URL}/${roundId}/draw`, null)
+      .pipe(map(round => SeasonEventRoundDto.fromPayload(round)));
   }
 
-  public deleteRound(
-    seasonEventId: string,
-    roundId: string
-  ): Observable<SeasonEventRoundDto> {
+  public deleteRound(seasonEventId: string, roundId: string): Observable<void> {
     return this.backendService.delete(
       `${URL}/${roundId}?seasonEventId=${seasonEventId}`
     );
