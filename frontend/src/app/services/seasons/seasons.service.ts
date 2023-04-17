@@ -62,6 +62,17 @@ export class SeasonEventDto {
     newEvent.id = payload?.id;
     return newEvent;
   }
+
+  get typeText(): string {
+    switch (this.type) {
+      case SeasonEventType.Race:
+        return 'Race';
+      case SeasonEventType.TimeTrial:
+        return 'Time Trial';
+      default:
+        return 'Unknown';
+    }
+  }
 }
 
 @Injectable({

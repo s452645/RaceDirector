@@ -42,10 +42,12 @@
   [resizable]="false"
   [(visible)]="isCircuitFormOpen"
   [style]="{ width: '50vw' }"
+  (onHide)="closeDialog(false)"
 >
   <app-circuit-form
-    [circuitDto]="seasonEvent.circuit"
-    (submittedForm)="handleSubmittedCircuit($event)"
+    [existingCircuit]="seasonEvent.circuit"
+    [seasonEventId]="seasonEventId"
+    (closeSelf)="closeDialog(true)"
   />
 </p-dialog>
 

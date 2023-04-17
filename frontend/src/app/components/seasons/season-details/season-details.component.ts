@@ -104,7 +104,7 @@ export class SeasonDetailsComponent implements OnInit, OnDestroy {
     this.newEventDialogVisible = false;
 
     if (refresh) {
-      this.subscription.add(this.refreshData());
+      this.refreshData();
     }
   }
 

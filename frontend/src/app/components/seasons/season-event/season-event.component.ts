@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subscription, first, map, mergeMap, of } from 'rxjs';
+import { Observable, Subscription, mergeMap, of } from 'rxjs';
 import {
   CircuitDto,
   CircuitService,
@@ -83,7 +83,6 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
   }
 
   handleOpenCircuitForm(): void {
-    this.circuitFormCmp.refreshForm();
     this.isCircuitFormOpen = true;
   }
 
@@ -153,6 +152,16 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
         });
       })
     );
+  }
+
+  closeDialog(refreshData: boolean) {
+    this.isCircuitFormOpen = false;
+    this.isNewRoundFormOpen = false;
+    this.isScoreRulesFormOpen = false;
+
+    if (refreshData) {
+      this.refreshData();
+    }
   }
 
   private refreshData(): void {

@@ -12,6 +12,7 @@
     <ng-template pTemplate="header">
       <tr>
         <th>Name</th>
+        <th>Type</th>
         <th>Start date</th>
         <th>End date</th>
         <th>Enter</th>
@@ -22,6 +23,7 @@
     <ng-template pTemplate="body" let-seasonEvent>
       <tr>
         <td>{{ seasonEvent.name }}</td>
+        <td>{{ seasonEvent.typeText }}</td>
         <td>{{ seasonEvent.startDate.toDateString() }}</td>
         <td>{{ seasonEvent.endDate.toDateString() }}</td>
         <td>
