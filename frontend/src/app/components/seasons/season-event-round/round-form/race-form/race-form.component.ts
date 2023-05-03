@@ -2,9 +2,11 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
@@ -16,7 +18,7 @@ import { UtilsService } from 'src/app/services/utils.service';
   templateUrl: './race-form.component.html',
   styleUrls: ['./race-form.component.css'],
 })
-export class RaceFormComponent implements OnInit, OnDestroy {
+export class RaceFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input()
   suggestedParticipantsCount = 0;
 
@@ -41,6 +43,15 @@ export class RaceFormComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.refreshForm();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      changes['suggestedInstantAdvancements'] ||
+      changes['suggestedSecondChances']
+    ) {
+      this.refreshForm();
+    }
   }
 
   ngOnDestroy(): void {

@@ -1,5 +1,6 @@
 ﻿using backend.Exceptions;
 using backend.Models;
+using backend.Models.Dtos.Seasons.Events;
 using backend.Models.Dtos.Seasons.Events.Rounds;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats;
@@ -48,17 +49,7 @@ namespace backend.Services.Seasons.Events.Rounds
 
         public async Task<SeasonEventRoundDto> AddSeasonEventRound(Guid seasonEventId, SeasonEventRoundDto roundDto)
         {
-            var seasonEvent = await _context
-                .SeasonEvents
-                .Where(seasonEvent => seasonEvent.Id == seasonEventId)
-                .Include(sE => sE.Participants)
-                .FirstOrDefaultAsync();
-
-            if (seasonEvent == null)
-            {
-                throw new NotFoundException($"Failed to add new Season Event Round: Season Event [{seasonEventId}] not found");
-            }
-
+            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId);
             var round = roundDto.ToEntity();
 
             if (seasonEvent.Rounds == null)
@@ -81,20 +72,45 @@ namespace backend.Services.Seasons.Events.Rounds
             return new SeasonEventRoundDto(round);
         }
 
-        public async Task<SeasonEventRoundDto> DeleteSeasonEventRound(Guid seasonEventId, Guid roundId)
+        public async Task<SeasonEventRoundDto> UpdateSeasonEventRound(Guid seasonEventId, SeasonEventRoundDto newRound)
         {
-            var seasonEvent = await _context
-                .SeasonEvents
-                .Where(seasonEvent => seasonEvent.Id == seasonEventId)
-                .Include(seasonEvent => seasonEvent.Rounds)
-                .Include(sE => sE.Participants)
-                .FirstOrDefaultAsync();
-
-            if (seasonEvent == null)
+            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId);
+            var existingRound = seasonEvent.Rounds.Where(r => r.Id == newRound.Id).FirstOrDefault();
+            
+            if (existingRound == null)
             {
-                throw new NotFoundException($"Failed to delete Season Event Round [{roundId}]: Season Event [{seasonEventId}] not found");
+                throw new NotFoundException($"Update Round [{newRound.Id}] failed: Round not found in Season Event [{seasonEventId}]");
             }
 
+            // TODO: potential data loss:
+            // changing/deleting existing round will result in loosing all results from that round!
+            // warn on frontend and make rounds/races anti-cascade delete, e.g. "isDeleted" flag
+
+            // NOTE that if races weren't included in the query, they woundn't be deleted
+            // there is a new empty list of races assigned to entity, but if it wasn't included,
+            // it would be null anyway and EF wouldn't know that it has to delete anything
+            // Of course, just not deleting them lead to errors (adding more and more races, not replacing them)
+
+            // need to do it explicitely anyways (to allow re-adding the same races with the same ids)
+            _context.SeasonEventRoundRaces.RemoveRange(existingRound.Races);
+            await _context.SaveChangesAsync();
+
+            newRound.ToEntity(existingRound);
+            _context.SeasonEventRoundRaces.AddRange(existingRound.Races);
+
+            if (existingRound.Order == 0)
+            {
+                existingRound.Participants = seasonEvent.Participants;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return new SeasonEventRoundDto(existingRound);
+        }
+
+        public async Task<SeasonEventRoundDto> DeleteSeasonEventRound(Guid seasonEventId, Guid roundId)
+        {
+            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId);
             var round = seasonEvent.Rounds.FirstOrDefault(r => r.Id == roundId);
 
             if (round == null)
@@ -172,6 +188,29 @@ namespace backend.Services.Seasons.Events.Rounds
 
             await _context.SaveChangesAsync();
             return new SeasonEventRoundDto(round);
+        }
+
+        private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId) 
+        {
+            return await GetSeasonEventOrThrow(seasonEventId, $"Season Event [{seasonEventId}] not found");
+        }
+
+        private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId, string errorMessage) 
+        {
+            var seasonEvent = await _context
+                .SeasonEvents
+                .Where(seasonEvent => seasonEvent.Id == seasonEventId)
+                .Include(seasonEvent => seasonEvent.Rounds).ThenInclude(r => r.Races)
+                .Include(seasonEvent => seasonEvent.Rounds).ThenInclude(r => r.Participants)
+                .Include(sE => sE.Participants)
+                .FirstOrDefaultAsync();
+
+            if (seasonEvent == null)
+            {
+                throw new NotFoundException(errorMessage);
+            }
+
+            return seasonEvent;
         }
     }
 }

@@ -47,6 +47,24 @@ namespace backend.Services.Seasons.Events.Circuits
             return new CircuitDto(circuit);
         }
 
+        public async Task<CircuitDto> UpdateCircuit(Guid seasonEventId, CircuitDto updatedCircuit)
+        {
+            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId);
+
+            if (updatedCircuit.Id != seasonEvent.Circuit?.Id)
+            {
+                throw new NotFoundException($"Cannot update Circuit [{updatedCircuit.Name}] in SeasonEvent [{seasonEvent.Name}]: Circuit not found in Season Event");
+            }
+
+            var existingCircuit = seasonEvent.Circuit;
+            updatedCircuit.ToEntity(existingCircuit);
+
+            await _context.Checkpoints.AddRangeAsync(existingCircuit.Checkpoints);
+            await _context.SaveChangesAsync();
+
+            return new CircuitDto(existingCircuit);
+        }
+
         public async Task DeleteCircuit(Guid seasonEventId, Guid circuitId)
         {
             var seasonEvent = await GetSeasonEventOrThrow(seasonEventId);
@@ -67,7 +85,7 @@ namespace backend.Services.Seasons.Events.Circuits
         private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId)
         {
             var seasonEvent = await _context.SeasonEvents
-                .Include(se => se.Circuit)
+                .Include(se => se.Circuit).ThenInclude(c => c.Checkpoints)
                 .FirstOrDefaultAsync(se => se.Id == seasonEventId);
 
             if (seasonEvent == null)

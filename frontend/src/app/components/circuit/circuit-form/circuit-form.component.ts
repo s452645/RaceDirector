@@ -2,9 +2,11 @@ import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnDestroy,
   OnInit,
   Output,
+  SimpleChanges,
 } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { SelectItem, SelectItemGroup } from 'primeng/api';
@@ -13,46 +15,48 @@ import {
   CheckpointDto,
   CheckpointType,
   CircuitDto,
+  CircuitService,
 } from 'src/app/services/seasons/events/circuit.service';
 import { PicoBoardsService } from 'src/app/services/hardware/pico-boards.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
-interface CheckpointTypeForm {
-  name: string;
-  code: number;
-}
+const CIRCUIT_NAME_FIELD = 'name';
+const CHECKPOINTS_FIELD = 'checkpoints';
+
+const CHECKPOINT_NAME_FIELD = 'checkpointName';
+const CHECKPOINT_TYPE_FIELD = 'type';
+const CHECKPOINT_SENSOR_FIELD = 'sensor';
 
 @Component({
   selector: 'app-circuit-form',
   templateUrl: './circuit-form.component.html',
   styleUrls: ['./circuit-form.component.css'],
 })
-export class CircuitFormComponent implements OnInit, OnDestroy {
+export class CircuitFormComponent implements OnInit, OnChanges, OnDestroy {
   @Input()
-  public circuitDto: CircuitDto | null | undefined;
+  public seasonEventId: string | undefined;
+
+  @Input()
+  public existingCircuit: CircuitDto | undefined;
 
   @Output()
-  public submittedForm: EventEmitter<CircuitDto> = new EventEmitter();
+  public closeSelf = new EventEmitter<boolean>();
 
   groupedBreakBeamSensors: SelectItemGroup[] = [];
 
-  checkpointTypes: CheckpointTypeForm[] = [
-    { name: 'Continue', code: CheckpointType.Continue },
-    { name: 'Start', code: CheckpointType.Start },
-    { name: 'Stop', code: CheckpointType.Stop },
-    { name: 'Pause', code: CheckpointType.Pause },
-    { name: 'Resume', code: CheckpointType.Resume },
+  checkpointTypes: SelectItem[] = [
+    { label: 'Continue', value: CheckpointType.Continue },
+    { label: 'Start', value: CheckpointType.Start },
+    { label: 'Stop', value: CheckpointType.Stop },
+    { label: 'Pause', value: CheckpointType.Pause },
+    { label: 'Resume', value: CheckpointType.Resume },
   ];
 
-  form = this.fb.group({
-    name: ['', Validators.required],
-    checkpoints: this.fb.array([this.createCheckpointFormGroup()]),
-  });
-
   get checkpoints() {
-    return this.form.get('checkpoints') as FormArray;
+    return this.form.get(CHECKPOINTS_FIELD) as FormArray;
   }
 
+  public form: FormGroup = this.fb.group({});
   public isSubmitButtonLoading = false;
 
   private subscription = new Subscription();
@@ -60,7 +64,8 @@ export class CircuitFormComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private utils: UtilsService,
-    private picoBoardsService: PicoBoardsService
+    private picoBoardsService: PicoBoardsService,
+    private circuitService: CircuitService
   ) {}
 
   ngOnInit(): void {
@@ -81,26 +86,53 @@ export class CircuitFormComponent implements OnInit, OnDestroy {
             };
           });
         })
-        .add(() => this.parseDtoToForm())
+        .add(() => this.initForm())
     );
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['existingCircuit']) {
+      this.initForm();
+    }
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 
-  refreshForm(): void {
-    this.form.reset();
+  initForm(): void {
+    const circuitName = this.existingCircuit?.name ?? null;
+    const checkpoints = this.existingCircuit?.checkpoints.map(c =>
+      this.initCheckpointForm(c)
+    ) ?? [this.initCheckpointForm()];
 
-    this.form.controls.checkpoints = this.fb.array([
-      this.createCheckpointFormGroup(),
-    ]);
+    this.form = this.fb.group({
+      [CIRCUIT_NAME_FIELD]: [circuitName, Validators.required],
+      [CHECKPOINTS_FIELD]: this.fb.array(checkpoints),
+    });
 
-    this.parseDtoToForm();
+    this.form.updateValueAndValidity();
+  }
+
+  initCheckpointForm(checkpoint?: CheckpointDto): FormGroup {
+    const checkpointName = checkpoint?.name ?? null;
+    const type =
+      this.checkpointTypes.find(c => c.value === checkpoint?.type) ?? null;
+    const sensor =
+      this.groupedBreakBeamSensors
+        .map(group => group.items)
+        .flat()
+        .find(item => item.value === checkpoint?.breakBeamSensorId) ?? null;
+
+    return this.fb.group({
+      [CHECKPOINT_NAME_FIELD]: [checkpointName, Validators.required],
+      [CHECKPOINT_TYPE_FIELD]: [type, Validators.required],
+      [CHECKPOINT_SENSOR_FIELD]: [sensor, Validators.required],
+    });
   }
 
   addCheckpoint(): void {
-    this.checkpoints.push(this.createCheckpointFormGroup());
+    this.checkpoints.push(this.initCheckpointForm());
     this.form.updateValueAndValidity();
   }
 
@@ -113,79 +145,61 @@ export class CircuitFormComponent implements OnInit, OnDestroy {
     this.isSubmitButtonLoading = true;
 
     const circuitName = this.utils.getNullableOrThrow(
-      this.form.controls.name.value
+      this.form.controls[CIRCUIT_NAME_FIELD].value
     );
-    const checkpointsArray = this.form.controls.checkpoints as FormArray;
 
-    const checkpoints = checkpointsArray.controls.map((checkpoint, idx) => {
-      const name = checkpoint.get('checkpointName')?.value;
+    const checkpoints = this.checkpoints.controls.map((checkpoint, idx) => {
+      const checkpointForm = checkpoint as FormGroup;
 
-      const typeForm = checkpoint.get('type')?.value as CheckpointTypeForm;
-      const type = typeForm.code;
+      const name = checkpointForm.controls[CHECKPOINT_NAME_FIELD]?.value;
 
-      const sensor = checkpoint.get('sensor')?.value as SelectItem;
-      return new CheckpointDto(name, idx, type, sensor.value);
+      const type = checkpointForm.controls[CHECKPOINT_TYPE_FIELD]
+        ?.value as SelectItem;
+
+      const sensor = checkpointForm.controls[CHECKPOINT_SENSOR_FIELD]
+        ?.value as SelectItem;
+
+      return new CheckpointDto(name, idx, type.value, sensor.value);
     });
 
     const circuit = new CircuitDto(circuitName, checkpoints);
-    this.submittedForm.emit(circuit);
+
+    if (this.existingCircuit) {
+      circuit.id = this.existingCircuit.id;
+      this.updateCircuit(circuit);
+      return;
+    }
+
+    this.addCircuit(circuit);
   }
 
-  private createCheckpointFormGroup(
-    name?: string,
-    type?: CheckpointType,
-    sensorId?: string
-  ): FormGroup {
-    const formGroup = this.fb.group({
-      checkpointName: ['', Validators.required],
-      type: [null as CheckpointTypeForm | null, Validators.required],
-      sensor: [null as SelectItem | null, Validators.required],
-    });
-
-    if (name !== undefined) {
-      formGroup.controls.checkpointName.setValue(name);
-    }
-
-    if (type !== undefined) {
-      formGroup.controls.type.setValue(
-        this.checkpointTypes.find(
-          formType => formType.code === type.valueOf()
-        ) ?? null
-      );
-    }
-
-    if (sensorId !== undefined) {
-      formGroup.controls.sensor.setValue(
-        this.groupedBreakBeamSensors
-          .map(group => group.items)
-          .flat()
-          .find(item => item.value === sensorId) ?? null
-      );
-    }
-
-    return formGroup;
-  }
-
-  private parseDtoToForm(): void {
-    if (this.circuitDto) {
-      this.form.controls.name.setValue(this.circuitDto.name);
-
-      this.form.controls.checkpoints.clear();
-      this.circuitDto.checkpoints
-        .map(checkpoint =>
-          this.createCheckpointFormGroup(
-            checkpoint.name,
-            checkpoint.type,
-            checkpoint.breakBeamSensorId
-          )
+  private addCircuit(circuitDto: CircuitDto): void {
+    this.subscription.add(
+      this.circuitService
+        .addCircuit(
+          this.utils.getUndefinedableOrThrow(this.seasonEventId),
+          circuitDto
         )
-        .forEach(checkpoint => this.form.controls.checkpoints.push(checkpoint));
+        .subscribe(() => {
+          this.closeSelf.emit(true);
+          this.initForm();
+        })
+        .add(() => (this.isSubmitButtonLoading = false))
+    );
+  }
 
-      this.form.updateValueAndValidity();
-    }
-
-    this.form.controls.checkpoints.valueChanges.subscribe(() =>
-      this.form.updateValueAndValidity({ onlySelf: true })
+  private updateCircuit(circuitDto: CircuitDto): void {
+    this.subscription.add(
+      this.circuitService
+        .updateCircuit(
+          this.utils.getUndefinedableOrThrow(this.seasonEventId),
+          circuitDto
+        )
+        .subscribe(() => {
+          this.closeSelf.emit(true);
+          this.initForm();
+        })
+        .add(() => (this.isSubmitButtonLoading = false))
     );
   }
 }

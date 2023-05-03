@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { Subscription } from 'rxjs';
@@ -9,7 +9,6 @@ import {
   SeasonsService,
 } from 'src/app/services/seasons/seasons.service';
 import { UtilsService } from 'src/app/services/utils.service';
-import { NewSeasonEventFormComponent } from '../season-event/new-season-event-form/new-season-event-form.component';
 
 @Component({
   selector: 'app-season-details',
@@ -18,12 +17,20 @@ import { NewSeasonEventFormComponent } from '../season-event/new-season-event-fo
   providers: [ConfirmationService],
 })
 export class SeasonDetailsComponent implements OnInit, OnDestroy {
-  @ViewChild(NewSeasonEventFormComponent, { static: true })
-  private newEventFormCmp!: NewSeasonEventFormComponent;
+  public seasonIdNullable: string | null = null;
+  public seasonNullable: SeasonDto | null = null;
 
-  public seasonId: string | null = null;
-  public season: SeasonDto | null = null;
+  get seasonId(): string {
+    return this.utils.getNullableOrThrow(this.seasonIdNullable);
+  }
+
+  get season(): SeasonDto {
+    return this.utils.getNullableOrThrow(this.season);
+  }
+
   public seasonEvents: SeasonEventDto[] = [];
+
+  public chosenSeasonEvent: SeasonEventDto | undefined = undefined;
 
   public newEventDialogVisible = false;
   public isListLoading = false;
@@ -40,21 +47,19 @@ export class SeasonDetailsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.seasonId = this.route.snapshot.paramMap.get('id');
+    this.seasonIdNullable = this.route.snapshot.paramMap.get('id');
 
-    if (this.seasonId === null) {
+    if (this.seasonIdNullable === null) {
       console.error('Could not initialize view. Season ID cannot be empty.');
       return;
     }
 
     this.subscription.add(this.refreshData());
     this.subscription.add(
-      this.seasonService
-        .getSeasonById(this.utils.getNullableOrThrow(this.seasonId))
-        .subscribe(season => {
-          this.routeTitleService.setRouteTitle(season.name);
-          this.season = season;
-        })
+      this.seasonService.getSeasonById(this.seasonId).subscribe(season => {
+        this.routeTitleService.setRouteTitle(season.name);
+        this.seasonNullable = season;
+      })
     );
   }
 
@@ -68,6 +73,14 @@ export class SeasonDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  public handleEditSeasonEvent(seasonEventId: string): void {
+    this.chosenSeasonEvent = this.seasonEvents.find(
+      e => e.id === seasonEventId
+    );
+
+    this.newEventDialogVisible = true;
+  }
+
   public handleDeleteSeasonEvent(event: Event, seasonEventId: string): void {
     this.confirmationService.confirm({
       target: event.target ?? undefined,
@@ -75,39 +88,31 @@ export class SeasonDetailsComponent implements OnInit, OnDestroy {
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
         this.seasonService
-          .deleteSeasonEvent(
-            this.utils.getNullableOrThrow(this.seasonId),
-            seasonEventId
-          )
+          .deleteSeasonEvent(this.seasonId, seasonEventId)
           .subscribe(() => this.refreshData());
       },
     });
   }
 
   public handleOpenNewEventForm(): void {
+    this.chosenSeasonEvent = undefined;
     this.newEventDialogVisible = true;
   }
 
-  public handleAddNewSeasonEvent(seasonEvent: SeasonEventDto): void {
-    this.subscription.add(
-      this.seasonService
-        .addSeasonEvent(
-          this.utils.getNullableOrThrow(this.seasonId),
-          seasonEvent
-        )
-        .subscribe(() => {
-          this.newEventDialogVisible = false;
-          this.newEventFormCmp.refreshForm();
-          this.subscription.add(this.refreshData());
-        })
-    );
+  public handleCloseEventForm(refresh: boolean): void {
+    this.chosenSeasonEvent = undefined;
+    this.newEventDialogVisible = false;
+
+    if (refresh) {
+      this.refreshData();
+    }
   }
 
   private refreshData(): void {
     this.isListLoading = true;
 
     const s = this.seasonService
-      .getSeasonEvents(this.utils.getNullableOrThrow(this.seasonId))
+      .getSeasonEvents(this.seasonId)
       .subscribe(seasonEvents => {
         this.isListLoading = false;
         this.seasonEvents = seasonEvents;

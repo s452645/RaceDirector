@@ -11,8 +11,6 @@
     ></p-button>
 
     <p-button label="Add round" (onClick)="handleOpenNewRoundForm()"></p-button>
-
-    <p-button label="Go to first round" (onClick)="goToFirstRound()"></p-button>
   </div>
 
   <span>
@@ -21,18 +19,60 @@
     Rounds: {{ rounds.length }}
   </span>
 
-  <div class="flex flex-column" [ngStyle]="{ gap: '0.5rem' }">
-    <span *ngFor="let checkpoint of seasonEvent.circuit?.checkpoints">
-      {{ checkpoint.position }}. {{ checkpoint.name }}
-    </span>
-  </div>
-
-  <div class="flex flex-column" [ngStyle]="{ gap: '0.5rem' }">
-    <span *ngFor="let round of rounds">
-      Round {{ round.order + 1 }}: {{ round.participantsCount }} ->
-      {{ round.advancesCount }}
-    </span>
-  </div>
+  <p-table [value]="rounds" [ngStyle]="{ width: '75%' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Order</th>
+        <th>Type</th>
+        <th>Races</th>
+        <th>Participants</th>
+        <th>Advances</th>
+        <th>Enter</th>
+        <th>Edit</th>
+        <th>Delete</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-round>
+      <tr>
+        <td>{{ round.order + 1 }}</td>
+        <td>{{ round.typeText }}</td>
+        <td>{{ round.races.length }}</td>
+        <td>{{ round.participantsCount }}</td>
+        <td>{{ round.advancesCount }}</td>
+        <td>
+          <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-chevron-circle-right"
+            ngClass="p-button-text"
+            (click)="handleEnterRound(round.id)"
+          ></button>
+        </td>
+        <td>
+          <button
+            type="button"
+            pButton
+            pRipple
+            icon="pi pi-pencil"
+            ngClass="p-button-text p-button-secondary"
+            (click)="handleEditRound(round.id)"
+          ></button>
+        </td>
+        <td>
+          <button
+            type="button"
+            pButton
+            pRipple
+            ngClass="p-button-text p-button-danger"
+            icon="pi pi-trash"
+            [disabled]="round.order !== rounds.length - 1"
+            (click)="handleDeleteRound(round.id)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
 </div>
 
 <p-dialog
@@ -42,10 +82,12 @@
   [resizable]="false"
   [(visible)]="isCircuitFormOpen"
   [style]="{ width: '50vw' }"
+  (onHide)="closeDialog(false)"
 >
   <app-circuit-form
-    [circuitDto]="seasonEvent.circuit"
-    (submittedForm)="handleSubmittedCircuit($event)"
+    [existingCircuit]="seasonEvent.circuit"
+    [seasonEventId]="seasonEventId"
+    (closeSelf)="closeDialog(true)"
   />
 </p-dialog>
 
@@ -69,12 +111,15 @@
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
-  [(visible)]="isNewRoundFormOpen"
+  [(visible)]="isRoundFormOpen"
   [style]="{ width: '50vw' }"
+  (onHide)="closeDialog(false)"
 >
   <app-round-form
+    [existingRound]="chosenRound"
     [participantsCount]="nextRoundParticipantsCount"
     [roundOrder]="nextRoundOrder"
-    (submittedRound)="handleSubmittedRound($event)"
+    [seasonEventId]="seasonEventId"
+    (closeSelf)="closeDialog(true)"
   />
 </p-dialog>

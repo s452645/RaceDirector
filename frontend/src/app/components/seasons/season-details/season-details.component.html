@@ -12,23 +12,27 @@
     <ng-template pTemplate="header">
       <tr>
         <th>Name</th>
+        <th>Type</th>
         <th>Start date</th>
         <th>End date</th>
         <th>Enter</th>
+        <th>Edit</th>
         <th>Delete</th>
       </tr>
     </ng-template>
     <ng-template pTemplate="body" let-seasonEvent>
       <tr>
         <td>{{ seasonEvent.name }}</td>
-        <td>{{ seasonEvent.startDate }}</td>
-        <td>{{ seasonEvent.endDate }}</td>
+        <td>{{ seasonEvent.typeText }}</td>
+        <td>{{ seasonEvent.startDate.toDateString() }}</td>
+        <td>{{ seasonEvent.endDate.toDateString() }}</td>
         <td>
           <button
             type="button"
             pButton
             pRipple
             icon="pi pi-chevron-circle-right"
+            ngClass="p-button-text"
             (click)="handleEnterSeasonEvent(seasonEvent.id)"
           ></button>
         </td>
@@ -37,6 +41,17 @@
             type="button"
             pButton
             pRipple
+            icon="pi pi-pencil"
+            ngClass="p-button-text p-button-secondary"
+            (click)="handleEditSeasonEvent(seasonEvent.id)"
+          ></button>
+        </td>
+        <td>
+          <button
+            type="button"
+            pButton
+            pRipple
+            ngClass="p-button-text p-button-danger"
             icon="pi pi-trash"
             (click)="handleDeleteSeasonEvent($event, seasonEvent.id)"
           ></button>
@@ -53,9 +68,12 @@
   [resizable]="false"
   [(visible)]="newEventDialogVisible"
   [style]="{ width: '50vw' }"
+  (onHide)="handleCloseEventForm(false)"
 >
   <app-new-season-event-form
-    (newSeasonEvent)="handleAddNewSeasonEvent($event)"
+    [seasonId]="seasonId"
+    [existingSeasonEvent]="chosenSeasonEvent"
+    (closeSelf)="handleCloseEventForm(true)"
   />
 </p-dialog>
 <p-confirmPopup></p-confirmPopup>

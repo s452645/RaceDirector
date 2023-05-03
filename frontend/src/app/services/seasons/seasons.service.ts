@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { BackendService } from '../backend.service';
 import { CircuitDto } from './events/circuit.service';
 
@@ -47,6 +47,32 @@ export class SeasonEventDto {
     public circuit: CircuitDto | undefined,
     public participantsCount: number | undefined
   ) {}
+
+  public static fromPayload(payload: any): SeasonEventDto {
+    const newEvent = new SeasonEventDto(
+      payload?.name,
+      new Date(payload?.startDate),
+      new Date(payload?.endDate),
+      payload?.type,
+      payload?.scoreRules,
+      payload?.circuit,
+      payload?.participantsCount
+    );
+
+    newEvent.id = payload?.id;
+    return newEvent;
+  }
+
+  get typeText(): string {
+    switch (this.type) {
+      case SeasonEventType.Race:
+        return 'Race';
+      case SeasonEventType.TimeTrial:
+        return 'Time Trial';
+      default:
+        return 'Unknown';
+    }
+  }
 }
 
 @Injectable({
@@ -72,18 +98,20 @@ export class SeasonsService {
   }
 
   public getSeasonEvents(seasonId: string): Observable<SeasonEventDto[]> {
-    return this.backendService.get<SeasonEventDto[]>(
-      `${URL}/${seasonId}/season-events`
-    );
+    return this.backendService
+      .get<SeasonEventDto[]>(`${URL}/${seasonId}/season-events`)
+      .pipe(
+        map(events => events.map(event => SeasonEventDto.fromPayload(event)))
+      );
   }
 
   public getSeasonEventById(
     seasonId: string,
     seasonEventId: string
   ): Observable<SeasonEventDto> {
-    return this.backendService.get<SeasonEventDto>(
-      `${URL}/${seasonId}/season-events/${seasonEventId}`
-    );
+    return this.backendService
+      .get<SeasonEventDto>(`${URL}/${seasonId}/season-events/${seasonEventId}`)
+      .pipe(map(event => SeasonEventDto.fromPayload(event)));
   }
 
   public addSeasonEvent(
@@ -96,22 +124,38 @@ export class SeasonsService {
     );
   }
 
+  public updateSeasonEvent(
+    seasonId: string,
+    seasonEvent: SeasonEventDto
+  ): Observable<SeasonEventDto> {
+    return this.backendService
+      .put<SeasonEventDto, SeasonEventDto>(
+        `${URL}/${seasonId}/season-events`,
+        seasonEvent
+      )
+      .pipe(map(event => SeasonEventDto.fromPayload(event)));
+  }
+
   public deleteSeasonEvent(
     seasonId: string,
     seasonEventId: string
   ): Observable<SeasonEventDto> {
-    return this.backendService.delete<SeasonEventDto>(
-      `${URL}/${seasonId}/season-events/${seasonEventId}`
-    );
+    return this.backendService
+      .delete<SeasonEventDto>(
+        `${URL}/${seasonId}/season-events/${seasonEventId}`
+      )
+      .pipe(map(event => SeasonEventDto.fromPayload(event)));
   }
 
   public addSeasonEventScoreRules(
     seasonEventId: string,
     scoreRules: SeasonEventScoreRulesDto
   ): Observable<SeasonEventDto> {
-    return this.backendService.post<SeasonEventScoreRulesDto, SeasonEventDto>(
-      `${URL}/${seasonEventId}/score-rules`,
-      scoreRules
-    );
+    return this.backendService
+      .post<SeasonEventScoreRulesDto, SeasonEventDto>(
+        `${URL}/${seasonEventId}/score-rules`,
+        scoreRules
+      )
+      .pipe(map(event => SeasonEventDto.fromPayload(event)));
   }
 }

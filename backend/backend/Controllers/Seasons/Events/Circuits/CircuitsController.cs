@@ -29,6 +29,13 @@ namespace backend.Controllers.Seasons.Events.Circuits
             return await _circuitService.AddCircuit(seasonEventId, circuitDto);
         }
 
+        // PUT: api/Circuits
+        [HttpPut]
+        public async Task<ActionResult<CircuitDto>> UpdateCircuit([FromQuery] Guid seasonEventId, [FromBody] CircuitDto circuitDto)
+        {
+            return await _circuitService.UpdateCircuit(seasonEventId, circuitDto);
+        }
+
         // DELETE: api/Circuits/5
         [HttpDelete("{circuitId}")]
         public async Task<IActionResult> DeleteCircuitDto(Guid circuitId, [FromQuery] Guid seasonEventId)

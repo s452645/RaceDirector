@@ -25,6 +25,12 @@ export class BackendService {
       .pipe(catchError(this.handleError.bind(this)));
   }
 
+  public put<T, U>(url: string, body: T): Observable<U> {
+    return this.httpClient
+      .put<U>(url, body)
+      .pipe(catchError(this.handleError.bind(this)));
+  }
+
   public delete<T>(url: string): Observable<T> {
     return this.httpClient
       .delete<T>(url)

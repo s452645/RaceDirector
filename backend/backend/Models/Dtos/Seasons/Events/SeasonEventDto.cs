@@ -72,33 +72,40 @@ namespace backend.Models.Dtos.Seasons.Events
 
         public SeasonEvent ToEntity()
         {
-            var seasonEvent = new SeasonEvent
+            var entity = new SeasonEvent
             {
                 Id = Id,
-                Name = Name ?? string.Empty,
-                StartDate = StartDate,
-                EndDate = EndDate,
-                Type = Type,
-
                 Rounds = new List<SeasonEventRound>()
             };
 
+            ToEntity(entity);
+
             if (ScoreRules != null)
             {
-                seasonEvent.ScoreRules = ScoreRules.ToEntity();
+                entity.ScoreRules = ScoreRules.ToEntity();
             }
 
             if (Circuit != null)
             {
-                seasonEvent.Circuit = Circuit.ToEntity();
+                entity.Circuit = Circuit.ToEntity();
             }
 
             if (SeasonId != null)
             {
-                seasonEvent.SeasonId = SeasonId.Value;
+                entity.SeasonId = SeasonId.Value;
             }
 
-            return seasonEvent;
+            return entity;
+        }
+
+        public SeasonEvent ToEntity(SeasonEvent entity)
+        {
+            entity.Name = Name ?? string.Empty;
+            entity.StartDate = StartDate;
+            entity.EndDate = EndDate;
+            entity.Type = Type;
+
+            return entity;
         }
     }
 }

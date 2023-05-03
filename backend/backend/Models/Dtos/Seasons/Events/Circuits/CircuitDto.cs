@@ -34,16 +34,21 @@ namespace backend.Models.Dtos.Seasons.Events.Circuits
 
         public Circuit ToEntity()
         {
+            var circuit = new Circuit();
+            circuit.Id = Id;
+            return ToEntity(circuit);
+        }
+
+        public Circuit ToEntity(Circuit entity)
+        {
             // TODO: no season event id assignment, as circuit does not contain such information in db
             // (it cannot, since only one side of relationship should have a foreign key)
             // is it correct?
 
-            var circuit = new Circuit();
-            circuit.Id = Id;
-            circuit.Name = Name ?? string.Empty;
-            circuit.Checkpoints = Checkpoints.Select(checkpointDto => checkpointDto.ToEntity()).ToList();
+            entity.Name = Name ?? string.Empty;
+            entity.Checkpoints = Checkpoints.Select(checkpointDto => checkpointDto.ToEntity()).ToList();
 
-            return circuit;
+            return entity;
         }
     }
 }
