@@ -240,6 +240,7 @@ export class RoundFormComponent implements OnInit, OnChanges, OnDestroy {
       type,
       this.participantsCount,
       [],
+      [],
       this.racesDtos,
       pointsStrategy,
       droppedCarsPositionDefinementStrategy,

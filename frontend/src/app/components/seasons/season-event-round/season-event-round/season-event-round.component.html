@@ -1,25 +1,38 @@
 <div class="p-4">
-  <p-button label="Draw races" (onClick)="drawRaces()"></p-button>
+  <div class="flex" [ngStyle]="{ gap: '2rem' }">
+    <p-button
+      label="Participants"
+      (onClick)="openParticipantsModal()"
+    ></p-button>
 
-  <div class="flex flex-wrap mt-4" [ngStyle]="{ gap: '2rem' }">
-    <div
-      *ngFor="let race of roundDto.races"
-      class="border-1 border-blue-400 border-round p-4 w-2 text-xs"
-    >
-      <p>Race {{ race.order + 1 }}:</p>
+    <p-button
+      label="Draw races"
+      [disabled]="!isDrawButtonEnabled"
+      (onClick)="drawRaces()"
+    ></p-button>
+  </div>
 
-      <p>Results:</p>
-      <div *ngFor="let result of race.results">
-        <p>
-          {{ (result.position ?? -1) + 1 }}. {{ result.car.name }} -
-          {{ result.points.toFixed(3) }}
-        </p>
-      </div>
-
-      <p-button
-        label="Go to race"
-        (onClick)="goToRace(race.id ?? '')"
-      ></p-button>
+  <div class="grid mt-4">
+    <div class="col-3" *ngFor="let race of roundDto.races">
+      <app-round-race-view [raceNullable]="race"></app-round-race-view>
     </div>
   </div>
 </div>
+
+<p-dialog
+  header="Participants"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [(visible)]="isParticipantsModalOpen"
+  [style]="{ width: '50vw' }"
+>
+  <div class="grid">
+    <div
+      *ngFor="let participant of roundDto.participantsNames; let i = index"
+      class="col-3 p-0"
+    >
+      <p class="text-sm">{{ i + 1 + '. ' + participant }}</p>
+    </div>
+  </div>
+</p-dialog>

@@ -13,6 +13,7 @@ import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
 import { TableModule } from 'primeng/table';
 import { CalendarModule } from 'primeng/calendar';
+import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { DropdownModule } from 'primeng/dropdown';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
@@ -45,6 +46,7 @@ import { BoardSensorsDetailsComponent } from './components/containers/settings/b
 import { SeasonEventRoundComponent } from './components/seasons/season-event-round/season-event-round/season-event-round.component';
 import { SeasonEventRoundRaceComponent } from './components/seasons/season-event-round-race/season-event-round-race.component';
 import { RaceHeatViewComponent } from './components/seasons/season-event-round-race/race-heat-view/race-heat-view.component';
+import { RoundRaceViewComponent } from './components/seasons/season-event-round/season-event-round/round-race-view/round-race-view.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -75,6 +77,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     SeasonEventRoundComponent,
     SeasonEventRoundRaceComponent,
     RaceHeatViewComponent,
+    RoundRaceViewComponent,
   ],
   imports: [
     BrowserModule,
@@ -98,6 +101,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     ReactiveFormsModule,
     ChipsModule,
     SelectButtonModule,
+    CardModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {

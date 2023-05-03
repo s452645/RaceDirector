@@ -13,6 +13,9 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./season-event-round.component.css'],
 })
 export class SeasonEventRoundComponent implements OnInit, OnDestroy {
+  isParticipantsModalOpen = false;
+  isDrawButtonEnabled = false;
+
   private seasonIdNullable: string | null = null;
   private seasonEventIdNullable: string | null = null;
   private roundIdNullable: string | null = null;
@@ -76,9 +79,17 @@ export class SeasonEventRoundComponent implements OnInit, OnDestroy {
         .subscribe(round => {
           this.roundDtoNullable = round;
 
+          const areRacesDrawn = round.races.map(r => r.heats).flat().length > 0;
+          this.isDrawButtonEnabled =
+            !areRacesDrawn && round.participantsIds.length > 0;
+
           this.sortRaces();
         })
     );
+  }
+
+  openParticipantsModal(): void {
+    this.isParticipantsModalOpen = true;
   }
 
   private sortRaces(): void {
