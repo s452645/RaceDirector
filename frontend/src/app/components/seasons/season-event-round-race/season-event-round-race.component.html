@@ -1,21 +1,32 @@
-<div class="p-4">
-  <p>Heats:</p>
-  <div class="flex flex-column" [ngStyle]="{ gap: '2rem' }">
-    <div
-      *ngFor="let heat of raceDto.heats"
-      class="p-4 flex flex-column border-1 border-blue-400 border-round w-4"
-      [ngStyle]="{ gap: '1rem' }"
+<div class="flex flex-column align-items-center w-full p-4">
+  <div class="w-4">
+    <p-table
+      [value]="raceDto.results"
+      styleClass="p-datatable-striped"
+      [ngStyle]="{ 'min-width': '40%' }"
     >
-      <div *ngFor="let result of heat.results">
-        <p>
-          {{ result.position + 1 }}. {{ result.car.name }} -
-          {{ result.pointsSummed.toFixed(3) }}
-        </p>
-      </div>
-      <p-button
-        label="Go to heat"
-        (onClick)="goToHeat(heat.id ?? '')"
-      ></p-button>
+      <ng-template pTemplate="header">
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Points</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-result>
+        <tr>
+          <td class="text-xs text-gray-300">{{ result.position }}</td>
+          <td>{{ result.car.name }}</td>
+          <td>
+            {{ result.points === 0 ? '-' : result.points.toFixed(3) }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <div class="heats-grid mt-4 w-full">
+    <div *ngFor="let heat of raceDto.heats">
+      <app-race-heat-view [heatDtoNullable]="heat"></app-race-heat-view>
     </div>
   </div>
 </div>

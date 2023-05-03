@@ -42,7 +42,6 @@ export class SeasonEventRoundRaceComponent implements OnInit, OnDestroy {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router,
     private utils: UtilsService,
     private raceService: SeasonEventRoundRacesService
   ) {
@@ -60,17 +59,16 @@ export class SeasonEventRoundRaceComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  goToHeat(heatId: string): void {
-    this.router.navigate([`heats/${heatId}`], {
-      relativeTo: this.route,
-    });
-  }
-
   private refreshData(): void {
     this.subscription.add(
-      this.raceService
-        .getRace(this.roundId, this.raceId)
-        .subscribe(race => (this.raceDtoNullable = race))
+      this.raceService.getRace(this.roundId, this.raceId).subscribe(race => {
+        this.raceDtoNullable = race;
+        this.sortHeats();
+      })
     );
+  }
+
+  private sortHeats(): void {
+    this.raceDto.heats.sort((a, b) => a.order - b.order);
   }
 }

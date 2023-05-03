@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SeasonEventRoundRaceDto } from 'src/app/services/seasons/events/rounds/season-event-rounds.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
@@ -15,5 +16,19 @@ export class RoundRaceViewComponent {
     return this.utils.getNullableOrThrow(this.raceNullable);
   }
 
-  constructor(private utils: UtilsService) {}
+  constructor(
+    private utils: UtilsService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {}
+
+  goToRace(raceId: string | undefined): void {
+    if (!raceId) {
+      return;
+    }
+
+    this.router.navigate([`races/${raceId}`], {
+      relativeTo: this.route,
+    });
+  }
 }

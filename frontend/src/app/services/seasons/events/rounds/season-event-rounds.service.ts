@@ -58,6 +58,7 @@ export class SeasonEventRoundRaceHeatDto {
   public id: string | undefined;
 
   constructor(
+    public order: number,
     public raceId: string,
     public results: SeasonEventRoundRaceHeatResultDto[]
   ) {}
