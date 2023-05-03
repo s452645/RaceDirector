@@ -199,4 +199,8 @@ export class SeasonEventRoundsService {
       `${URL}/${roundId}?seasonEventId=${seasonEventId}`
     );
   }
+
+  public hasRoundStarted(roundId: string): Observable<boolean> {
+    return this.backendService.get(`${URL}/${roundId}/hasStarted`);
+  }
 }

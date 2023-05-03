@@ -58,5 +58,12 @@ namespace backend.Controllers.Seasons.Events.Rounds
             await _roundsService.DeleteSeasonEventRound(seasonEventId, roundId);
             return NoContent();
         }
+
+        // GET: api/SeasonEventRounds/5/hasStarted
+        [HttpGet("{roundId}/hasStarted")]
+        public async Task<ActionResult<bool>> HasRoundStarted(Guid roundId)
+        {
+            return await _roundsService.HasRoundStarted(roundId);
+        }
     }
 }

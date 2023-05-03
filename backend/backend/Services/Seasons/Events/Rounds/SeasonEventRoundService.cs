@@ -190,6 +190,19 @@ namespace backend.Services.Seasons.Events.Rounds
             return new SeasonEventRoundDto(round);
         }
 
+        public async Task<bool> HasRoundStarted(Guid roundId)
+        {
+            var races = await _context.SeasonEventRoundRaces
+                .Where(r => r.RoundId == roundId)
+                .Include(r => r.Heats).ThenInclude(h => h.Results)
+                .ToListAsync();
+
+            return races
+                .SelectMany(r => r.Heats)
+                .SelectMany(h => h.Results)
+                .Any(result => result.PointsSummed != 0);
+        }
+
         private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId) 
         {
             return await GetSeasonEventOrThrow(seasonEventId, $"Season Event [{seasonEventId}] not found");
