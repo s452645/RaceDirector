@@ -10,7 +10,7 @@ import { SeasonEventComponent } from './components/seasons/season-event/season-e
 import { RouteTitle } from './services/route-title.service';
 import { SeasonEventRoundComponent } from './components/seasons/season-event-round/season-event-round/season-event-round.component';
 import { SeasonEventRoundRaceComponent } from './components/seasons/season-event-round-race/season-event-round-race.component';
-import { RaceHeatViewComponent } from './components/seasons/season-event-round-race/race-heat-view/race-heat-view.component';
+import { RaceHeatViewComponent } from './components/seasons/season-event-round-race/race-heat-view-temp/race-heat-view.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent, title: RouteTitle.HOME },

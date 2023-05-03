@@ -66,12 +66,6 @@ export class SeasonEventRoundComponent implements OnInit, OnDestroy {
     );
   }
 
-  goToRace(raceId: string): void {
-    this.router.navigate([`races/${raceId}`], {
-      relativeTo: this.route,
-    });
-  }
-
   refreshData(): void {
     this.subscription.add(
       this.roundsService

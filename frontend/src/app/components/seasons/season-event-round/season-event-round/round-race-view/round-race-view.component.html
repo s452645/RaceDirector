@@ -28,6 +28,8 @@
       <p-button
         icon="pi pi-chevron-circle-right"
         styleClass="p-button-sm p-button-text p-button-raised"
+        [disabled]="race.results.length === 0"
+        (onClick)="goToRace(race.id)"
       ></p-button>
     </div>
   </ng-template>

@@ -148,6 +148,8 @@ namespace backend.Services.Seasons.Events.Rounds
 
             races.ForEach(race =>
             {
+                var heatOrder = 0;
+
                 while (race.ParticipantsCount > race.Results.Count)
                 {
                     var participantIndex = random.Next(participants.Count);
@@ -165,6 +167,9 @@ namespace backend.Services.Seasons.Events.Rounds
                     _context.SeasonEventRoundRaceResults.Add(raceResult.ToEntity());
 
                     var heat = new SeasonEventRoundRaceHeatDto();
+
+                    heat.Order = heatOrder;
+                    heatOrder++;
 
                     var heatResults = new SeasonEventRoundRaceHeatResultDto();
                     heatResults.CarId = participant.Id;
