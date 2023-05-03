@@ -1,0 +1,42 @@
+<p-card [header]="'Race ' + (race.order + 1).toString()">
+  <div *ngIf="race.results.length; else raceNotDrawn">
+    <p-table
+      [value]="race.results"
+      styleClass="p-datatable-striped p-datatable-sm"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Points</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-result>
+        <tr>
+          <td class="text-xs text-gray-300 w-1">{{ result.position }}</td>
+          <td>{{ result.car.name }}</td>
+          <td class="w-3">
+            {{ result.points === 0 ? '-' : result.points.toFixed(3) }}
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end">
+      <p-button
+        icon="pi pi-chevron-circle-right"
+        styleClass="p-button-sm p-button-text p-button-raised"
+      ></p-button>
+    </div>
+  </ng-template>
+</p-card>
+
+<ng-template #raceNotDrawn>
+  <div
+    class="flex justify-content-center align-items-center w-full h-full text-gray-300"
+  >
+    <p>No participants yet...</p>
+  </div>
+</ng-template>

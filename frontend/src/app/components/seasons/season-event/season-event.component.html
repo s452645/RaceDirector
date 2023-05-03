@@ -56,7 +56,8 @@
             pRipple
             icon="pi pi-pencil"
             ngClass="p-button-text p-button-secondary"
-            (click)="handleEditRound(round.id)"
+            [disabled]="round.order !== rounds.length - 1"
+            (click)="handleEditRound($event, round.id)"
           ></button>
         </td>
         <td>
@@ -67,7 +68,7 @@
             ngClass="p-button-text p-button-danger"
             icon="pi pi-trash"
             [disabled]="round.order !== rounds.length - 1"
-            (click)="handleDeleteRound(round.id)"
+            (click)="handleDeleteRound($event, round.id)"
           ></button>
         </td>
       </tr>
@@ -123,3 +124,4 @@
     (closeSelf)="closeDialog(true)"
   />
 </p-dialog>
+<p-confirmPopup></p-confirmPopup>

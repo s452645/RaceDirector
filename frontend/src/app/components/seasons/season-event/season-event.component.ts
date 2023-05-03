@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subscription, mergeMap, of } from 'rxjs';
+import { Observable, Subscription, map, mergeMap, of } from 'rxjs';
 import { RouteTitleService } from 'src/app/services/route-title.service';
 import {
   SeasonEventDto,
@@ -13,11 +13,13 @@ import {
   SeasonEventRoundsService,
 } from 'src/app/services/seasons/events/rounds/season-event-rounds.service';
 import { SeasonEventScoreRulesFormComponent } from './season-event-score-rules-form/season-event-score-rules-form.component';
+import { ConfirmationService } from 'primeng/api';
 
 @Component({
   selector: 'app-season-event',
   templateUrl: './season-event.component.html',
   styleUrls: ['./season-event.component.css'],
+  providers: [ConfirmationService],
 })
 export class SeasonEventComponent implements OnInit, OnDestroy {
   @ViewChild(SeasonEventScoreRulesFormComponent, { static: true })
@@ -56,6 +58,7 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
     private seasonsService: SeasonsService,
     private utils: UtilsService,
     private roundsService: SeasonEventRoundsService,
+    private confirmationService: ConfirmationService,
     private router: Router
   ) {
     this.seasonIdNullable = this.route.snapshot.paramMap.get('seasonId');
@@ -96,7 +99,26 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
     });
   }
 
-  handleEditRound(roundId: string) {
+  handleEditRound(event: Event, roundId: string) {
+    const s = this.roundsService
+      .hasRoundStarted(roundId)
+      .subscribe(hasStarted => {
+        if (!hasStarted) {
+          this.editRound(roundId);
+          return;
+        }
+
+        this.displayConfirmationPopup(
+          event,
+          `This round has already started. Editing can result in a loss of data. Do you want to continue?`,
+          () => this.editRound(roundId)
+        );
+      });
+
+    this.subscription.add(s);
+  }
+
+  private editRound(roundId: string): void {
     this.chosenRound = this.utils.getUndefinedableOrThrow(
       this.rounds.find(r => r.id === roundId)
     );
@@ -107,7 +129,26 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
     this.isRoundFormOpen = true;
   }
 
-  handleDeleteRound(roundId: string) {
+  handleDeleteRound(event: Event, roundId: string) {
+    const s = this.roundsService
+      .hasRoundStarted(roundId)
+      .subscribe(hasStarted => {
+        if (!hasStarted) {
+          this.deleteRound(roundId);
+          return;
+        }
+
+        this.displayConfirmationPopup(
+          event,
+          'This round has already started. Deleting will result in a loss of data. Do you want to continue?',
+          () => this.deleteRound(roundId)
+        );
+      });
+
+    this.subscription.add(s);
+  }
+
+  private deleteRound(roundId: string) {
     this.subscription.add(
       this.roundsService
         .deleteRound(this.seasonEventId, roundId)
@@ -115,6 +156,19 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
           this.refreshData();
         })
     );
+  }
+
+  private displayConfirmationPopup(
+    event: Event,
+    msg: string,
+    onAccept: () => void
+  ): void {
+    this.confirmationService.confirm({
+      target: event.target ?? undefined,
+      message: msg,
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => onAccept(),
+    });
   }
 
   handleSubmittedScoreRules(scoreRules: SeasonEventScoreRulesDto): void {

@@ -14,6 +14,7 @@ namespace backend.Models.Seasons.Events.Rounds.Races
         public int InstantAdvancements { get; set; }
         public int SecondChances { get; set; }
 
+        public Guid RoundId { get; set; }
         public SeasonEventRound Round { get; set; }
     }
 }

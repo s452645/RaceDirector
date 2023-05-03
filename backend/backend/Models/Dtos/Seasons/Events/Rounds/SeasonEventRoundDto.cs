@@ -13,6 +13,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds
         public RoundType Type { get; set; }
 
         public List<Guid> ParticipantsIds { get; set; }
+        public List<string> ParticipantsNames { get; set; }
         public List<SeasonEventRoundRaceDto> Races { get; set; }
 
         public RoundPointsStrategy PointsStrategy { get; set; }
@@ -29,6 +30,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds
             Order = 0;
             ParticipantsCount = 0;
             ParticipantsIds = new List<Guid>();
+            ParticipantsNames = new List<string>();
             Races = new List<SeasonEventRoundRaceDto>();
         }
 
@@ -38,6 +40,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds
             int participantsCount,
             RoundType type,
             List<Guid> participantIds,
+            List<string> participantsNames,
             List<SeasonEventRoundRaceDto> races,
             RoundPointsStrategy pointsStrategy,
             DroppedCarsPositionDefinementStrategy droppedCarsPositionDefinementStrategy,
@@ -51,6 +54,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds
             ParticipantsCount = participantsCount;
             Type = type;
             ParticipantsIds = participantIds;
+            ParticipantsNames = participantsNames;
             Races = races;
             PointsStrategy = pointsStrategy;
             DroppedCarsPositionDefinementStrategy = droppedCarsPositionDefinementStrategy;
@@ -66,6 +70,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds
             ParticipantsCount = seasonEventRound.ParticipantsCount;
             Type = seasonEventRound.Type;
             ParticipantsIds = seasonEventRound.Participants?.Select(p => p.Id).ToList() ?? new();
+            ParticipantsNames= seasonEventRound.Participants?.Select(p => p.Name).ToList() ?? new();
             Races = seasonEventRound.Races?.Select(race => new SeasonEventRoundRaceDto(race)).ToList() ?? new();
             PointsStrategy = seasonEventRound.PointsStrategy;
             DroppedCarsPositionDefinementStrategy = seasonEventRound.DroppedCarsPositionDefinementStrategy;
@@ -73,7 +78,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds
             SeasonEventId = seasonEventRound.SeasonEventId;
 
             int advancesCount = 0;
-            seasonEventRound.Races.ForEach(r => advancesCount += r.InstantAdvancements);
+            seasonEventRound.Races?.ForEach(r => advancesCount += r.InstantAdvancements);
             advancesCount += seasonEventRound.SecondChanceRules?.AdvancesCount ?? 0;
 
             AdvancesCount = advancesCount;

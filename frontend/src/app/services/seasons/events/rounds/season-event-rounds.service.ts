@@ -98,6 +98,7 @@ export class SeasonEventRoundDto {
     public type: RoundType,
     public participantsCount: number,
     public participantsIds: string[],
+    public participantsNames: string[],
     public races: SeasonEventRoundRaceDto[],
     public pointsStrategy: RoundPointsStrategy,
     public droppedCarsPositionDefinementStrategy: DroppedCarsPositionDefinementStrategy,
@@ -112,6 +113,7 @@ export class SeasonEventRoundDto {
       payload.type,
       payload.participantsCount,
       payload.participantsIds,
+      payload.participantsNames,
       payload.races,
       payload.pointsStrategy,
       payload.droppedCarsPositionDefinementStrategy,
@@ -198,5 +200,9 @@ export class SeasonEventRoundsService {
     return this.backendService.delete(
       `${URL}/${roundId}?seasonEventId=${seasonEventId}`
     );
+  }
+
+  public hasRoundStarted(roundId: string): Observable<boolean> {
+    return this.backendService.get(`${URL}/${roundId}/hasStarted`);
   }
 }

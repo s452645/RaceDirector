@@ -1,5 +1,6 @@
 ﻿using backend.Exceptions;
 using backend.Models;
+using backend.Models.Cars;
 using backend.Models.Dtos.Seasons.Events;
 using backend.Models.Dtos.Seasons.Events.Rounds;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races;
@@ -9,6 +10,7 @@ using backend.Models.Seasons.Events.Rounds;
 using backend.Models.Seasons.Events.Rounds.Races;
 using backend.Models.Seasons.Events.Rounds.Races.Heats;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace backend.Services.Seasons.Events.Rounds
 {
@@ -140,7 +142,7 @@ namespace backend.Services.Seasons.Events.Rounds
             }
 
             var random = new Random();
-            var participants = round.Participants;
+            var participants = new List<Car>(round.Participants);
             
             var races = round.Races.Select(r => new SeasonEventRoundRaceDto(r)).ToList();
 
@@ -188,6 +190,19 @@ namespace backend.Services.Seasons.Events.Rounds
 
             await _context.SaveChangesAsync();
             return new SeasonEventRoundDto(round);
+        }
+
+        public async Task<bool> HasRoundStarted(Guid roundId)
+        {
+            var races = await _context.SeasonEventRoundRaces
+                .Where(r => r.RoundId == roundId)
+                .Include(r => r.Heats).ThenInclude(h => h.Results)
+                .ToListAsync();
+
+            return races
+                .SelectMany(r => r.Heats)
+                .SelectMany(h => h.Results)
+                .Any(result => result.PointsSummed != 0);
         }
 
         private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId) 
