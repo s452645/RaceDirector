@@ -1,0 +1,23 @@
+<div class="h-full">
+  <p-table
+    [value]="heatResults"
+    styleClass="p-datatable-striped p-datatable-sm"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Points</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-result>
+      <tr>
+        <td class="text-xs text-gray-300">{{ result.position }}</td>
+        <td>{{ result.car.name }}</td>
+        <td>
+          {{ result.pointsSummed === 0 ? '-' : result.pointsSummed.toFixed(3) }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

@@ -47,6 +47,9 @@ import { SeasonEventRoundComponent } from './components/seasons/season-event-rou
 import { SeasonEventRoundRaceComponent } from './components/seasons/season-event-round-race/season-event-round-race.component';
 import { RaceHeatViewComponent } from './components/seasons/season-event-round-race/race-heat-view/race-heat-view.component';
 import { RoundRaceViewComponent } from './components/seasons/season-event-round/season-event-round/round-race-view/round-race-view.component';
+import { SeasonEventRoundRaceHeatComponent } from './components/seasons/season-event-round-race-heat/season-event-round-race-heat.component';
+import { HeatCurrentRaceTableComponent } from './components/seasons/season-event-round-race-heat/heat-current-race-table/heat-current-race-table.component';
+import { HeatPointsTableComponent } from './components/seasons/season-event-round-race-heat/heat-points-table/heat-points-table.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -78,6 +81,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     SeasonEventRoundRaceComponent,
     RaceHeatViewComponent,
     RoundRaceViewComponent,
+    SeasonEventRoundRaceHeatComponent,
+    HeatCurrentRaceTableComponent,
+    HeatPointsTableComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,0 +1,27 @@
+<div
+  class="flex justify-content-between w-full h-full"
+  [ngStyle]="{ gap: '2rem' }"
+>
+  <app-heat-current-race-table
+    class="w-2"
+    [raceDtoNullable]="raceDto"
+  ></app-heat-current-race-table>
+
+  <div class="flex w-full">
+    <app-heat-points-table
+      class="w-4"
+      [heatResults]="heatDto.results"
+    ></app-heat-points-table>
+
+    <p-button
+      label="Previous heat"
+      [disabled]="!previousHeatAvailable"
+      (onClick)="goToPreviousHeat()"
+    ></p-button>
+    <p-button
+      label="Next heat"
+      [disabled]="!nextHeatAvailable"
+      (onClick)="goToNextHeat()"
+    ></p-button>
+  </div>
+</div>

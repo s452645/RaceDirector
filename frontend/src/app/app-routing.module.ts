@@ -10,7 +10,7 @@ import { SeasonEventComponent } from './components/seasons/season-event/season-e
 import { RouteTitle } from './services/route-title.service';
 import { SeasonEventRoundComponent } from './components/seasons/season-event-round/season-event-round/season-event-round.component';
 import { SeasonEventRoundRaceComponent } from './components/seasons/season-event-round-race/season-event-round-race.component';
-import { RaceHeatViewComponent } from './components/seasons/season-event-round-race/race-heat-view-temp/race-heat-view.component';
+import { SeasonEventRoundRaceHeatComponent } from './components/seasons/season-event-round-race-heat/season-event-round-race-heat.component';
 
 const routes: Routes = [
   { path: 'home', component: HomeComponent, title: RouteTitle.HOME },
@@ -36,8 +36,8 @@ const routes: Routes = [
     component: SeasonEventRoundRaceComponent,
   },
   {
-    path: 'seasons/:seasonId/events/:eventId/rounds/:roundId/races/:raceId/heats/:heatId',
-    component: RaceHeatViewComponent,
+    path: 'seasons/:seasonId/events/:eventId/rounds/:roundId/races/:raceId/heats',
+    component: SeasonEventRoundRaceHeatComponent,
   },
   { path: 'cars', component: CarsComponent, title: RouteTitle.CARS },
   { path: 'owners', component: OwnersComponent, title: RouteTitle.OWNERS },

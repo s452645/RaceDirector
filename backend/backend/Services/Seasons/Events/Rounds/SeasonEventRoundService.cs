@@ -1,16 +1,13 @@
 ﻿using backend.Exceptions;
 using backend.Models;
 using backend.Models.Cars;
-using backend.Models.Dtos.Seasons.Events;
 using backend.Models.Dtos.Seasons.Events.Rounds;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats;
 using backend.Models.Seasons.Events;
 using backend.Models.Seasons.Events.Rounds;
 using backend.Models.Seasons.Events.Rounds.Races;
-using backend.Models.Seasons.Events.Rounds.Races.Heats;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 
 namespace backend.Services.Seasons.Events.Rounds
 {

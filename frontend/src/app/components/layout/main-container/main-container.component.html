@@ -1,5 +1,11 @@
-<div class="flex-column w-full">
-  <app-title-bar />
-  <router-outlet></router-outlet>
+<div class="flex flex-column w-full h-full">
+  <app-title-bar
+    class="w-full transition-all transition-duration-200 border-bottom-1 border-200"
+  />
+
+  <div class="content-container transition-all transition-duration-200">
+    <router-outlet></router-outlet>
+  </div>
+
   <p-toast position="bottom-right"></p-toast>
 </div>
