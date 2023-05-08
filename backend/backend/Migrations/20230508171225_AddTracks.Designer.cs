@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Models;
@@ -11,9 +12,10 @@ using backend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    partial class BackendContextModelSnapshot : ModelSnapshot
+    [Migration("20230508171225_AddTracks")]
+    partial class AddTracks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -361,8 +363,8 @@ namespace backend.Migrations
                     b.Property<int>("Position")
                         .HasColumnType("integer");
 
-                    b.Property<int>("TrackNumber")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("TrackId")
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
@@ -372,6 +374,8 @@ namespace backend.Migrations
                     b.HasIndex("BreakBeamSensorId");
 
                     b.HasIndex("CircuitId");
+
+                    b.HasIndex("TrackId");
 
                     b.ToTable("Checkpoints");
                 });
@@ -389,6 +393,21 @@ namespace backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Circuits");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Circuits.Track", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tracks");
                 });
 
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatSectorResult", b =>
@@ -981,9 +1000,15 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("backend.Models.Seasons.Events.Circuits.Track", "Track")
+                        .WithMany("Checkpoints")
+                        .HasForeignKey("TrackId");
+
                     b.Navigation("BreakBeamSensor");
 
                     b.Navigation("Circuit");
+
+                    b.Navigation("Track");
                 });
 
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatSectorResult", b =>
@@ -1248,6 +1273,11 @@ namespace backend.Migrations
 
                     b.Navigation("SeasonEvent")
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Circuits.Track", b =>
+                {
+                    b.Navigation("Checkpoints");
                 });
 
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", b =>
