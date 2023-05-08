@@ -7,7 +7,6 @@ using backend.Models.Seasons.Events.Circuits;
 using backend.Models.Seasons.Events.Rounds.Races;
 using backend.Services.Hardware.Comms;
 using Microsoft.EntityFrameworkCore;
-using System.IO.Pipelines;
 
 namespace backend.Services.Seasons.Events.Rounds.Races
 {

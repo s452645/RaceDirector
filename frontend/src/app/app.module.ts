@@ -21,6 +21,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ChipsModule } from 'primeng/chips';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { ProgressBarModule } from 'primeng/progressbar';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -112,6 +113,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     SelectButtonModule,
     CardModule,
     MultiSelectModule,
+    ProgressBarModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {
