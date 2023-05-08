@@ -3,8 +3,10 @@ import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { SeasonEventRoundRacesService } from 'src/app/services/seasons/events/rounds/races/season-event-round-races.service';
 import {
+  RaceHeatSectorResultDto,
   SeasonEventRoundRaceDto,
   SeasonEventRoundRaceHeatDto,
+  SeasonEventRoundsService,
 } from 'src/app/services/seasons/events/rounds/season-event-rounds.service';
 import { UtilsService } from 'src/app/services/utils.service';
 
@@ -25,6 +27,11 @@ export class SeasonEventRoundRaceHeatComponent implements OnInit, OnDestroy {
 
   nextHeatAvailable = false;
   previousHeatAvailable = false;
+
+  sectorsIndexes: number[] = [];
+  sectorsResults: RaceHeatSectorResultDto[] = [];
+
+  availableBonuses: number[] = [];
 
   get roundId(): string {
     return this.utils.getNullableOrThrow(this.roundIdNullable);
@@ -63,6 +70,10 @@ export class SeasonEventRoundRaceHeatComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+  }
+
+  public getSectorResults(sectorOrder: number): RaceHeatSectorResultDto[] {
+    return this.sectorsResults.filter(result => result.order === sectorOrder);
   }
 
   updateHeat(newHeatId: string): void {
@@ -112,6 +123,22 @@ export class SeasonEventRoundRaceHeatComponent implements OnInit, OnDestroy {
         if (this.heatDto.order < this.raceDto.heats.length - 1) {
           this.nextHeatAvailable = true;
         }
+
+        const sectorsCount =
+          this.heatDto.results.at(0)?.sectorResults.length ?? 0;
+
+        this.sectorsIndexes = Array(sectorsCount)
+          .fill(0)
+          .map((_, i) => i);
+
+        this.sectorsResults = this.heatDto.results
+          .map(r => r.sectorResults)
+          .flat();
+
+        const s = this.racesService
+          .getRaceAvailableBonuses(this.raceId)
+          .subscribe(bonuses => (this.availableBonuses = bonuses));
+        this.subscription.add(s);
       });
 
     this.subscription.add(s);
@@ -119,5 +146,15 @@ export class SeasonEventRoundRaceHeatComponent implements OnInit, OnDestroy {
 
   private sortHeats(): void {
     this.raceDto.heats.sort((a, b) => a.order - b.order);
+
+    this.raceDto.heats.forEach(heat =>
+      heat.results.forEach(heatResult => {
+        heatResult.sectorResults.forEach(
+          sectorResult => (sectorResult.carName = heatResult.car.name)
+        );
+
+        heatResult.sectorResults.sort((a, b) => a.order - b.order);
+      })
+    );
   }
 }

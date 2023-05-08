@@ -7,21 +7,39 @@
     [raceDtoNullable]="raceDto"
   ></app-heat-current-race-table>
 
-  <div class="flex w-full">
-    <app-heat-points-table
-      class="w-4"
-      [heatResults]="heatDto.results"
-    ></app-heat-points-table>
+  <div
+    class="flex flex-column w-full pt-3"
+    [ngStyle]="{ gap: '2rem', paddingRight: '2rem' }"
+  >
+    <div class="grid grid-nogutter w-full">
+      <app-heat-points-table
+        class="col-8 col-offset-2"
+        [heatResults]="heatDto.results"
+        [availableBonuses]="availableBonuses"
+      ></app-heat-points-table>
+    </div>
 
-    <p-button
-      label="Previous heat"
-      [disabled]="!previousHeatAvailable"
-      (onClick)="goToPreviousHeat()"
-    ></p-button>
-    <p-button
-      label="Next heat"
-      [disabled]="!nextHeatAvailable"
-      (onClick)="goToNextHeat()"
-    ></p-button>
+    <div class="flex justify-content-around w-full">
+      <app-heat-race-sector-table
+        *ngFor="let i of sectorsIndexes"
+        class="col-5"
+        [sectorResults]="getSectorResults(i)"
+      ></app-heat-race-sector-table>
+    </div>
+
+    <div class="grid grid-nogutter w-full">
+      <p-button
+        class="col-2 col-offset-8"
+        label="Previous heat"
+        [disabled]="!previousHeatAvailable"
+        (onClick)="goToPreviousHeat()"
+      ></p-button>
+      <p-button
+        class="col-2"
+        label="Next heat"
+        [disabled]="!nextHeatAvailable"
+        (onClick)="goToNextHeat()"
+      ></p-button>
+    </div>
   </div>
 </div>

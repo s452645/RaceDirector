@@ -18,6 +18,10 @@ export class SeasonEventRoundRacesService {
     return this.backendService.get(`${URL}/${raceId}?roundId=${roundId}`);
   }
 
+  public getRaceAvailableBonuses(raceId: string): Observable<number[]> {
+    return this.backendService.get(`${URL}/${raceId}/bonuses`);
+  }
+
   public beginHeat(heatId: string): Observable<void> {
     return this.backendService.post(`${URL}/${heatId}/begin-heat`, null);
   }

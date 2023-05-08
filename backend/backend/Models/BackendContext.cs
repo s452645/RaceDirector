@@ -8,6 +8,7 @@ using backend.Models.Seasons.Events.Circuits;
 using backend.Models.Seasons.Events.Rounds;
 using backend.Models.Seasons.Events.Rounds.Races;
 using backend.Models.Seasons.Events.Rounds.Races.Heats;
+using backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults;
 using backend.Models.Teams;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -26,7 +27,7 @@ public class BackendContext : DbContext
     {
         modelBuilder.Entity<Photo>()
             .Property(x => x.UploadDate)
-            .HasDefaultValueSql("getutcdate()");
+            .HasDefaultValueSql("now()");
 
         var floatArrayConverter = new ValueConverter<float[], string>(
             v => string.Join(";", v),
@@ -51,7 +52,7 @@ public class BackendContext : DbContext
             .SetValueComparer(floatArrayComparer);
 
         modelBuilder
-            .Entity<SeasonEventRoundRaceHeatResult>()
+            .Entity<TimeTrialHeatResult>()
             .Property(heatResult => heatResult.SectorTimes)
             .HasConversion(floatArrayConverter)
             .Metadata
@@ -82,6 +83,9 @@ public class BackendContext : DbContext
     public DbSet<SeasonEventRoundRaceResult> SeasonEventRoundRaceResults => Set<SeasonEventRoundRaceResult>();
     public DbSet<SeasonEventRoundRaceHeat> SeasonEventRoundRaceHeats => Set<SeasonEventRoundRaceHeat>();
     public DbSet<SeasonEventRoundRaceHeatResult> SeasonEventRoundRaceHeatResults => Set<SeasonEventRoundRaceHeatResult>();
+    public DbSet<TimeTrialHeatResult> TimeTrialHeatResults => Set<TimeTrialHeatResult>();
+    public DbSet<RaceHeatResult> RaceHeatResults => Set<RaceHeatResult>();
+    public DbSet<RaceHeatSectorResult> RaceHeatSectorResults => Set<RaceHeatSectorResult>();
     public DbSet<SyncBoardResult> SyncBoardResults => Set<SyncBoardResult>();
     public DbSet<BoardEvent> BoardEvents => Set<BoardEvent>();
 

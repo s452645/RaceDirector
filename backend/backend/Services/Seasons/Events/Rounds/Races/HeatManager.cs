@@ -111,24 +111,24 @@ namespace backend.Services.Seasons.Events.Rounds.Races
 
             if (HeatState.Finished != _state)
             {
-                while (heatResult.SectorTimes.Length < _circuit.Checkpoints.Count - 1)
+              /*  while (heatResult.SectorTimes.Length < _circuit.Checkpoints.Count - 1)
                 {
                     heatResult.SectorTimes = heatResult.SectorTimes.Append(_scoreRules.UnfinishedSectorPenaltyPoints).ToArray();
                 }
-
+*/
                 CalculateTimePoints();
                 _state = HeatState.Finished;
             }
 
 
-            var pointsSummed =
+            /*var pointsSummed =
                 heatResult.TimePoints + 
                 heatResult.AdvantagePoints + 
                 heatResult.DistancePoints;
-
-            heatResult.Bonuses.ToList().ForEach(b => pointsSummed += b);
+*/
+  /*          heatResult.Bonuses.ToList().ForEach(b => pointsSummed += b);
             heatResult.PointsSummed = pointsSummed;
-
+*/
             HandleHeatChange(true);
         }
 
@@ -171,7 +171,7 @@ namespace backend.Services.Seasons.Events.Rounds.Races
             _syncedCheckpointsTimestamps.Add(syncedTimestamp);
 
             var heatResult = _heat.Results.First();
-            heatResult.SectorTimes = heatResult.SectorTimes.Append((float)sectorTime).ToArray();
+            // heatResult.SectorTimes = heatResult.SectorTimes.Append((float)sectorTime).ToArray();
 
             var heatFinished = boardEvent.SensorId == FinishSensorId;
             if (heatFinished)
@@ -191,7 +191,7 @@ namespace backend.Services.Seasons.Events.Rounds.Races
             var paused = false;
             var fullTime = 0.0f;
             
-            heatResult.SectorTimes.ToList().ForEach(sectorTime =>
+            /*heatResult.SectorTimes.ToList().ForEach(sectorTime =>
             {
                 if (paused && CheckpointType.Resume == _circuit.Checkpoints.Where(c => c.Position == sectorIndex + 1).First().Type)
                 {
@@ -210,10 +210,10 @@ namespace backend.Services.Seasons.Events.Rounds.Races
                 }
 
                 sectorIndex++;
-            });
+            });*/
 
-            heatResult.FullTime = fullTime;
-            heatResult.TimePoints = heatResult.FullTime * _scoreRules.TimeMultiplier;
+            // heatResult.FullTime = fullTime;
+            // heatResult.TimePoints = heatResult.FullTime * _scoreRules.TimeMultiplier;
         }
 
 

@@ -2,9 +2,9 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using backend.Models;
 
 #nullable disable
@@ -12,39 +12,39 @@ using backend.Models;
 namespace backend.Migrations
 {
     [DbContext(typeof(BackendContext))]
-    [Migration("20230405005058_AddTimestampsToSyncResult")]
-    partial class AddTimestampsToSyncResult
+    [Migration("20230507174909_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.15")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("backend.Models.Cars.Car", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("MainPhotoId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("OwnerId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("PurchaseDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -59,22 +59,22 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CarId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("HeightId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("LengthId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("WeightId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("WidthId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -96,26 +96,26 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CarId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("ModelName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("SeriesId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("WikiLink")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Year")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -131,35 +131,60 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("FirstLevelName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("SecondLevelName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.ToTable("Series");
                 });
 
+            modelBuilder.Entity("backend.Models.Hardware.BoardEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Broken")
+                        .HasColumnType("boolean");
+
+                    b.Property<long>("PicoLocalTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ReceivedTimestamp")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("SensorId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SensorId");
+
+                    b.ToTable("BoardEvents");
+                });
+
             modelBuilder.Entity("backend.Models.Hardware.BreakBeamSensor", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("BoardId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Pin")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -172,24 +197,24 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("Active")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("Connected")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<string>("IPAddress")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -200,7 +225,7 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<long?>("ClockAdjustedPicoTimestamp")
                         .HasColumnType("bigint");
@@ -212,19 +237,19 @@ namespace backend.Migrations
                         .HasColumnType("real");
 
                     b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<long?>("NewClockOffset")
                         .HasColumnType("bigint");
 
                     b.Property<Guid>("PicoBoardId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("SyncFinishedTimestamp")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("SyncResult")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -237,32 +262,32 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("CarId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<byte[]>("File")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("bytea");
 
                     b.Property<int?>("Height")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UploadDate")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("getutcdate()");
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
 
                     b.Property<int?>("Width")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -275,17 +300,17 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Unit")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Value")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -296,21 +321,21 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("BirthDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("PhotoId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Prefix")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -323,23 +348,23 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("BreakBeamSensorId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CircuitId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<int>("Position")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -354,25 +379,97 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.ToTable("Circuits");
                 });
 
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatSectorResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("AdvantagePoints")
+                        .HasColumnType("real");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.Property<float>("PositionPoints")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("RaceHeatResultId")
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("Time")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RaceHeatResultId");
+
+                    b.ToTable("RaceHeatSectorResults");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.SeasonEventRoundRaceHeatResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Bonuses")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("CarId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("DistancePoints")
+                        .HasColumnType("real");
+
+                    b.Property<Guid>("HeatId")
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("PointsSummed")
+                        .HasColumnType("real");
+
+                    b.Property<int>("Position")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CarId");
+
+                    b.ToTable("SeasonEventRoundRaceHeatResults");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("SeasonEventRoundRaceHeatResult");
+                });
+
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("RaceId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -381,73 +478,26 @@ namespace backend.Migrations
                     b.ToTable("SeasonEventRoundRaceHeats");
                 });
 
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeatResult", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<float>("AdvantagePoints")
-                        .HasColumnType("real");
-
-                    b.Property<string>("Bonuses")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CarId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<float>("DistancePoints")
-                        .HasColumnType("real");
-
-                    b.Property<float>("FullTime")
-                        .HasColumnType("real");
-
-                    b.Property<float>("PointsSummed")
-                        .HasColumnType("real");
-
-                    b.Property<int>("Position")
-                        .HasColumnType("int");
-
-                    b.Property<Guid?>("SeasonEventRoundRaceHeatId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SectorTimes")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<float>("TimePoints")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CarId");
-
-                    b.HasIndex("SeasonEventRoundRaceHeatId");
-
-                    b.ToTable("SeasonEventRoundRaceHeatResults");
-                });
-
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("InstantAdvancements")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ParticipantsCount")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("RoundId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("SecondChances")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -460,22 +510,22 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CarId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<float>("Points")
                         .HasColumnType("real");
 
                     b.Property<int?>("Position")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("RaceOutcome")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("SeasonEventRoundRaceId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -490,39 +540,38 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("DroppedCarsPointsStrategy")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("DroppedCarsPositionDefinementStrategy")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("ParticipantsCount")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("PointsStrategy")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("SeasonEventId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("SecondChanceRulesId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SeasonEventId");
 
                     b.HasIndex("SecondChanceRulesId")
-                        .IsUnique()
-                        .HasFilter("[SecondChanceRulesId] IS NOT NULL");
+                        .IsUnique();
 
                     b.ToTable("SeasonEventRounds");
                 });
@@ -531,13 +580,13 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("AdvancesCount")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<int>("PointsStrategy")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -548,39 +597,37 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("CircuitId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid?>("ScoreRulesId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("SeasonId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("Type")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CircuitId")
-                        .IsUnique()
-                        .HasFilter("[CircuitId] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("ScoreRulesId")
-                        .IsUnique()
-                        .HasFilter("[ScoreRulesId] IS NOT NULL");
+                        .IsUnique();
 
                     b.HasIndex("SeasonId");
 
@@ -591,17 +638,17 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("AvailableBonuses")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<float>("DistanceMultiplier")
                         .HasColumnType("real");
 
                     b.Property<bool>("TheMoreTheBetter")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean");
 
                     b.Property<float>("TimeMultiplier")
                         .HasColumnType("real");
@@ -618,17 +665,17 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -639,19 +686,19 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CarId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Place")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double>("Points")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision");
 
                     b.Property<Guid>("SeasonId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -666,19 +713,19 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Place")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<double>("Points")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision");
 
                     b.Property<Guid?>("SeasonId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("TeamId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -693,13 +740,13 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Hierarchy")
-                        .HasColumnType("int");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("TeamId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -712,18 +759,18 @@ namespace backend.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Prefix")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("SeasonId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -735,10 +782,10 @@ namespace backend.Migrations
             modelBuilder.Entity("CarPot", b =>
                 {
                     b.Property<Guid>("CarsId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("PotsId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("CarsId", "PotsId");
 
@@ -750,10 +797,10 @@ namespace backend.Migrations
             modelBuilder.Entity("CarSeasonEvent", b =>
                 {
                     b.Property<Guid>("ParticipantsId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("SeasonEventsId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("ParticipantsId", "SeasonEventsId");
 
@@ -765,16 +812,44 @@ namespace backend.Migrations
             modelBuilder.Entity("CarSeasonEventRound", b =>
                 {
                     b.Property<Guid>("ParticipantsId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("SeasonEventRoundsId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid");
 
                     b.HasKey("ParticipantsId", "SeasonEventRoundsId");
 
                     b.HasIndex("SeasonEventRoundsId");
 
                     b.ToTable("CarSeasonEventRound");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatResult", b =>
+                {
+                    b.HasBaseType("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.SeasonEventRoundRaceHeatResult");
+
+                    b.HasIndex("HeatId");
+
+                    b.HasDiscriminator().HasValue("RaceHeatResult");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.TimeTrialHeatResult", b =>
+                {
+                    b.HasBaseType("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.SeasonEventRoundRaceHeatResult");
+
+                    b.Property<float>("FullTime")
+                        .HasColumnType("real");
+
+                    b.Property<string>("SectorTimes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<float>("TimePoints")
+                        .HasColumnType("real");
+
+                    b.HasIndex("HeatId");
+
+                    b.HasDiscriminator().HasValue("TimeTrialHeatResult");
                 });
 
             modelBuilder.Entity("backend.Models.Cars.Car", b =>
@@ -844,6 +919,17 @@ namespace backend.Migrations
                     b.Navigation("Series");
                 });
 
+            modelBuilder.Entity("backend.Models.Hardware.BoardEvent", b =>
+                {
+                    b.HasOne("backend.Models.Hardware.BreakBeamSensor", "Sensor")
+                        .WithMany()
+                        .HasForeignKey("SensorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Sensor");
+                });
+
             modelBuilder.Entity("backend.Models.Hardware.BreakBeamSensor", b =>
                 {
                     b.HasOne("backend.Models.Hardware.PicoBoard", "Board")
@@ -899,6 +985,28 @@ namespace backend.Migrations
                     b.Navigation("Circuit");
                 });
 
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatSectorResult", b =>
+                {
+                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatResult", "RaceHeatResult")
+                        .WithMany("SectorResults")
+                        .HasForeignKey("RaceHeatResultId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RaceHeatResult");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.SeasonEventRoundRaceHeatResult", b =>
+                {
+                    b.HasOne("backend.Models.Cars.Car", "Car")
+                        .WithMany("HeatResults")
+                        .HasForeignKey("CarId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Car");
+                });
+
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", b =>
                 {
                     b.HasOne("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", "Race")
@@ -908,21 +1016,6 @@ namespace backend.Migrations
                         .IsRequired();
 
                     b.Navigation("Race");
-                });
-
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeatResult", b =>
-                {
-                    b.HasOne("backend.Models.Cars.Car", "Car")
-                        .WithMany("HeatResults")
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", null)
-                        .WithMany("Results")
-                        .HasForeignKey("SeasonEventRoundRaceHeatId");
-
-                    b.Navigation("Car");
                 });
 
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", b =>
@@ -1096,6 +1189,28 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatResult", b =>
+                {
+                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", "Heat")
+                        .WithMany("Results")
+                        .HasForeignKey("HeatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Heat");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.TimeTrialHeatResult", b =>
+                {
+                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", "Heat")
+                        .WithMany()
+                        .HasForeignKey("HeatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Heat");
+                });
+
             modelBuilder.Entity("backend.Models.Cars.Car", b =>
                 {
                     b.Navigation("HeatResults");
@@ -1180,6 +1295,11 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Teams.Team", b =>
                 {
                     b.Navigation("Pots");
+                });
+
+            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatResult", b =>
+                {
+                    b.Navigation("SectorResults");
                 });
 #pragma warning restore 612, 618
         }

@@ -27,6 +27,13 @@ namespace backend.Controllers.Seasons.Events.Rounds.Races
             return Ok(_raceService.GetRace(roundId, id));
         }
 
+        // GET: api/SeasonEventRoundRaces/5/bonuses
+        [HttpGet("{id}/bonuses")]
+        public async Task<ActionResult<List<float>>> GetRaceAvailableBonuses(Guid id)
+        {
+            return Ok(await _raceService.GetRaceAvailableBonuses(id));
+        }
+
 
         // POST: api/SeasonEventRoundRaces/6/begin-heat
         [HttpPost("{heatId}/begin-heat")]

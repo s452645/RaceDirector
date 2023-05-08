@@ -36,6 +36,7 @@ namespace backend.Services.Seasons.Events.Rounds.Races
                 .Include(r => r.Results).ThenInclude(r => r.Car)
                 .Include(r => r.Round)
                 .Include(r => r.Heats).ThenInclude(h => h.Results).ThenInclude(h => h.Car)
+                .Include(r => r.Heats).ThenInclude(h => h.Results).ThenInclude(r => r.SectorResults)
                 .FirstOrDefault();
 
             if (race == null)
@@ -46,7 +47,25 @@ namespace backend.Services.Seasons.Events.Rounds.Races
             return new SeasonEventRoundRaceDto(race);
         }
 
-        public void BeginHeat(Guid heatId)
+        public async Task<List<float>> GetRaceAvailableBonuses(Guid raceId)
+        {
+            using var scope = scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
+
+            var race = await db.SeasonEventRoundRaces
+                .Where(race => race.Id == raceId)
+                .Include(race => race.Round).ThenInclude(round => round.SeasonEvent).ThenInclude(seasonEvent => seasonEvent.ScoreRules)
+                .FirstOrDefaultAsync();
+
+            if (race == null)
+            {
+                throw new NotFoundException($"Race [{raceId}] not found");
+            }
+
+            return race.Round.SeasonEvent.ScoreRules?.AvailableBonuses.ToList() ?? new();
+        }
+
+            public void BeginHeat(Guid heatId)
         {
             using var scope = scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<BackendContext>();

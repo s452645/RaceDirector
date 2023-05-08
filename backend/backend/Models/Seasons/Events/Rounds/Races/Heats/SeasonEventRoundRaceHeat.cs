@@ -1,4 +1,5 @@
 ﻿using backend.Models.Seasons.Events.Rounds.Races;
+using backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults;
 
 namespace backend.Models.Seasons.Events.Rounds.Races.Heats
 {
@@ -10,6 +11,7 @@ namespace backend.Models.Seasons.Events.Rounds.Races.Heats
         public Guid RaceId { get; set; }
         public SeasonEventRoundRace Race { get; set; }
 
-        public List<SeasonEventRoundRaceHeatResult> Results { get; set; }
+        // TODO
+        public List<RaceHeatResult> Results { get; set; }
     }
 }

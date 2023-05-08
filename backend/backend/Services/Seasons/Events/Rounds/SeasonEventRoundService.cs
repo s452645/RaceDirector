@@ -4,9 +4,11 @@ using backend.Models.Cars;
 using backend.Models.Dtos.Seasons.Events.Rounds;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats;
+using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats.HeatResults;
 using backend.Models.Seasons.Events;
 using backend.Models.Seasons.Events.Rounds;
 using backend.Models.Seasons.Events.Rounds.Races;
+using backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services.Seasons.Events.Rounds
@@ -35,7 +37,6 @@ namespace backend.Services.Seasons.Events.Rounds
             var round = _context.SeasonEventRounds.Where(round => (round.SeasonEventId == seasonEventId) && (round.Id == roundId))
                 .Include(round => round.Participants)
                 .Include(round => round.Races).ThenInclude(race => race.Results).ThenInclude(r => r.Car)
-                .Include(round => round.Races).ThenInclude(race => race.Heats).ThenInclude(h => h.Results).ThenInclude(r => r.Car)
                 .FirstOrDefault();
 
             if (round == null)
@@ -168,20 +169,31 @@ namespace backend.Services.Seasons.Events.Rounds
                     heat.Order = heatOrder;
                     heatOrder++;
 
-                    var heatResults = new SeasonEventRoundRaceHeatResultDto();
+                    var heatResults = new RaceHeatResultDto();
                     heatResults.CarId = participant.Id;
 
-                    heatResults.SectorTimes = new float [0];
+/*                    heatResults.SectorTimes = new float [0];
                     heatResults.FullTime = 0;
 
                     heatResults.TimePoints = 0;
                     heatResults.AdvantagePoints = 0;
-                    heatResults.DistancePoints = 0;
+*/                  heatResults.DistancePoints = 0;
 
                     heatResults.Bonuses = new float[0];
 
                     heatResults.Position = 0;
                     heatResults.PointsSummed = 0;
+
+                    var sectorOneResults = new RaceHeatSectorResultDto();
+                    sectorOneResults.Order = 0;
+                    sectorOneResults.PositionPoints = 1;
+                    sectorOneResults.AdvantagePoints = 3.50f;
+
+                    var sectorTwoResults = new RaceHeatSectorResultDto();
+                    sectorTwoResults.Order = 1;
+                    sectorTwoResults.AdvantagePoints = 2.45f;
+
+                    heatResults.SectorResults.AddRange(new List<RaceHeatSectorResultDto> {sectorOneResults, sectorTwoResults });
 
                     heat.RaceId = race.Id;
                     heat.Results.Add(heatResults);

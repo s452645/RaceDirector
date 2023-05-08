@@ -37,20 +37,51 @@ export class CarDto {
   constructor(public name: string) {}
 }
 
-export class SeasonEventRoundRaceHeatResultDto {
+// export class SeasonEventRoundRaceHeatResultDto {
+//   public id: string | undefined;
+
+//   constructor(
+//     public carId: string,
+//     public car: CarDto,
+//     public sectorTimes: number[],
+//     public fullTime: number,
+//     public timePoints: number,
+//     public advantagePoints: number,
+//     public distancePoints: number,
+//     public bonuses: number[],
+//     public pointsSummed: number,
+//     public position: number
+//   ) {}
+// }
+
+export class RaceHeatSectorResultDto {
+  public id: string | undefined;
+  public carName: string | undefined;
+
+  constructor(
+    public order: number,
+    public time: number,
+    public position: number,
+    public positionPoints: number,
+    public advantagePoints: number,
+    public raceHeatResultId: string
+  ) {}
+}
+
+export class RaceHeatResultDto {
   public id: string | undefined;
 
   constructor(
     public carId: string,
     public car: CarDto,
-    public sectorTimes: number[],
-    public fullTime: number,
-    public timePoints: number,
-    public advantagePoints: number,
+    public heatId: string,
+
     public distancePoints: number,
     public bonuses: number[],
     public pointsSummed: number,
-    public position: number
+    public position: number,
+
+    public sectorResults: RaceHeatSectorResultDto[]
   ) {}
 }
 
@@ -60,7 +91,7 @@ export class SeasonEventRoundRaceHeatDto {
   constructor(
     public order: number,
     public raceId: string,
-    public results: SeasonEventRoundRaceHeatResultDto[]
+    public results: RaceHeatResultDto[]
   ) {}
 }
 
