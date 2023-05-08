@@ -37,7 +37,7 @@ builder.Services.AddScoped<SeasonEventRoundService>();
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<BackendContext>(options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("BackendContext"))
+    options.UseNpgsql(builder.Configuration.GetConnectionString("BackendContext"))
 );
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

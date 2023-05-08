@@ -27,8 +27,9 @@ export class RaceHeatViewComponent {
       return;
     }
 
-    this.router.navigate([`heats/${heatId}`], {
+    this.router.navigate([`heats`], {
       relativeTo: this.route,
+      queryParams: { startHeatId: heatId },
     });
   }
 }

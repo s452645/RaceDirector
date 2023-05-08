@@ -1,4 +1,5 @@
-﻿using backend.Models.Seasons.Events.Rounds.Races.Heats;
+﻿using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats.HeatResults;
+using backend.Models.Seasons.Events.Rounds.Races.Heats;
 
 namespace backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats
 {
@@ -9,16 +10,17 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats
 
         public Guid RaceId { get; set; }
 
-        public List<SeasonEventRoundRaceHeatResultDto> Results { get; set; }
+        // TODO
+        public List<RaceHeatResultDto> Results { get; set; }
 
         public SeasonEventRoundRaceHeatDto()
         {
             Id = Guid.NewGuid();
             Order = 0;
-            Results = new List<SeasonEventRoundRaceHeatResultDto>();
+            Results = new List<RaceHeatResultDto>();
         }
 
-        public SeasonEventRoundRaceHeatDto(Guid id, int order, Guid raceId, List<SeasonEventRoundRaceHeatResultDto> results)
+        public SeasonEventRoundRaceHeatDto(Guid id, int order, Guid raceId, List<RaceHeatResultDto> results)
         {
             Id = id;
             Order = order;
@@ -31,7 +33,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats
             Id = raceHeat.Id;
             Order = raceHeat.Order;
             RaceId = raceHeat.Race.Id;
-            Results = raceHeat.Results.Select(r => new SeasonEventRoundRaceHeatResultDto(r)).ToList();
+            Results = raceHeat.Results.Select(r => new RaceHeatResultDto(r)).ToList();
         }
 
         public SeasonEventRoundRaceHeat ToEntity()

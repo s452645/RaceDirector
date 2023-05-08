@@ -1,0 +1,135 @@
+<p-table
+  [value]="heatResults"
+  dataKey="id"
+  editMode="row"
+  styleClass="p-datatable-striped p-datatable-sm"
+>
+  <ng-template pTemplate="header">
+    <tr>
+      <th class="w-1">#</th>
+      <th [style]="{ minWidth: '12%' }">Name</th>
+      <th [style]="{ minWidth: '10%' }">Points</th>
+
+      <th
+        class="text-xs"
+        [style]="{ width: '10%' }"
+        *ngFor="
+          let sectorResult of heatResults.at(0)?.sectorResults;
+          let i = index
+        "
+      >
+        {{ 'Sector ' + (i + 1) }}
+      </th>
+
+      <th class="text-xs" [style]="{ width: '10%' }">Distance</th>
+      <th class="w-2 text-xs">Bonuses</th>
+      <th class="w-1"></th>
+    </tr>
+  </ng-template>
+
+  <ng-template
+    pTemplate="body"
+    let-result
+    let-editing="editing"
+    let-ri="rowIndex"
+  >
+    <tr [pEditableRow]="result">
+      <td class="text-xs text-gray-300">{{ result.position }}</td>
+      <td>{{ result.car.name }}</td>
+      <td>
+        {{
+          result.pointsSummed === 0 ? '34.563' : result.pointsSummed.toFixed(3)
+        }}
+      </td>
+
+      <td
+        *ngFor="
+          let sectorResult of heatResults.at(0)?.sectorResults;
+          let i = index
+        "
+        class="text-xs"
+      >
+        {{
+          (
+            (result.sectorResults.at(i)?.positionPoints ?? 0) +
+            (result.sectorResults.at(i)?.advantagePoints ?? 0)
+          ).toFixed(3)
+        }}
+      </td>
+
+      <td class="text-xs">
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <p-inputNumber
+              class="p-inputtext-sm"
+              [(ngModel)]="result.distancePoints"
+              mode="decimal"
+              [minFractionDigits]="3"
+              [inputStyle]="{ width: '100px' }"
+            />
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{
+              result.distancePoints === 0
+                ? '-'
+                : result.distancePoints?.toFixed(3) ?? '-'
+            }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+
+      <td class="text-xs">
+        <p-cellEditor>
+          <ng-template pTemplate="input">
+            <p-multiSelect
+              appendTo="body"
+              [options]="availableBonuses"
+              [(ngModel)]="result.bonuses"
+              [style]="{ width: '120px', height: '40px', padding: '0' }"
+            >
+              ></p-multiSelect
+            >
+          </ng-template>
+          <ng-template pTemplate="output">
+            {{ result.bonuses.length === 0 ? '-' : result.bonuses.join(', ') }}
+          </ng-template>
+        </p-cellEditor>
+      </td>
+
+      <td>
+        <div class="flex align-items-center justify-content-center">
+          <button
+            *ngIf="!editing"
+            pButton
+            pRipple
+            type="button"
+            pInitEditableRow
+            icon="pi pi-pencil"
+            (click)="onRowEditInit(result)"
+            class="p-button-rounded p-button-text"
+          ></button>
+          <button
+            *ngIf="editing"
+            pButton
+            pRipple
+            type="button"
+            pSaveEditableRow
+            icon="pi pi-check"
+            (click)="onRowEditSave(result)"
+            class="p-button-rounded p-button-text p-button-success mr-2"
+          ></button>
+          <button
+            *ngIf="editing"
+            pButton
+            pRipple
+            type="button"
+            pCancelEditableRow
+            icon="pi pi-times"
+            (click)="onRowEditCancel(result, ri)"
+            class="p-button-rounded p-button-text p-button-danger"
+          ></button>
+        </div>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>

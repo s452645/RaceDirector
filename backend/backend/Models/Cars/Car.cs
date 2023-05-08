@@ -3,7 +3,7 @@ using backend.Models.Owners;
 using backend.Models.Seasons.Events;
 using backend.Models.Seasons.Events.Rounds;
 using backend.Models.Seasons.Events.Rounds.Races;
-using backend.Models.Seasons.Events.Rounds.Races.Heats;
+using backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults;
 using backend.Models.Teams;
 
 namespace backend.Models.Cars

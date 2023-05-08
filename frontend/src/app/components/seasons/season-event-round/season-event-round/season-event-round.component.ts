@@ -73,7 +73,8 @@ export class SeasonEventRoundComponent implements OnInit, OnDestroy {
         .subscribe(round => {
           this.roundDtoNullable = round;
 
-          const areRacesDrawn = round.races.map(r => r.heats).flat().length > 0;
+          const areRacesDrawn =
+            round.races.map(r => r.results).flat().length > 0;
           this.isDrawButtonEnabled =
             !areRacesDrawn && round.participantsIds.length > 0;
 

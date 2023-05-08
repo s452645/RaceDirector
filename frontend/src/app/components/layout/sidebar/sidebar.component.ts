@@ -19,6 +19,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   public ngOnInit(): void {
     const s = this.routeTitleService
       .getRouteTitle()
+
+      // FIXME (look for a string in active route instead)
       .subscribe(title => (this.selectedOption = title));
     this.subscription.add(s);
   }

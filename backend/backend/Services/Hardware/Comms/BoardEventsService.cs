@@ -1,7 +1,5 @@
 ﻿using backend.Models;
 using backend.Models.Hardware;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.WebSockets;
 using System.Text.Json;
 
 namespace backend.Services.Hardware.Comms
