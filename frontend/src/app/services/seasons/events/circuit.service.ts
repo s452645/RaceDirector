@@ -17,7 +17,8 @@ export class CheckpointDto {
     public name: string,
     public position: number,
     public type: CheckpointType,
-    public breakBeamSensorId: string
+    public breakBeamSensorId: string,
+    public trackNumber: number
   ) {}
 
   public static fromPayload(payload: any): CheckpointDto {
@@ -25,7 +26,8 @@ export class CheckpointDto {
       payload?.name,
       payload?.position,
       payload?.type,
-      payload?.breakBeamSensorId
+      payload?.breakBeamSensorId,
+      payload?.trackNumber
     );
 
     checkpoint.id = payload?.id;
@@ -41,7 +43,7 @@ export class CircuitDto {
   public static fromPayload(payload: any): CircuitDto {
     const circuit = new CircuitDto(
       payload?.name,
-      payload?.checkpoints.map((c: any) => CheckpointDto.fromPayload(c))
+      payload?.checkpoints?.map((c: any) => CheckpointDto.fromPayload(c)) ?? []
     );
 
     circuit.id = payload?.id;

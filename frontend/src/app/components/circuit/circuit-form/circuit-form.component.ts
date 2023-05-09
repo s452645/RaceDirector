@@ -26,6 +26,7 @@ const CHECKPOINTS_FIELD = 'checkpoints';
 const CHECKPOINT_NAME_FIELD = 'checkpointName';
 const CHECKPOINT_TYPE_FIELD = 'type';
 const CHECKPOINT_SENSOR_FIELD = 'sensor';
+const CHECKPOINT_TRACK_NUMBER_FIELD = 'trackNumber';
 
 @Component({
   selector: 'app-circuit-form',
@@ -123,11 +124,16 @@ export class CircuitFormComponent implements OnInit, OnChanges, OnDestroy {
         .map(group => group.items)
         .flat()
         .find(item => item.value === checkpoint?.breakBeamSensorId) ?? null;
+    const trackNumber = checkpoint?.trackNumber;
 
     return this.fb.group({
       [CHECKPOINT_NAME_FIELD]: [checkpointName, Validators.required],
       [CHECKPOINT_TYPE_FIELD]: [type, Validators.required],
       [CHECKPOINT_SENSOR_FIELD]: [sensor, Validators.required],
+      [CHECKPOINT_TRACK_NUMBER_FIELD]: [
+        trackNumber,
+        [Validators.required, Validators.min(0)],
+      ],
     });
   }
 
@@ -159,7 +165,16 @@ export class CircuitFormComponent implements OnInit, OnChanges, OnDestroy {
       const sensor = checkpointForm.controls[CHECKPOINT_SENSOR_FIELD]
         ?.value as SelectItem;
 
-      return new CheckpointDto(name, idx, type.value, sensor.value);
+      const trackNumber =
+        checkpointForm.controls[CHECKPOINT_TRACK_NUMBER_FIELD]?.value;
+
+      return new CheckpointDto(
+        name,
+        idx,
+        type.value,
+        sensor.value,
+        trackNumber
+      );
     });
 
     const circuit = new CircuitDto(circuitName, checkpoints);

@@ -8,11 +8,17 @@ using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats.HeatResults;
 using backend.Models.Seasons.Events;
 using backend.Models.Seasons.Events.Rounds;
 using backend.Models.Seasons.Events.Rounds.Races;
-using backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services.Seasons.Events.Rounds
 {
+    enum SeasonEventInclusion
+    {
+        PARTICIPANTS,
+        ROUNDS,
+        ROUNDS_RACES,
+    }
+
     public class SeasonEventRoundService
     {
         private readonly BackendContext _context;
@@ -27,7 +33,6 @@ namespace backend.Services.Seasons.Events.Rounds
             return _context.SeasonEventRounds.Where(round => round.SeasonEventId == seasonEventId)
                 .Include(round => round.Participants)
                 .Include(round => round.Races).ThenInclude(race => race.Results).ThenInclude(r => r.Car)
-                .Include(round => round.Races).ThenInclude(race => race.Heats).ThenInclude(h => h.Results).ThenInclude(r => r.Car)
                 .Select(round => new SeasonEventRoundDto(round))
                 .ToList();
         }
@@ -49,7 +54,7 @@ namespace backend.Services.Seasons.Events.Rounds
 
         public async Task<SeasonEventRoundDto> AddSeasonEventRound(Guid seasonEventId, SeasonEventRoundDto roundDto)
         {
-            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId);
+            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId, new() { SeasonEventInclusion.ROUNDS });
             var round = roundDto.ToEntity();
 
             if (seasonEvent.Rounds == null)
@@ -74,9 +79,9 @@ namespace backend.Services.Seasons.Events.Rounds
 
         public async Task<SeasonEventRoundDto> UpdateSeasonEventRound(Guid seasonEventId, SeasonEventRoundDto newRound)
         {
-            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId);
+            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId, new() { SeasonEventInclusion.ROUNDS });
             var existingRound = seasonEvent.Rounds.Where(r => r.Id == newRound.Id).FirstOrDefault();
-            
+
             if (existingRound == null)
             {
                 throw new NotFoundException($"Update Round [{newRound.Id}] failed: Round not found in Season Event [{seasonEventId}]");
@@ -110,7 +115,7 @@ namespace backend.Services.Seasons.Events.Rounds
 
         public async Task<SeasonEventRoundDto> DeleteSeasonEventRound(Guid seasonEventId, Guid roundId)
         {
-            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId);
+            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId, new() { SeasonEventInclusion.ROUNDS });
             var round = seasonEvent.Rounds.FirstOrDefault(r => r.Id == roundId);
 
             if (round == null)
@@ -219,20 +224,33 @@ namespace backend.Services.Seasons.Events.Rounds
                 .Any(result => result.PointsSummed != 0);
         }
 
-        private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId) 
+        private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId, List<SeasonEventInclusion> inclusions) 
         {
-            return await GetSeasonEventOrThrow(seasonEventId, $"Season Event [{seasonEventId}] not found");
+            return await GetSeasonEventOrThrow(seasonEventId, inclusions, $"Season Event [{seasonEventId}] not found");
         }
 
-        private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId, string errorMessage) 
+        private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId, List<SeasonEventInclusion> inclusions, string errorMessage) 
         {
-            var seasonEvent = await _context
+            var query = _context
                 .SeasonEvents
-                .Where(seasonEvent => seasonEvent.Id == seasonEventId)
-                .Include(seasonEvent => seasonEvent.Rounds).ThenInclude(r => r.Races)
-                .Include(seasonEvent => seasonEvent.Rounds).ThenInclude(r => r.Participants)
-                .Include(sE => sE.Participants)
-                .FirstOrDefaultAsync();
+                .Where(seasonEvent => seasonEvent.Id == seasonEventId);
+
+            if (inclusions.Contains(SeasonEventInclusion.PARTICIPANTS))
+            {
+                query = IncludeParticipants(query);
+            }
+
+            if (inclusions.Contains(SeasonEventInclusion.ROUNDS))
+            {
+                query = IncludeRounds(query);
+            }
+
+            if (inclusions.Contains(SeasonEventInclusion.ROUNDS_RACES))
+            {
+                query = IncludeRoundsRaces(query);
+            }
+
+            var seasonEvent = await query.FirstOrDefaultAsync();
 
             if (seasonEvent == null)
             {
@@ -240,6 +258,21 @@ namespace backend.Services.Seasons.Events.Rounds
             }
 
             return seasonEvent;
+        }
+
+        private IQueryable<SeasonEvent> IncludeRounds(IQueryable<SeasonEvent> query)
+        {
+            return query.Include(seasonEvent => seasonEvent.Rounds);
+        }
+
+        private IQueryable<SeasonEvent> IncludeRoundsRaces(IQueryable<SeasonEvent> query)
+        {
+            return query.Include(seasonEvent => seasonEvent.Rounds).ThenInclude(round => round.Races);
+        }
+
+        private IQueryable<SeasonEvent> IncludeParticipants(IQueryable<SeasonEvent> query)
+        {
+            return query.Include(seasonEvent => seasonEvent.Participants);
         }
     }
 }
