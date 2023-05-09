@@ -43,7 +43,7 @@ export class CircuitDto {
   public static fromPayload(payload: any): CircuitDto {
     const circuit = new CircuitDto(
       payload?.name,
-      payload?.checkpoints.map((c: any) => CheckpointDto.fromPayload(c))
+      payload?.checkpoints?.map((c: any) => CheckpointDto.fromPayload(c)) ?? []
     );
 
     circuit.id = payload?.id;

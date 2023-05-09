@@ -35,6 +35,13 @@ export class CarDto {
   public id: string | undefined;
 
   constructor(public name: string) {}
+
+  public static fromPayload(payload: any): CarDto {
+    const carDto = new CarDto(payload?.name);
+    carDto.id = payload?.id;
+
+    return carDto;
+  }
 }
 
 // export class SeasonEventRoundRaceHeatResultDto {
@@ -66,6 +73,20 @@ export class RaceHeatSectorResultDto {
     public advantagePoints: number,
     public raceHeatResultId: string
   ) {}
+
+  public static fromPayload(payload: any): RaceHeatSectorResultDto {
+    const resultDto = new RaceHeatSectorResultDto(
+      payload?.order,
+      payload?.time,
+      payload?.position,
+      payload?.positionPoints,
+      payload?.advantagePoints,
+      payload?.raceHeatResultId
+    );
+
+    resultDto.id = payload?.id;
+    return resultDto;
+  }
 }
 
 export class RaceHeatResultDto {
@@ -83,6 +104,24 @@ export class RaceHeatResultDto {
 
     public sectorResults: RaceHeatSectorResultDto[]
   ) {}
+
+  public static fromPayload(payload: any): RaceHeatResultDto {
+    const resultDto = new RaceHeatResultDto(
+      payload?.carId,
+      CarDto.fromPayload(payload?.car),
+      payload?.heatId,
+      payload?.distancePoints,
+      payload?.bonuses ?? [],
+      payload?.pointsSummed,
+      payload?.position,
+      payload?.sectorResults?.map((r: any) =>
+        RaceHeatSectorResultDto.fromPayload(r)
+      ) ?? []
+    );
+
+    resultDto.id = payload?.id;
+    return resultDto;
+  }
 }
 
 export class SeasonEventRoundRaceHeatDto {
@@ -93,6 +132,17 @@ export class SeasonEventRoundRaceHeatDto {
     public raceId: string,
     public results: RaceHeatResultDto[]
   ) {}
+
+  public static fromPayload(payload: any): SeasonEventRoundRaceHeatDto {
+    const heatDto = new SeasonEventRoundRaceHeatDto(
+      payload?.order,
+      payload?.raceId,
+      payload?.results?.map((r: any) => RaceHeatResultDto.fromPayload(r)) ?? []
+    );
+
+    heatDto.id = payload?.id;
+    return heatDto;
+  }
 }
 
 export class SeasonEventRoundRaceResultDto {
@@ -106,6 +156,20 @@ export class SeasonEventRoundRaceResultDto {
     public points: number,
     public raceOutcome: RaceOutcome
   ) {}
+
+  public static fromPayload(payload: any): SeasonEventRoundRaceResultDto {
+    const resultDto = new SeasonEventRoundRaceResultDto(
+      payload?.carId,
+      CarDto.fromPayload(payload?.car),
+      payload?.raceId,
+      payload?.position,
+      payload?.points,
+      payload?.raceOutcome
+    );
+
+    resultDto.id = payload?.id;
+    return resultDto;
+  }
 }
 
 export class SeasonEventRoundRaceDto {
@@ -120,6 +184,25 @@ export class SeasonEventRoundRaceDto {
     public secondChances: number,
     public roundId?: string
   ) {}
+
+  public static fromPayload(payload: any): SeasonEventRoundRaceDto {
+    const raceDto = new SeasonEventRoundRaceDto(
+      payload?.order,
+      payload.participantsCount,
+      payload?.results?.map((r: any) =>
+        SeasonEventRoundRaceResultDto.fromPayload(r)
+      ) ?? [],
+      payload.heats?.map((h: any) =>
+        SeasonEventRoundRaceHeatDto.fromPayload(h)
+      ) ?? [],
+      payload?.instantAdvancements,
+      payload?.secondChances,
+      payload?.roundId
+    );
+
+    raceDto.id = payload?.id;
+    return raceDto;
+  }
 }
 
 export class SeasonEventRoundDto {
@@ -141,20 +224,21 @@ export class SeasonEventRoundDto {
 
   public static fromPayload(payload: any): SeasonEventRoundDto {
     const round = new SeasonEventRoundDto(
-      payload.order,
-      payload.type,
-      payload.participantsCount,
-      payload.participantsIds,
-      payload.participantsNames,
-      payload.races,
-      payload.pointsStrategy,
-      payload.droppedCarsPositionDefinementStrategy,
-      payload.droppedCarsPointsStrategy,
-      payload.seasonEventId,
-      payload.advancesCount
+      payload?.order,
+      payload?.type,
+      payload?.participantsCount,
+      payload?.participantsIds ?? [],
+      payload?.participantsNames ?? [],
+      payload?.races?.map((r: any) => SeasonEventRoundRaceDto.fromPayload(r)) ??
+        [],
+      payload?.pointsStrategy,
+      payload?.droppedCarsPositionDefinementStrategy,
+      payload?.droppedCarsPointsStrategy,
+      payload?.seasonEventId,
+      payload?.advancesCount
     );
 
-    round.id = payload.id;
+    round.id = payload?.id;
     return round;
   }
 

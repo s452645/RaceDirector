@@ -14,6 +14,17 @@ export class SeasonDto {
     public endDate: Date
   ) {}
 
+  public static fromPayload(payload: any): SeasonDto {
+    const seasonDto = new SeasonDto(
+      payload?.name,
+      new Date(payload?.startDate),
+      new Date(payload?.endDate)
+    );
+
+    seasonDto.id = payload?.id;
+    return seasonDto;
+  }
+
   // TODO: standings
 }
 
@@ -28,6 +39,20 @@ export class SeasonEventScoreRulesDto {
     public theMoreTheBetter: boolean,
     public seasonEventId: string
   ) {}
+
+  public static fromPayload(payload: any): SeasonEventScoreRulesDto {
+    const rules = new SeasonEventScoreRulesDto(
+      payload?.timeMultiplier,
+      payload?.distanceMultiplier,
+      payload?.availableBonuses ?? [],
+      payload?.unfinishedSectorPenaltyPoints,
+      payload?.theMoreTheBetter,
+      payload?.seasonEventId
+    );
+
+    rules.id = payload?.id;
+    return rules;
+  }
 }
 
 export enum SeasonEventType {
@@ -54,8 +79,8 @@ export class SeasonEventDto {
       new Date(payload?.startDate),
       new Date(payload?.endDate),
       payload?.type,
-      payload?.scoreRules,
-      payload?.circuit,
+      SeasonEventScoreRulesDto.fromPayload(payload?.scoreRules),
+      CircuitDto.fromPayload(payload?.circuit),
       payload?.participantsCount
     );
 
@@ -82,19 +107,27 @@ export class SeasonsService {
   constructor(private backendService: BackendService) {}
 
   public getSeasons(): Observable<SeasonDto[]> {
-    return this.backendService.get<SeasonDto[]>(URL);
+    return this.backendService
+      .get<SeasonDto[]>(URL)
+      .pipe(map(seasons => seasons.map(s => SeasonDto.fromPayload(s))));
   }
 
   public getSeasonById(id: string): Observable<SeasonDto> {
-    return this.backendService.get<SeasonDto>(`${URL}/${id}`);
+    return this.backendService
+      .get<SeasonDto>(`${URL}/${id}`)
+      .pipe(map(s => SeasonDto.fromPayload(s)));
   }
 
   public addSeason(season: SeasonDto): Observable<SeasonDto> {
-    return this.backendService.post<SeasonDto, SeasonDto>(URL, season);
+    return this.backendService
+      .post<SeasonDto, SeasonDto>(URL, season)
+      .pipe(map(s => SeasonDto.fromPayload(s)));
   }
 
   public deleteSeason(seasonId: string): Observable<SeasonDto> {
-    return this.backendService.delete<SeasonDto>(`${URL}/${seasonId}`);
+    return this.backendService
+      .delete<SeasonDto>(`${URL}/${seasonId}`)
+      .pipe(map(s => SeasonDto.fromPayload(s)));
   }
 
   public getSeasonEvents(seasonId: string): Observable<SeasonEventDto[]> {
