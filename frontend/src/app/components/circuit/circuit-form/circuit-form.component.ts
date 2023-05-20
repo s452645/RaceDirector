@@ -16,6 +16,7 @@ import {
   CheckpointType,
   CircuitDto,
   CircuitService,
+  Track,
 } from 'src/app/services/seasons/events/circuit.service';
 import { PicoBoardsService } from 'src/app/services/hardware/pico-boards.service';
 import { UtilsService } from 'src/app/services/utils.service';
@@ -26,7 +27,7 @@ const CHECKPOINTS_FIELD = 'checkpoints';
 const CHECKPOINT_NAME_FIELD = 'checkpointName';
 const CHECKPOINT_TYPE_FIELD = 'type';
 const CHECKPOINT_SENSOR_FIELD = 'sensor';
-const CHECKPOINT_TRACK_NUMBER_FIELD = 'trackNumber';
+const CHECKPOINT_TRACK_FIELD = 'track';
 
 @Component({
   selector: 'app-circuit-form',
@@ -51,6 +52,14 @@ export class CircuitFormComponent implements OnInit, OnChanges, OnDestroy {
     { label: 'Stop', value: CheckpointType.Stop },
     { label: 'Pause', value: CheckpointType.Pause },
     { label: 'Resume', value: CheckpointType.Resume },
+  ];
+
+  tracks: SelectItem[] = [
+    { label: 'All', value: Track.ALL },
+    { label: 'Track A', value: Track.TRACK_A },
+    { label: 'Track B', value: Track.TRACK_B },
+    { label: 'Track C', value: Track.TRACK_C },
+    { label: 'Track D', value: Track.TRACK_D },
   ];
 
   get checkpoints() {
@@ -124,16 +133,13 @@ export class CircuitFormComponent implements OnInit, OnChanges, OnDestroy {
         .map(group => group.items)
         .flat()
         .find(item => item.value === checkpoint?.breakBeamSensorId) ?? null;
-    const trackNumber = checkpoint?.trackNumber;
+    const track = this.tracks.find(t => t.value === checkpoint?.track);
 
     return this.fb.group({
       [CHECKPOINT_NAME_FIELD]: [checkpointName, Validators.required],
       [CHECKPOINT_TYPE_FIELD]: [type, Validators.required],
       [CHECKPOINT_SENSOR_FIELD]: [sensor, Validators.required],
-      [CHECKPOINT_TRACK_NUMBER_FIELD]: [
-        trackNumber,
-        [Validators.required, Validators.min(0)],
-      ],
+      [CHECKPOINT_TRACK_FIELD]: [track, [Validators.required]],
     });
   }
 
@@ -165,15 +171,15 @@ export class CircuitFormComponent implements OnInit, OnChanges, OnDestroy {
       const sensor = checkpointForm.controls[CHECKPOINT_SENSOR_FIELD]
         ?.value as SelectItem;
 
-      const trackNumber =
-        checkpointForm.controls[CHECKPOINT_TRACK_NUMBER_FIELD]?.value;
+      const track = checkpointForm.controls[CHECKPOINT_TRACK_FIELD]
+        ?.value as SelectItem;
 
       return new CheckpointDto(
         name,
         idx,
         type.value,
         sensor.value,
-        trackNumber
+        track.value
       );
     });
 

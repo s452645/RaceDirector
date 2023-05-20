@@ -80,9 +80,9 @@ export class RaceHeatViewComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-  startHeat(): void {
+  initHeat(): void {
     this.subscription.add(
-      this.raceService.beginHeat(this.heatId).subscribe(() => {
+      this.raceService.initHeat(this.heatId).subscribe(() => {
         this.newHeatStateMessages =
           this.webSocketService.createSyncWebSocket<string>('heat');
 
@@ -96,11 +96,12 @@ export class RaceHeatViewComponent implements OnInit, OnDestroy {
   }
 
   save(): void {
-    this.subscription.add(
-      this.raceService
-        .saveDistanceAndBonuses(this.distance, this.selectedBonuses)
-        .subscribe(() => this.refreshData())
-    );
+    // TODO
+    // this.subscription.add(
+    //   this.raceService
+    //     .saveDistanceAndBonuses(this.distance, this.selectedBonuses)
+    //     .subscribe(() => this.refreshData())
+    // );
   }
 
   endHeat(): void {

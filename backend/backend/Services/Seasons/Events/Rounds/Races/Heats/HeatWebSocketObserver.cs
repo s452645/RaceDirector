@@ -3,7 +3,7 @@ using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 
-namespace backend.Services.Seasons.Events.Rounds.Races
+namespace backend.Services.Seasons.Events.Rounds.Races.Heats
 {
     public class HeatWebSocketObserver : IHeatObserver
     {
@@ -11,7 +11,7 @@ namespace backend.Services.Seasons.Events.Rounds.Races
         private readonly WebSocket _websocket;
         private readonly TaskCompletionSource<object> _socketFinishedTcs;
 
-        public HeatWebSocketObserver(WebSocket webSocket, TaskCompletionSource<object> socketFinishedTcs) 
+        public HeatWebSocketObserver(WebSocket webSocket, TaskCompletionSource<object> socketFinishedTcs)
         {
             _websocket = webSocket;
             _socketFinishedTcs = socketFinishedTcs;

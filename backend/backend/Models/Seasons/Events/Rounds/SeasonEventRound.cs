@@ -30,8 +30,8 @@ namespace backend.Models.Seasons.Events.Rounds
         public int ParticipantsCount { get; set; }
         public RoundType Type { get; set; }
 
-        public List<Car> Participants { get; set; }
-        public List<SeasonEventRoundRace> Races { get; set; }
+        public List<Car> Participants { get; set; } = new List<Car>(); 
+        public List<SeasonEventRoundRace> Races { get; set; } = new List<SeasonEventRoundRace>();
 
         public Guid? SecondChanceRulesId { get; set; }
         public SecondChanceRules? SecondChanceRules { get; set; }

@@ -22,18 +22,23 @@ export class SeasonEventRoundRacesService {
     return this.backendService.get(`${URL}/${raceId}/bonuses`);
   }
 
-  public beginHeat(heatId: string): Observable<void> {
-    return this.backendService.post(`${URL}/${heatId}/begin-heat`, null);
+  public initHeat(heatId: string): Observable<void> {
+    return this.backendService.post(`${URL}/${heatId}/init-heat`, null);
   }
 
   public saveDistanceAndBonuses(
+    heatId: string,
+    heatResultId: string,
     distance: number,
     bonuses: number[]
   ): Observable<void> {
-    return this.backendService.post(`${URL}/save-heat-data`, {
-      distance: distance,
-      bonuses: bonuses,
-    });
+    return this.backendService.post(
+      `${URL}/${heatId}/${heatResultId}/save-heat-data`,
+      {
+        distance: distance,
+        bonuses: bonuses,
+      }
+    );
   }
 
   public endHeat(): Observable<void> {

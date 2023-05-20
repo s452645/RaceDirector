@@ -2,6 +2,6 @@
 {
     public class RaceHeatResult : SeasonEventRoundRaceHeatResult
     {
-        public List<RaceHeatSectorResult> SectorResults { get; set; }
+        public List<RaceHeatSectorResult> SectorResults { get; set; } = new List<RaceHeatSectorResult>();
     }
 }

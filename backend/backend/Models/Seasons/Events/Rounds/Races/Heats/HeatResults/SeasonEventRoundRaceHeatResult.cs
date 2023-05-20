@@ -1,4 +1,5 @@
 ﻿using backend.Models.Cars;
+using backend.Models.Seasons.Events.Circuits;
 
 namespace backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults
 {
@@ -11,6 +12,8 @@ namespace backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults
 
         public Guid HeatId { get; set; }
         public SeasonEventRoundRaceHeat Heat { get; set; }
+
+        public Track Track { get; set; }
 
         public float DistancePoints { get; set; }
         public float[] Bonuses { get; set; }

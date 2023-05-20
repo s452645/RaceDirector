@@ -9,13 +9,13 @@ namespace backend.Models.Dtos.Seasons.Events.Circuits
         public int Position { get; set; }
         public Guid? BreakBeamSensorId { get; set; }
         public CheckpointType Type { get; set; }
-        public int TrackNumber { get; set; }
+        public Track Track { get; set; }
         public Guid CircuitId { get; set; }
 
         public CheckpointDto()
         {
             Id = Guid.NewGuid();
-            TrackNumber = 0;
+            Track = Track.ALL;
         }
 
         public CheckpointDto(
@@ -25,7 +25,7 @@ namespace backend.Models.Dtos.Seasons.Events.Circuits
             Guid? breakBeamSensorId,
             CheckpointType type,
             Guid circuitId,
-            int trackNumber
+            Track track
         )
         {
             Id = id;
@@ -34,7 +34,7 @@ namespace backend.Models.Dtos.Seasons.Events.Circuits
             BreakBeamSensorId = breakBeamSensorId;
             Type = type;
             CircuitId = circuitId;
-            TrackNumber = trackNumber;
+            Track = track;
         }
 
         public CheckpointDto(Checkpoint checkpoint)
@@ -45,7 +45,7 @@ namespace backend.Models.Dtos.Seasons.Events.Circuits
             BreakBeamSensorId = checkpoint.BreakBeamSensorId;
             Type = checkpoint.Type;
             CircuitId = checkpoint.CircuitId;
-            TrackNumber = checkpoint.TrackNumber;
+            Track = checkpoint.Track;
         }
 
         public Checkpoint ToEntity()
@@ -57,7 +57,7 @@ namespace backend.Models.Dtos.Seasons.Events.Circuits
             checkpoint.BreakBeamSensorId = BreakBeamSensorId;
             checkpoint.Type = Type;
             checkpoint.CircuitId = CircuitId;
-            checkpoint.TrackNumber = TrackNumber;
+            checkpoint.Track = Track;
 
             return checkpoint;
         }

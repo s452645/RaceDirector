@@ -36,16 +36,16 @@ namespace backend.Controllers.Seasons.Events.Rounds.Races
 
 
         // POST: api/SeasonEventRoundRaces/6/begin-heat
-        [HttpPost("{heatId}/begin-heat")]
-        public IActionResult BeginHeat(Guid heatId)
+        [HttpPost("{heatId}/init-heat")]
+        public async Task<IActionResult> InitHeat(Guid heatId)
         {
-            _raceService.BeginHeat(heatId);
+            await _raceService.InitHeat(heatId);
             return Ok();
         }
 
         // POST: api/SeasonEventRoundRaces/save-heat-data
-        [HttpPost("save-heat-data")]
-        public IActionResult SaveDistanceAndBonuses([FromBody] HeatData heatData) 
+        [HttpPost("{heatId}/{heatResultId}/save-heat-data")]
+        public IActionResult SaveDistanceAndBonuses(Guid heatId, Guid heatResultId, [FromBody] HeatData heatData) 
         {
             _raceService.SaveDistanceAndBonuses(heatData.Distance, heatData.Bonuses);
             return Ok();
