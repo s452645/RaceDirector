@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { BackendService } from 'src/app/services/backend.service';
+import { Track } from '../circuit.service';
 
 export enum RoundType {
   Ladder,
@@ -96,6 +97,7 @@ export class RaceHeatResultDto {
     public carId: string,
     public car: CarDto,
     public heatId: string,
+    public track: Track,
 
     public distancePoints: number,
     public bonuses: number[],
@@ -110,6 +112,7 @@ export class RaceHeatResultDto {
       payload?.carId,
       CarDto.fromPayload(payload?.car),
       payload?.heatId,
+      payload?.track,
       payload?.distancePoints,
       payload?.bonuses ?? [],
       payload?.pointsSummed,
@@ -124,11 +127,18 @@ export class RaceHeatResultDto {
   }
 }
 
+export enum HeatState {
+  Inactive,
+  Pending,
+  Active,
+}
+
 export class SeasonEventRoundRaceHeatDto {
   public id: string | undefined;
 
   constructor(
     public order: number,
+    public state: HeatState,
     public raceId: string,
     public results: RaceHeatResultDto[]
   ) {}
@@ -136,6 +146,7 @@ export class SeasonEventRoundRaceHeatDto {
   public static fromPayload(payload: any): SeasonEventRoundRaceHeatDto {
     const heatDto = new SeasonEventRoundRaceHeatDto(
       payload?.order,
+      payload?.state,
       payload?.raceId,
       payload?.results?.map((r: any) => RaceHeatResultDto.fromPayload(r)) ?? []
     );

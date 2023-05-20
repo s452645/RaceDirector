@@ -1,6 +1,7 @@
 ﻿using backend.Services.Hardware;
 using backend.Services.Hardware.Comms;
 using backend.Services.Seasons.Events.Rounds.Races;
+using backend.Services.Seasons.Events.Rounds.Races.Heats;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers.Misc

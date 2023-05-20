@@ -71,7 +71,7 @@ namespace backend.Services.Hardware
             _timeSyncService.Register(observer);
         }
 
-        public void EmitElevatorEnterEvent(long timestamp)
+        public async Task EmitElevatorEnterEvent(long timestamp)
         {
             using var scope = scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
@@ -86,10 +86,10 @@ namespace backend.Services.Hardware
                 ReceivedTimestamp = timestamp
             };
 
-            _boardEventsService.handleEvent(boardEvent, timestamp);
+            await _boardEventsService.handleEvent(boardEvent, timestamp);
         }
 
-        public void EmitElevatorExitEvent(long timestamp)
+        public async Task EmitElevatorExitEvent(long timestamp)
         {
             using var scope = scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
@@ -104,7 +104,7 @@ namespace backend.Services.Hardware
                 ReceivedTimestamp = timestamp
             };
 
-            _boardEventsService.handleEvent(boardEvent, timestamp);
+            await _boardEventsService.handleEvent(boardEvent, timestamp);
 
         }
     }

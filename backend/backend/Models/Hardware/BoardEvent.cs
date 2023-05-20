@@ -9,5 +9,10 @@
         public bool Broken { get; set; }
         public Int64 PicoLocalTimestamp { get; set; }
         public long ReceivedTimestamp { get; set; }
+
+        public BoardEvent()
+        {
+            Id = Guid.NewGuid();
+        }
     }
 }

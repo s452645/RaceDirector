@@ -16,7 +16,7 @@ namespace backend.Services.Hardware.Comms
             _socketFinishedTcs = socketFinishedTcs;
         }
 
-        public async void Notify(BoardEvent boardEvent)
+        public async Task Notify(BoardEvent boardEvent)
         {
             var responseBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(boardEvent));
             var byteArraySegment = new ArraySegment<byte>(responseBytes, 0, responseBytes.Length);

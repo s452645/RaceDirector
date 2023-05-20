@@ -6,7 +6,7 @@ namespace backend.Services.Hardware.Comms
 {
     public interface IBoardEventsObserver
     {
-        void Notify(BoardEvent newEvent);
+        Task Notify(BoardEvent newEvent);
     }
 
     public record AddSensorCommand
@@ -18,24 +18,24 @@ namespace backend.Services.Hardware.Comms
 
     public class BoardEventsService
     {
-        private readonly IServiceScopeFactory scopeFactory;
-        private List<Task> tasks = new List<Task>();
+        private readonly IServiceScopeFactory _scopeFactory;
+        private readonly List<Task> tasks = new();
 
-        private List<IBoardEventsObserver> Observers = new List<IBoardEventsObserver>();
+        private readonly List<IBoardEventsObserver> _observers = new();
 
         public BoardEventsService(IServiceScopeFactory scopeFactory)
         {
-            this.scopeFactory = scopeFactory;
+            this._scopeFactory = scopeFactory;
         }
 
         public void Register(IBoardEventsObserver observer)
         {
-            Observers.Add(observer);
+            _observers.Add(observer);
         }
 
         public void UnRegister(IBoardEventsObserver observer)
         {
-            Observers.Remove(observer);
+            _observers.Remove(observer);
         }
 
 
@@ -47,7 +47,7 @@ namespace backend.Services.Hardware.Comms
             {
                 var sensor = board.PicoBoardDto.BreakBeamSensors[sensorsCount - 1];
 
-                AddSensorCommand command = new AddSensorCommand("ADD_SENSOR", sensor.Id.ToString(), sensor.Pin);
+                AddSensorCommand command = new("ADD_SENSOR", sensor.Id.ToString(), sensor.Pin);
                 string serializedCommand = JsonSerializer.Serialize(command);
 
                 _ = await board.EventSocket.Send("[command]", serializedCommand);
@@ -76,7 +76,7 @@ namespace backend.Services.Hardware.Comms
 
                     if (deserialized != null)
                     {
-                        handleEvent(deserialized, timestampReceived);
+                        await handleEvent(deserialized, timestampReceived);
                     }
 
                     await eventSocket.Send("[ready]", "");
@@ -88,11 +88,11 @@ namespace backend.Services.Hardware.Comms
             }
         }
 
-        public void handleEvent(BoardEvent boardEvent, long timestampReceived) 
+        public async Task handleEvent(BoardEvent boardEvent, long timestampReceived) 
         {
             boardEvent.ReceivedTimestamp = timestampReceived;
 
-            using (var scope = scopeFactory.CreateScope())
+            using (var scope = _scopeFactory.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
 
@@ -100,7 +100,8 @@ namespace backend.Services.Hardware.Comms
                 db.SaveChanges();
             }
 
-            Observers.ForEach(o => o.Notify(boardEvent));
+            var tasks = _observers.Select(o => o.Notify(boardEvent));
+            await Task.WhenAll(tasks);
         }
 
         /*public async Task StartListeningForAll(List<PicoWBoard> boards, WebSocket webSocket, TaskCompletionSource<object> socketFinishedTcs)

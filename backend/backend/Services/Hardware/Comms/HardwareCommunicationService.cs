@@ -78,10 +78,10 @@ namespace backend.Services.Hardware.Comms
 
                 if (picoMessage.msg == "car_detected")
                 {
-                    _boardsManager.EmitElevatorEnterEvent(picoMessage.timestamp);
+                    await _boardsManager.EmitElevatorEnterEvent(picoMessage.timestamp);
                 } else if (picoMessage.msg == "release")
                 {
-                    _boardsManager.EmitElevatorExitEvent(picoMessage.timestamp);
+                    await _boardsManager.EmitElevatorExitEvent(picoMessage.timestamp);
                 }
             }
         }

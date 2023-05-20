@@ -10,6 +10,14 @@ export enum CheckpointType {
   Continue,
 }
 
+export enum Track {
+  ALL,
+  TRACK_A,
+  TRACK_B,
+  TRACK_C,
+  TRACK_D,
+}
+
 export class CheckpointDto {
   public id: string | undefined;
 
@@ -18,7 +26,7 @@ export class CheckpointDto {
     public position: number,
     public type: CheckpointType,
     public breakBeamSensorId: string,
-    public trackNumber: number
+    public track: Track
   ) {}
 
   public static fromPayload(payload: any): CheckpointDto {

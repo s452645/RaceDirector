@@ -37,15 +37,15 @@
             <label htmlFor="checkpointName">Checkpoint name</label>
           </span>
 
-          <span class="p-float-label">
-            <p-inputNumber
-              formControlName="trackNumber"
-              [showButtons]="true"
-              inputId="trackNumber"
-            >
-            </p-inputNumber>
-            <label htmlFor="trackNumber">Track number (0 - all)</label>
-          </span>
+          <p-dropdown
+            appendTo="body"
+            formControlName="track"
+            [options]="tracks"
+            optionLabel="label"
+            [placeholder]="'Checkpoint ' + i + ' track'"
+            class="w-8"
+            styleClass="w-full"
+          ></p-dropdown>
 
           <p-dropdown
             appendTo="body"

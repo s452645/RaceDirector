@@ -11,6 +11,15 @@ namespace backend.Models.Seasons.Events.Circuits
         Continue,
     }
 
+    public enum Track
+    {
+        ALL,
+        TRACK_A,
+        TRACK_B,
+        TRACK_C,
+        TRACK_D
+    }
+
     public class Checkpoint
     {
         public Guid Id { get; set; }
@@ -21,7 +30,7 @@ namespace backend.Models.Seasons.Events.Circuits
         public Guid? BreakBeamSensorId { get; set; }
         public BreakBeamSensor? BreakBeamSensor { get; set; }
 
-        public int TrackNumber { get; set; }
+        public Track Track { get; set; }
 
         public Guid CircuitId { get; set; }
         public Circuit Circuit { get; set; }

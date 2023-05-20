@@ -14,7 +14,7 @@
         public string IPAddress { get; set; }
         public bool Active { get; set; }
         public bool Connected { get; set; }
-        public List<BreakBeamSensor> BreakBeamSensors { get; set; }
-        public List<SyncBoardResult> SyncBoardResults { get; set; }
+        public List<BreakBeamSensor> BreakBeamSensors { get; set; } = new List<BreakBeamSensor>();
+        public List<SyncBoardResult> SyncBoardResults { get; set; } = new List<SyncBoardResult>();
     }
 }

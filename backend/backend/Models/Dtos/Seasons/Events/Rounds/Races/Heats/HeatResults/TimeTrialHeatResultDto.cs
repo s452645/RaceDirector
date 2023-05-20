@@ -1,5 +1,5 @@
 ﻿using backend.Models.Dtos.Cars;
-using backend.Models.Seasons.Events.Rounds.Races.Heats;
+using backend.Models.Seasons.Events.Circuits;
 using backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults;
 
 namespace backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats.HeatResults
@@ -14,6 +14,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats.HeatResults
         public TimeTrialHeatResultDto()
         {
             Id = Guid.NewGuid();
+            Track = Track.ALL;
             SectorTimes = new float[0];
             FullTime = 0;
             TimePoints = 0;
@@ -23,10 +24,11 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats.HeatResults
             Position = 0;
         }
 
-        public TimeTrialHeatResultDto(Guid id, Guid carId, float distancePoints, float[] bonuses, float pointsSummed, int position, Guid heatId, float[] sectorTimes, float fullTime, float timePoints)
+        public TimeTrialHeatResultDto(Guid id, Guid carId, Track track, float distancePoints, float[] bonuses, float pointsSummed, int position, Guid heatId, float[] sectorTimes, float fullTime, float timePoints)
         {
             Id = id;
             CarId = carId;
+            Track = track;
 
             DistancePoints = distancePoints;
             Bonuses = bonuses;
@@ -47,6 +49,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats.HeatResults
             Car = new CarDto(heatResult.Car);
 
             HeatId = heatResult.HeatId;
+            Track = heatResult.Track;
 
             SectorTimes = heatResult.SectorTimes;
             FullTime = heatResult.FullTime;
@@ -62,6 +65,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats.HeatResults
             var result = new TimeTrialHeatResult();
 
             result.Id = Id;
+            result.Track = Track;
             result.SectorTimes = SectorTimes;
             result.FullTime = FullTime;
             result.TimePoints = TimePoints;
@@ -74,6 +78,11 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats.HeatResults
             result.HeatId = HeatId;
 
             return result;
+        }
+
+        public override void ProcessResultsChanges()
+        {
+            throw new NotImplementedException();
         }
     }
 }
