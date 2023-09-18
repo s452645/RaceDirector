@@ -1,4 +1,4 @@
-﻿using backend.Models.Dtos.Seasons.Events.Circuits;
+﻿/*using backend.Models.Dtos.Seasons.Events.Circuits;
 using backend.Models.Dtos.Seasons.Events;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats;
 using backend.Models.Hardware;
@@ -236,3 +236,4 @@ namespace backend.Services.Seasons.Events.Rounds.Races.Heats
         }
     }
 }
+*/

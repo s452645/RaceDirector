@@ -67,7 +67,7 @@ export class PicoBoardDto {
   }
 }
 
-const URL = 'https://localhost:7219/api/PicoBoards';
+const URL = 'https://localhost:7219/api/Boards';
 
 @Injectable({
   providedIn: 'root',
@@ -81,6 +81,10 @@ export class PicoBoardsService {
       .pipe(map(boards => boards.map(PicoBoardDto.fromPayload)));
   }
 
+  public getSensors(picoBoardId: string): Observable<BreakBeamSensorDto[]> {
+    return this.backendService.get(`${URL}/${picoBoardId}/sensors`);
+  }
+
   public addBoard(picoBoardDto: PicoBoardDto): Observable<PicoBoardDto> {
     return this.backendService.post<PicoBoardDto, PicoBoardDto>(
       URL,
@@ -88,20 +92,8 @@ export class PicoBoardsService {
     );
   }
 
-  public connectBoard(picoBoardId: string): Observable<PicoBoardDto> {
-    return this.backendService.post(`${URL}/${picoBoardId}/connect`, null);
-  }
-
-  public syncBoardOnce(picoBoardId: string): Observable<void> {
-    return this.backendService.post(`${URL}/${picoBoardId}/sync-once`, null);
-  }
-
   public deleteBoard(picoBoardId: string): Observable<void> {
     return this.backendService.delete(`${URL}/${picoBoardId}`);
-  }
-
-  public getSensors(picoBoardId: string): Observable<BreakBeamSensorDto[]> {
-    return this.backendService.get(`${URL}/${picoBoardId}/sensors`);
   }
 
   public addSensor(
@@ -121,5 +113,13 @@ export class PicoBoardsService {
     return this.backendService.delete(
       `${URL}/${picoBoardId}/sensors/${sensorId}`
     );
+  }
+
+  public syncAll(): Observable<SyncBoardResult[]> {
+    return this.backendService.post(`${URL}/sync-all`, null);
+  }
+
+  public listenToEventsAll(): Observable<void> {
+    return this.backendService.post(`${URL}/start-listening-all`, null);
   }
 }

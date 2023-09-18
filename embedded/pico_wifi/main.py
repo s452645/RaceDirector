@@ -1,23 +1,37 @@
 from ServerManager import ServerManager
-from secrets import WIFI_SSID, WIFI_PASSWORD
+from secrets import PICO_WIFI_SSID, PICO_WIFI_PASSWORD
 import network
 import machine
 from time import sleep
 import uasyncio
 
-SYNC_SERVER_PORT = 15000
-EVENT_SERVER_PORT = 12000
+SERVER_PORT = 15000
 
+MODE_ACCESS_POINT = network.AP_IF
+MODE_CLIENT = network.STA_IF
+
+BOARD_MODE = MODE_CLIENT
 led = machine.Pin("LED", machine.Pin.OUT)
 
 
 def connect():
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    wlan.connect(WIFI_SSID, WIFI_PASSWORD)
-    while wlan.isconnected() == False:
-        print("Waiting for connection...")
-        sleep(1)
+    wlan = network.WLAN(BOARD_MODE)
+
+    if BOARD_MODE == MODE_ACCESS_POINT:
+        wlan.config(essid=PICO_WIFI_SSID, password=PICO_WIFI_PASSWORD, channel=10)
+        wlan.active(True)
+
+        while not wlan.isconnected():
+            print("Starting Access Point...")
+            sleep(1)
+
+    else:
+        wlan.active(True)
+        wlan.connect(PICO_WIFI_SSID, PICO_WIFI_PASSWORD)
+        while wlan.isconnected() == False:
+            print("Waiting for connection...")
+            sleep(1)
+
     ip = wlan.ifconfig()[0]
     print(f"Connected on {ip}")
     return ip
@@ -31,16 +45,11 @@ async def main():
         ip = connect()
 
         server_manager = ServerManager()
+        server = await server_manager.start_server(ip, SERVER_PORT)
 
-        sync_server = uasyncio.create_task(
-            server_manager.launch_sync_server(ip, SYNC_SERVER_PORT)
-        )
-        event_server = uasyncio.create_task(
-            server_manager.launch_event_server(ip, EVENT_SERVER_PORT)
-        )
-
-        await sync_server
-        await event_server
+        async with server:
+            while True:
+                await uasyncio.sleep(60)
 
     except KeyboardInterrupt:
         machine.reset()

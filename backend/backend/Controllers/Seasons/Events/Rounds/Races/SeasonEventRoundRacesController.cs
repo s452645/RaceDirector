@@ -1,4 +1,4 @@
-﻿using backend.Models.Dtos.Seasons.Events.Rounds.Races;
+﻿/*using backend.Models.Dtos.Seasons.Events.Rounds.Races;
 using backend.Services.Seasons.Events.Rounds.Races;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,7 +47,7 @@ namespace backend.Controllers.Seasons.Events.Rounds.Races
         [HttpPost("{heatId}/{heatResultId}/save-heat-data")]
         public IActionResult SaveDistanceAndBonuses(Guid heatId, Guid heatResultId, [FromBody] HeatData heatData) 
         {
-            _raceService.SaveDistanceAndBonuses(heatData.Distance, heatData.Bonuses);
+            // _raceService.SaveDistanceAndBonuses(heatData.Distance, heatData.Bonuses);
             return Ok();
         }
 
@@ -55,8 +55,9 @@ namespace backend.Controllers.Seasons.Events.Rounds.Races
         [HttpPost("end-heat")]
         public IActionResult EndHeat()
         {
-            _raceService.EndHeat();
+            // _raceService.EndHeat();
             return NoContent();
         }
     }
 }
+*/

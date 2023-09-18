@@ -30,15 +30,31 @@
       </div>
 
       <div
-        class="flex align-items-center justify-content-center"
+        class="flex align-items-center justify-content-center pt-4"
         [ngStyle]="{ gap: '1rem' }"
       >
         <button
           pButton
           type="submit"
           label="Add board"
-          class="p-button-sm mt-4"
+          class="p-button-sm"
           [disabled]="newBoardForm.invalid"
+        ></button>
+
+        <button
+          pButton
+          type="button"
+          label="Sync all"
+          class="p-button-sm"
+          (click)="syncAll()"
+        ></button>
+
+        <button
+          pButton
+          type="button"
+          label="Listen to all"
+          class="p-button-sm"
+          (click)="listenToEventsAll()"
         ></button>
       </div>
     </div>
@@ -54,13 +70,10 @@
           <th>Type</th>
           <th>Name</th>
           <th>Address</th>
-          <th>Active</th>
-          <th>Connected</th>
           <th>Last sync date</th>
           <th>Last sync offset</th>
           <th>Last sync result</th>
           <th>Sensors</th>
-          <th>Connect</th>
           <th>Delete</th>
         </tr>
       </ng-template>
@@ -69,8 +82,6 @@
           <td>{{ board.typeText }}</td>
           <td>{{ board.name }}</td>
           <td>{{ board.ipAddress }}</td>
-          <td>{{ board.active }}</td>
-          <td>{{ board.connected }}</td>
           <td>{{ board.lastSyncLocaleDate }}</td>
           <td>{{ board.lastSyncOffset }}</td>
           <td>{{ board.lastSyncResult }}</td>
@@ -88,15 +99,6 @@
               type="button"
               pButton
               pRipple
-              icon="pi pi-sync"
-              (click)="connect(board.id)"
-            ></button>
-          </td>
-          <td>
-            <button
-              type="button"
-              pButton
-              pRipple
               icon="pi pi-trash"
               (click)="handleDeleteBoard(board.id)"
             ></button>
@@ -104,13 +106,6 @@
         </tr>
       </ng-template>
     </p-table>
-    <button
-      pButton
-      type="button"
-      label="Sync"
-      class="p-button-info p-button-sm mt-4"
-      (click)="createSyncWebSocket()"
-    ></button>
   </div>
 </div>
 

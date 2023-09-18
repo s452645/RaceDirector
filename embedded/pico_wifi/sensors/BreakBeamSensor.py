@@ -15,3 +15,9 @@ class BreakBeamSensor:
 
     def get_value(self):
         return self._pin.value()
+
+    def is_duplicate(self, id, pin):
+        id_conflict = self._id == id if id is not None else self._id == pin
+        pin_conflict = self._pin == pin
+
+        return id_conflict or pin_conflict

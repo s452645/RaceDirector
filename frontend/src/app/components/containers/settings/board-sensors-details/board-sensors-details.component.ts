@@ -61,6 +61,7 @@ export class BoardSensorsDetailsComponent
     const pin = this.utils.getUndefinedableOrThrow(this.form.get('pin')?.value);
 
     const sensor = new BreakBeamSensorDto(name, pin, this.boardId);
+
     this.subscription.add(
       this.boardsService.addSensor(this.boardId, sensor).subscribe(() => {
         this.refreshData();

@@ -15,7 +15,6 @@ namespace backend.Models.Hardware
         public Guid Id { get; set; }
 
         public Guid PicoBoardId { get; set; }
-        public PicoBoard PicoBoard { get; set; }
 
         public SyncResult SyncResult { get; set; }
         public Int64? CurrentSyncOffset { get; set; }

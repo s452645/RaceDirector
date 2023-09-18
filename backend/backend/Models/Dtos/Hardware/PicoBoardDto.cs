@@ -45,7 +45,7 @@ namespace backend.Models.Dtos.Hardware
             IPAddress = picoBoard.IPAddress;
             Active = picoBoard.Active;
             Connected = picoBoard.Connected;
-            BreakBeamSensors = picoBoard.BreakBeamSensors.Select(bbs => new BreakBeamSensorDto(bbs)).ToList();
+            BreakBeamSensors = picoBoard.BreakBeamSensors?.Select(bbs => new BreakBeamSensorDto(bbs)).ToList() ?? new();
         }
 
         public PicoBoard ToEntity()

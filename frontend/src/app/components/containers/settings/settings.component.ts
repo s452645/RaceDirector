@@ -51,27 +51,6 @@ export class SettingsComponent
     this.isSensorsDialogOpen = true;
   }
 
-  public sync(boardId: string): void {
-    this.subscription.add(
-      this.picoBoardsService
-        .syncBoardOnce(boardId)
-        .subscribe(() => this.refreshBoards())
-    );
-  }
-
-  public connect(boardId: string): void {
-    this.subscription.add(
-      this.picoBoardsService
-        .connectBoard(boardId)
-        .subscribe(() => this.refreshBoards())
-    );
-  }
-
-  public createSyncWebSocket(): void {
-    // this.syncDataService.createSyncSocket();
-    // this.syncDataService.createEventsSocket();
-  }
-
   public handleDeleteBoard(boardId: string): void {
     this.subscription.add(
       this.picoBoardsService
@@ -80,7 +59,7 @@ export class SettingsComponent
     );
   }
 
-  getSelectedBoardName(): string | null {
+  public getSelectedBoardName(): string | null {
     if (!this.selectedBoardId) {
       return null;
     }
@@ -94,7 +73,7 @@ export class SettingsComponent
     return selectedBoard.name;
   }
 
-  handleSubmitNewBoard(): void {
+  public handleSubmitNewBoard(): void {
     const type = this.utils.getUndefinedableOrThrow(
       this.newBoardForm.get('type')?.value
     ).value;
@@ -127,6 +106,23 @@ export class SettingsComponent
     );
   }
 
+  public syncAll(): void {
+    this.subscription.add(
+      this.picoBoardsService.syncAll().subscribe(() => {
+        this.refreshBoards();
+        this.refreshForm();
+      })
+    );
+  }
+
+  public listenToEventsAll(): void {
+    this.subscription.add(
+      this.picoBoardsService.listenToEventsAll().subscribe(() => {
+        return;
+      })
+    );
+  }
+
   private refreshForm(): void {
     this.newBoardForm = this.fb.group({
       type: [null as SelectItem | null, Validators.required],
@@ -135,7 +131,8 @@ export class SettingsComponent
         '',
         (control: AbstractControl) => {
           if (
-            PicoBoardType.WiFi === this.newBoardForm.get('type')?.value.value &&
+            PicoBoardType.WiFi ===
+              this.newBoardForm.get('type')?.value?.value &&
             !control.value
           ) {
             return { missingIpAddress: true };
@@ -149,21 +146,13 @@ export class SettingsComponent
     this.subscription.add(
       this.newBoardForm.get('type')?.valueChanges.subscribe(value => {
         if (value.value === PicoBoardType.USB) {
-          this.newBoardForm.get('ipAddress')?.disable();
+          const ipAddressInput = this.newBoardForm.get('ipAddress');
+          ipAddressInput?.disable();
+          ipAddressInput?.setValue(null);
         } else {
           this.newBoardForm.get('ipAddress')?.enable();
         }
       })
     );
   }
-
-  // TODO: sometimes, there is a need to refresh the page before creating the socket
-  // .NET doesn't even receive a request then (investigate)
-  // public createSyncWebSocket() {
-  //   this.webSocketService.createSyncWebSocket('/sync');
-  //   const s = this.webSocketService.messages.subscribe(msg => {
-  //     console.log('Response from websocket: ' + msg);
-  //   });
-  //   this.subscription.add(s);
-  // }
 }

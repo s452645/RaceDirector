@@ -1,11 +1,9 @@
 using backend.Models;
 using backend.Services.Cars;
 using backend.Services.Hardware;
-using backend.Services.Hardware.Comms;
 using backend.Services.Seasons;
 using backend.Services.Seasons.Events.Circuits;
 using backend.Services.Seasons.Events.Rounds;
-using backend.Services.Seasons.Events.Rounds.Races;
 using Microsoft.EntityFrameworkCore;
 
 var customOriginsConfig = "_customOriginsConfig";
@@ -22,15 +20,12 @@ builder.Services.AddCors(options =>
 });
 
 // Add services to the container.
-builder.Services.AddSingleton<HardwareCommunicationService>();
-builder.Services.AddSingleton<TimeSyncService>();
-builder.Services.AddSingleton<BoardsManager>();
-builder.Services.AddSingleton<BoardEventsService>();
-builder.Services.AddSingleton<SeasonEventRoundRaceService>();
+builder.Services.AddSingleton<BoardSyncer>();
+builder.Services.AddSingleton<BoardListener>();
 
+builder.Services.AddScoped<BoardsService>();
 builder.Services.AddScoped<SeasonService>();
 builder.Services.AddScoped<CircuitService>();
-builder.Services.AddScoped<PicoBoardsService>();
 builder.Services.AddScoped<CarService>();
 builder.Services.AddScoped<SeasonEventRoundService>();
 

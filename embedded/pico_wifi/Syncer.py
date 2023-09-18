@@ -13,24 +13,15 @@ class Syncer:
         self.reader = reader
         self.writer = writer
         self.timer = SyncedTimer()
-        self.next_sleep_seconds = 10
 
     async def run(self):
-        while True:
-            try:
-                print(f"Waiting {self.next_sleep_seconds} s for sync...")
-                await uasyncio.sleep(self.next_sleep_seconds)
-                print("Sync started...")
-
-                await uasyncio.create_task(self._sync_clock())
-
-            except AssertionError as error:
-                print("Error while running syncer:")
-                print(error)
+        await self._sync_clock()
 
     # ===============================================================================
 
     async def _sync_clock(self):
+        await recv(self.reader, self.timer, "[0]")
+        
         _ = await send(
             self.writer,
             self.timer,
@@ -86,28 +77,25 @@ class Syncer:
 
         await send(self.writer, self.timer, "[3]", json.dumps(response))
 
-        if (
-            abs(sync_result.offset) < 10
-            and sync_result.avg_offset
-            and abs(sync_result.avg_offset) < 10
-        ):
-            self.next_sleep_seconds = 300
+        # if (
+        #     abs(sync_result.offset) < 10
+        #     and sync_result.avg_offset
+        #     and abs(sync_result.avg_offset) < 10
+        # ):
+        #     self.next_sleep_seconds = 300
 
-        elif abs(sync_result.offset) < 10:
-            self.next_sleep_seconds = 120
+        # elif abs(sync_result.offset) < 10:
+        #     self.next_sleep_seconds = 120
 
-        elif abs(sync_result.offset) < 20:
-            self.next_sleep_seconds = 30
+        # elif abs(sync_result.offset) < 20:
+        #     self.next_sleep_seconds = 30
 
-        else:
-            self.next_sleep_seconds = 10
+        # else:
+        #     self.next_sleep_seconds = 10
 
     async def _sync_packet(self):
-        print("sync_packet start")
         t2, _ = await recv(self.reader, self.timer, "[1]")
-
         await send(self.writer, self.timer, "[ready-2]", "")
-
         _, t1 = await recv(self.reader, self.timer, "[2]")
 
         return t1, t2

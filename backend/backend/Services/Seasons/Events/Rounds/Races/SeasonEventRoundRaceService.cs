@@ -1,4 +1,4 @@
-﻿using backend.Exceptions;
+﻿/*using backend.Exceptions;
 using backend.Models;
 using backend.Models.Dtos.Seasons.Events;
 using backend.Models.Dtos.Seasons.Events.Circuits;
@@ -266,3 +266,4 @@ namespace backend.Services.Seasons.Events.Rounds.Races
         }
     }
 }
+*/

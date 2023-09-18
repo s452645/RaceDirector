@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { BackendService } from '../backend.service';
 import { CircuitDto } from './events/circuit.service';
+import { isNil } from 'lodash';
 
 const URL = 'https://localhost:7219/api/Seasons';
 
@@ -80,7 +81,9 @@ export class SeasonEventDto {
       new Date(payload?.endDate),
       payload?.type,
       SeasonEventScoreRulesDto.fromPayload(payload?.scoreRules),
-      CircuitDto.fromPayload(payload?.circuit),
+      isNil(payload?.circuit)
+        ? undefined
+        : CircuitDto.fromPayload(payload?.circuit),
       payload?.participantsCount
     );
 

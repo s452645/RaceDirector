@@ -35,7 +35,7 @@ export class CheckpointDto {
       payload?.position,
       payload?.type,
       payload?.breakBeamSensorId,
-      payload?.trackNumber
+      payload?.track
     );
 
     checkpoint.id = payload?.id;

@@ -1,9 +1,10 @@
-﻿using backend.Models.Dtos.Seasons.Events;
+﻿/*using backend.Models.Dtos.Seasons.Events;
 using backend.Models.Dtos.Seasons.Events.Circuits;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats;
 using backend.Models.Hardware;
 using backend.Repositories;
 using backend.Services.Hardware.Comms;
+using backend.Services.Hardware_New;
 
 namespace backend.Services.Seasons.Events.Rounds.Races.Heats
 {
@@ -74,3 +75,4 @@ namespace backend.Services.Seasons.Events.Rounds.Races.Heats
         }
     }
 }
+*/

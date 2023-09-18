@@ -1,4 +1,4 @@
-﻿using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats;
+﻿/*using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -34,3 +34,4 @@ namespace backend.Services.Seasons.Events.Rounds.Races.Heats
         }
     }
 }
+*/
