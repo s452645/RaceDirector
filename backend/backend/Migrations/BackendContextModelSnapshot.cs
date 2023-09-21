@@ -391,100 +391,6 @@ namespace backend.Migrations
                     b.ToTable("Circuits");
                 });
 
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatSectorResult", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<float>("AdvantagePoints")
-                        .HasColumnType("real");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Position")
-                        .HasColumnType("integer");
-
-                    b.Property<float>("PositionPoints")
-                        .HasColumnType("real");
-
-                    b.Property<Guid>("RaceHeatResultId")
-                        .HasColumnType("uuid");
-
-                    b.Property<float>("Time")
-                        .HasColumnType("real");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RaceHeatResultId");
-
-                    b.ToTable("RaceHeatSectorResults");
-                });
-
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.SeasonEventRoundRaceHeatResult", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Bonuses")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("CarId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<float>("DistancePoints")
-                        .HasColumnType("real");
-
-                    b.Property<Guid>("HeatId")
-                        .HasColumnType("uuid");
-
-                    b.Property<float>("PointsSummed")
-                        .HasColumnType("real");
-
-                    b.Property<int>("Position")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Track")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CarId");
-
-                    b.ToTable("SeasonEventRoundRaceHeatResults");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("SeasonEventRoundRaceHeatResult");
-                });
-
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("RaceId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("State")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RaceId");
-
-                    b.ToTable("SeasonEventRoundRaceHeats");
-                });
-
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", b =>
                 {
                     b.Property<Guid>("Id")
@@ -519,8 +425,14 @@ namespace backend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<float>("BonusesPoints")
+                        .HasColumnType("real");
+
                     b.Property<Guid>("CarId")
                         .HasColumnType("uuid");
+
+                    b.Property<float>("Distance")
+                        .HasColumnType("real");
 
                     b.Property<float>("Points")
                         .HasColumnType("real");
@@ -531,8 +443,19 @@ namespace backend.Migrations
                     b.Property<int>("RaceOutcome")
                         .HasColumnType("integer");
 
+                    b.Property<int>("RaceState")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("SeasonEventRoundRaceId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("SectorTimes")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SectorTimestamps")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -831,34 +754,6 @@ namespace backend.Migrations
                     b.ToTable("CarSeasonEventRound");
                 });
 
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatResult", b =>
-                {
-                    b.HasBaseType("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.SeasonEventRoundRaceHeatResult");
-
-                    b.HasIndex("HeatId");
-
-                    b.HasDiscriminator().HasValue("RaceHeatResult");
-                });
-
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.TimeTrialHeatResult", b =>
-                {
-                    b.HasBaseType("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.SeasonEventRoundRaceHeatResult");
-
-                    b.Property<float>("FullTime")
-                        .HasColumnType("real");
-
-                    b.Property<string>("SectorTimes")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<float>("TimePoints")
-                        .HasColumnType("real");
-
-                    b.HasIndex("HeatId");
-
-                    b.HasDiscriminator().HasValue("TimeTrialHeatResult");
-                });
-
             modelBuilder.Entity("backend.Models.Cars.Car", b =>
                 {
                     b.HasOne("backend.Models.Misc.Photo", "MainPhoto")
@@ -950,13 +845,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Models.Hardware.SyncBoardResult", b =>
                 {
-                    b.HasOne("backend.Models.Hardware.PicoBoard", "PicoBoard")
+                    b.HasOne("backend.Models.Hardware.PicoBoard", null)
                         .WithMany("SyncBoardResults")
                         .HasForeignKey("PicoBoardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("PicoBoard");
                 });
 
             modelBuilder.Entity("backend.Models.Misc.Photo", b =>
@@ -990,39 +883,6 @@ namespace backend.Migrations
                     b.Navigation("BreakBeamSensor");
 
                     b.Navigation("Circuit");
-                });
-
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatSectorResult", b =>
-                {
-                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatResult", "RaceHeatResult")
-                        .WithMany("SectorResults")
-                        .HasForeignKey("RaceHeatResultId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("RaceHeatResult");
-                });
-
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.SeasonEventRoundRaceHeatResult", b =>
-                {
-                    b.HasOne("backend.Models.Cars.Car", "Car")
-                        .WithMany("HeatResults")
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Car");
-                });
-
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", b =>
-                {
-                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", "Race")
-                        .WithMany("Heats")
-                        .HasForeignKey("RaceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Race");
                 });
 
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", b =>
@@ -1196,32 +1056,8 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatResult", b =>
-                {
-                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", "Heat")
-                        .WithMany("Results")
-                        .HasForeignKey("HeatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Heat");
-                });
-
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.TimeTrialHeatResult", b =>
-                {
-                    b.HasOne("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", "Heat")
-                        .WithMany()
-                        .HasForeignKey("HeatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Heat");
-                });
-
             modelBuilder.Entity("backend.Models.Cars.Car", b =>
                 {
-                    b.Navigation("HeatResults");
-
                     b.Navigation("OfficialName");
 
                     b.Navigation("Photos");
@@ -1256,15 +1092,8 @@ namespace backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.SeasonEventRoundRaceHeat", b =>
-                {
-                    b.Navigation("Results");
-                });
-
             modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.SeasonEventRoundRace", b =>
                 {
-                    b.Navigation("Heats");
-
                     b.Navigation("Results");
                 });
 
@@ -1302,11 +1131,6 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Models.Teams.Team", b =>
                 {
                     b.Navigation("Pots");
-                });
-
-            modelBuilder.Entity("backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults.RaceHeatResult", b =>
-                {
-                    b.Navigation("SectorResults");
                 });
 #pragma warning restore 612, 618
         }

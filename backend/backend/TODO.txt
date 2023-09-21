@@ -1,0 +1,41 @@
+﻿Na ten moment flow eventu wygląda tak:
+
+1. Wykrycie przez płytkę
+2. Dodanie do kolejki do wysłania do backendu
+3. Wysłanie do backendu
+4. Odebranie przez backend
+5. Deserializacja przez backend
+6. Przeprocesowanie eventu
+	a) powiadomienie wszystkich obserwatorów o nowym evencie
+		WAŻNE:  obecnie jest to tylko websocket, do którego podłączony jest front
+				to rozwiązanie służy tylko do testów, żeby sprawdzić czy faktycznie eventy
+				będą się sensownie przekazywać aż do UI.
+
+				docelowo frontend prawdopodobnie będzie się podłączał do jakiegoś websocketa wyścigowego,
+				który po otrzymaniu eventu przeprocesuje go i wyśle do frontu jakąś inną formę informacji
+				(a nie surowy event)
+
+	b) zapisanie eventu w bazie danych
+7. Wysłanie do płytki wiadomości o zakończenu procesowania eventu
+8. Przystąpienie przez płytkę do wysyłania następnego w kolejce eventu lub czekania aż się one pojawią
+
+
+
+Schemat komunikacji połączenia eventowego z płytką:
+
+1. Inicjalizacja połączenia: BACKEND
+2. PICO:		[hello]: "ready"
+3. BACKEND:		[conn-type]: "EVENTS"
+4. PICO:		[conn-type]: "ACCEPTED"
+		... oczekiwanie na event ...
+	5. PICO:		[event-1]: {...}
+		... procesowanie eventu ...
+	6. BACKEND:		[event-1]: "ready"
+		...
+	7. PICO:		[event-2]: {...}
+		...
+	8. BACKEND:		[event-2]: "ready"
+
+9. BACKEND:		[goodbye]: "?"
+10. PICO:		[goodbye]: "ready"
+11. Zerwanie połączenia: BACKEND

@@ -89,7 +89,7 @@ export class SettingsComponent
     const boardDto = new PicoBoardDto(
       type,
       name,
-      ipAddress,
+      ipAddress ?? '',
       false,
       false,
       [],

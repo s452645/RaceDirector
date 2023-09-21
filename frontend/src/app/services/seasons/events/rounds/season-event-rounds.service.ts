@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { BackendService } from 'src/app/services/backend.service';
-import { Track } from '../circuit.service';
+import { CarDto } from 'src/app/services/cars/car.service';
 
 export enum RoundType {
   Ladder,
@@ -30,130 +30,20 @@ export enum RaceOutcome {
   SecondChanceDropped,
 }
 
-const URL = `https://localhost:7219/api/SeasonEventRounds`;
-
-export class CarDto {
-  public id: string | undefined;
-
-  constructor(public name: string) {}
-
-  public static fromPayload(payload: any): CarDto {
-    const carDto = new CarDto(payload?.name);
-    carDto.id = payload?.id;
-
-    return carDto;
-  }
-}
-
-// export class SeasonEventRoundRaceHeatResultDto {
-//   public id: string | undefined;
-
-//   constructor(
-//     public carId: string,
-//     public car: CarDto,
-//     public sectorTimes: number[],
-//     public fullTime: number,
-//     public timePoints: number,
-//     public advantagePoints: number,
-//     public distancePoints: number,
-//     public bonuses: number[],
-//     public pointsSummed: number,
-//     public position: number
-//   ) {}
-// }
-
-export class RaceHeatSectorResultDto {
-  public id: string | undefined;
-  public carName: string | undefined;
-
-  constructor(
-    public order: number,
-    public time: number,
-    public position: number,
-    public positionPoints: number,
-    public advantagePoints: number,
-    public raceHeatResultId: string
-  ) {}
-
-  public static fromPayload(payload: any): RaceHeatSectorResultDto {
-    const resultDto = new RaceHeatSectorResultDto(
-      payload?.order,
-      payload?.time,
-      payload?.position,
-      payload?.positionPoints,
-      payload?.advantagePoints,
-      payload?.raceHeatResultId
-    );
-
-    resultDto.id = payload?.id;
-    return resultDto;
-  }
-}
-
-export class RaceHeatResultDto {
-  public id: string | undefined;
-
-  constructor(
-    public carId: string,
-    public car: CarDto,
-    public heatId: string,
-    public track: Track,
-
-    public distancePoints: number,
-    public bonuses: number[],
-    public pointsSummed: number,
-    public position: number,
-
-    public sectorResults: RaceHeatSectorResultDto[]
-  ) {}
-
-  public static fromPayload(payload: any): RaceHeatResultDto {
-    const resultDto = new RaceHeatResultDto(
-      payload?.carId,
-      CarDto.fromPayload(payload?.car),
-      payload?.heatId,
-      payload?.track,
-      payload?.distancePoints,
-      payload?.bonuses ?? [],
-      payload?.pointsSummed,
-      payload?.position,
-      payload?.sectorResults?.map((r: any) =>
-        RaceHeatSectorResultDto.fromPayload(r)
-      ) ?? []
-    );
-
-    resultDto.id = payload?.id;
-    return resultDto;
-  }
-}
-
-export enum HeatState {
+export enum RaceState {
   Inactive,
   Pending,
   Active,
 }
 
-export class SeasonEventRoundRaceHeatDto {
-  public id: string | undefined;
+const URL = `https://localhost:7219/api/SeasonEventRounds`;
 
+export class SeasonEventRoundRaceResultData {
   constructor(
-    public order: number,
-    public state: HeatState,
-    public raceId: string,
-    public results: RaceHeatResultDto[]
+    public raceResultId: string,
+    public distance: number,
+    public bonusesPoints: number
   ) {}
-
-  public static fromPayload(payload: any): SeasonEventRoundRaceHeatDto {
-    const heatDto = new SeasonEventRoundRaceHeatDto(
-      payload?.order,
-      payload?.state,
-      payload?.raceId,
-      payload?.results?.map((r: any) => RaceHeatResultDto.fromPayload(r)) ?? []
-    );
-
-    heatDto.id = payload?.id;
-    return heatDto;
-  }
 }
 
 export class SeasonEventRoundRaceResultDto {
@@ -165,7 +55,11 @@ export class SeasonEventRoundRaceResultDto {
     public raceId: string,
     public position: number | null,
     public points: number,
-    public raceOutcome: RaceOutcome
+    public raceOutcome: RaceOutcome,
+    public sectorTimes: number[],
+    public distance: number,
+    public bonusesPoints: number,
+    public raceState: RaceState
   ) {}
 
   public static fromPayload(payload: any): SeasonEventRoundRaceResultDto {
@@ -175,10 +69,34 @@ export class SeasonEventRoundRaceResultDto {
       payload?.raceId,
       payload?.position,
       payload?.points,
-      payload?.raceOutcome
+      payload?.raceOutcome,
+      payload?.sectorTimes ?? [],
+      payload?.distance,
+      payload?.bonusesPoints,
+      payload?.raceState
     );
 
     resultDto.id = payload?.id;
+    return resultDto;
+  }
+
+  public static fromWebScocketPayload(
+    payload: any
+  ): SeasonEventRoundRaceResultDto {
+    const resultDto = new SeasonEventRoundRaceResultDto(
+      payload?.CarId,
+      CarDto.fromWebsocketPayload(payload?.Car),
+      payload?.RaceId,
+      payload?.Position,
+      payload?.Points,
+      payload?.RaceOutcome,
+      payload?.SectorTimes ?? [],
+      payload?.Distance,
+      payload?.BonusesPoints,
+      payload?.RaceState
+    );
+
+    resultDto.id = payload?.Id;
     return resultDto;
   }
 }
@@ -190,7 +108,6 @@ export class SeasonEventRoundRaceDto {
     public order: number,
     public participantsCount: number,
     public results: SeasonEventRoundRaceResultDto[],
-    public heats: SeasonEventRoundRaceHeatDto[],
     public instantAdvancements: number,
     public secondChances: number,
     public roundId?: string
@@ -203,15 +120,28 @@ export class SeasonEventRoundRaceDto {
       payload?.results?.map((r: any) =>
         SeasonEventRoundRaceResultDto.fromPayload(r)
       ) ?? [],
-      payload.heats?.map((h: any) =>
-        SeasonEventRoundRaceHeatDto.fromPayload(h)
-      ) ?? [],
       payload?.instantAdvancements,
       payload?.secondChances,
       payload?.roundId
     );
 
     raceDto.id = payload?.id;
+    return raceDto;
+  }
+
+  public static fromWebSocketPayload(payload: any): SeasonEventRoundRaceDto {
+    const raceDto = new SeasonEventRoundRaceDto(
+      payload?.Order,
+      payload.ParticipantsCount,
+      payload?.Results?.map((r: any) =>
+        SeasonEventRoundRaceResultDto.fromWebScocketPayload(r)
+      ) ?? [],
+      payload?.InstantAdvancements,
+      payload?.SecondChances,
+      payload?.RoundId
+    );
+
+    raceDto.id = payload?.Id;
     return raceDto;
   }
 }

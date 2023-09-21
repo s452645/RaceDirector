@@ -3,7 +3,6 @@ using backend.Models.Owners;
 using backend.Models.Seasons.Events;
 using backend.Models.Seasons.Events.Rounds;
 using backend.Models.Seasons.Events.Rounds.Races;
-using backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults;
 using backend.Models.Teams;
 
 namespace backend.Models.Cars
@@ -29,7 +28,6 @@ namespace backend.Models.Cars
         public List<SeasonEvent> SeasonEvents { get; set; }
         public List<SeasonEventRound> SeasonEventRounds { get; set; }
         public List<SeasonEventRoundRaceResult> RaceResults { get; set; }
-        public List<SeasonEventRoundRaceHeatResult> HeatResults { get; set; }
 
         // multiple Pots, as in many seasons one car will be in different teams
         // each Pot is associated with one Team, and one Team with a single Season

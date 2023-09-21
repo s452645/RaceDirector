@@ -1,10 +1,13 @@
 ﻿using backend.Exceptions;
 using backend.Models;
 using backend.Models.Cars;
+using backend.Models.Dtos.Cars;
 using backend.Models.Dtos.Seasons;
 using backend.Models.Dtos.Seasons.Events;
+using backend.Models.Owners;
 using backend.Models.Seasons.Events;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Policy;
 
 namespace backend.Services.Seasons
 {
@@ -107,7 +110,12 @@ namespace backend.Services.Seasons
 
             var eventEntity = seasonEvent.ToEntity();
             eventEntity.Season = season;
-            eventEntity.Participants = _context.Cars.Where(c => true).ToList();
+
+            var participants = _context.Cars
+                .Where(c => c.Owner.Name == "Borys")
+                .ToList();
+
+            eventEntity.Participants = participants;
 
             _context.SeasonEvents.Add(eventEntity);
 
@@ -170,6 +178,49 @@ namespace backend.Services.Seasons
 
             _context.SeasonEventScoreRules.Add(scoreRules);
             seasonEvent.ScoreRules = scoreRules;
+            await _context.SaveChangesAsync();
+
+            return new SeasonEventDto(seasonEvent);
+        }
+
+        public async Task<List<CarDto>> GetSeasonEventParticipants(Guid seasonEventId)
+        {
+            var seasonEvent = await _context.SeasonEvents
+                .Include(se => se.Participants)
+                .Where(se => se.Id == seasonEventId)
+                .FirstOrDefaultAsync();
+
+            if (seasonEvent == null)
+            {
+                throw new NotFoundException($"Cannot get participants: season event [{seasonEventId}] not found");
+            }
+
+            return seasonEvent.Participants.Select(p => new CarDto(p)).ToList();
+        }
+
+        public async Task<SeasonEventDto> AssignSeasonEventParticipants(Guid seasonEventId, List<Guid> participantsIds)
+        {
+            // TODO: block if started
+            var seasonEvent = await _context.SeasonEvents
+                .Include(se => se.Participants)
+                .Where(se => se.Id == seasonEventId)
+                .FirstOrDefaultAsync();
+
+            if (seasonEvent == null)
+            {
+                throw new NotFoundException($"Cannot assign participants to season event [{seasonEventId}]: season event not found");
+            }
+
+            var participants = await _context.Cars
+                .Where(c => participantsIds.Contains(c.Id))
+                .ToListAsync();
+
+            if (participants.Count != participantsIds.Count)
+            {
+                throw new BadRequestException($"Cannot assign participants to season event [{seasonEventId}]. Some participants were not found.");
+            }
+
+            seasonEvent.Participants = participants;
             await _context.SaveChangesAsync();
 
             return new SeasonEventDto(seasonEvent);

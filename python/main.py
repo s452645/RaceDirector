@@ -38,6 +38,10 @@ class MainProgram:
             msg = "car_detected"
         elif "release_state" in data.strip().lower():
             msg = "release"
+        elif "start_detected" in data.strip().lower():
+            msg = "start"
+        elif "sector_0_detected" in data.strip().lower():
+            msg = "sector_0"
 
         if msg is not None:
             print("Sending message " + msg)

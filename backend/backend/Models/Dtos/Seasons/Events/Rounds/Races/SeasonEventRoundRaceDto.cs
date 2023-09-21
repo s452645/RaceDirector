@@ -1,5 +1,4 @@
-﻿using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats;
-using backend.Models.Seasons.Events.Rounds.Races;
+﻿using backend.Models.Seasons.Events.Rounds.Races;
 
 namespace backend.Models.Dtos.Seasons.Events.Rounds.Races
 {
@@ -10,7 +9,6 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races
         public int ParticipantsCount { get; set; }
 
         public List<SeasonEventRoundRaceResultDto> Results { get; set; }
-        public List<SeasonEventRoundRaceHeatDto> Heats { get; set; }
 
         public int InstantAdvancements { get; set; }
         public int SecondChances { get; set; }
@@ -25,7 +23,6 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races
             SecondChances = 0;
 
             Results = new List<SeasonEventRoundRaceResultDto>();
-            Heats = new List<SeasonEventRoundRaceHeatDto>();
         }
 
         public SeasonEventRoundRaceDto(
@@ -33,7 +30,6 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races
             int order,
             int participantsCount,
             List<SeasonEventRoundRaceResultDto> results,
-            List<SeasonEventRoundRaceHeatDto> heats,
             int instantAdvancements, 
             int secondChances, 
             Guid roundId
@@ -43,7 +39,6 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races
             Order = order;
             ParticipantsCount = participantsCount;
             Results = results;
-            Heats = heats;
             InstantAdvancements = instantAdvancements;
             SecondChances = secondChances;
             RoundId = roundId;
@@ -57,7 +52,6 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races
          
             // TODO: deal with not-included relationships better
             Results = race.Results?.Select(r => new SeasonEventRoundRaceResultDto(r)).ToList() ?? new();
-            Heats = race.Heats?.Select(h => new SeasonEventRoundRaceHeatDto(h)).ToList() ?? new();
             
             InstantAdvancements = race.InstantAdvancements;
             SecondChances = race.SecondChances;
@@ -73,7 +67,6 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races
             race.InstantAdvancements = InstantAdvancements;
             race.SecondChances = SecondChances;
             race.Results = Results.Select(r => r.ToEntity()).ToList();
-            race.Heats = Heats.Select(h => h.ToEntity()).ToList();
 
             return race;
         }

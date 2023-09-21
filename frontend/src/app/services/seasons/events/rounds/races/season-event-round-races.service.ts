@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { BackendService } from 'src/app/services/backend.service';
-import { SeasonEventRoundRaceDto } from '../season-event-rounds.service';
+import {
+  SeasonEventRoundRaceDto,
+  SeasonEventRoundRaceResultData,
+} from '../season-event-rounds.service';
 
 const URL = `https://localhost:7219/api/SeasonEventRoundRaces`;
 
@@ -22,26 +25,24 @@ export class SeasonEventRoundRacesService {
     return this.backendService.get(`${URL}/${raceId}/bonuses`);
   }
 
-  public initHeat(heatId: string): Observable<void> {
-    return this.backendService.post(`${URL}/${heatId}/init-heat`, null);
+  public saveDistanceAndBonuses(
+    raceId: string,
+    raceData: SeasonEventRoundRaceResultData
+  ): Observable<void> {
+    return this.backendService.post(`${URL}/${raceId}/race-data`, raceData);
   }
 
-  public saveDistanceAndBonuses(
-    heatId: string,
-    heatResultId: string,
-    distance: number,
-    bonuses: number[]
-  ): Observable<void> {
+  public startRace(raceId: string, raceResultId: string): Observable<void> {
     return this.backendService.post(
-      `${URL}/${heatId}/${heatResultId}/save-heat-data`,
-      {
-        distance: distance,
-        bonuses: bonuses,
-      }
+      `${URL}/${raceId}/${raceResultId}/start`,
+      null
     );
   }
 
-  public endHeat(): Observable<void> {
-    return this.backendService.post(`${URL}/end-heat`, null);
+  public DNFrace(raceId: string, raceResultId: string): Observable<void> {
+    return this.backendService.post(
+      `${URL}/${raceId}/${raceResultId}/dnf`,
+      null
+    );
   }
 }

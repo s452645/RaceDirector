@@ -98,7 +98,6 @@ export class RaceFormComponent implements OnInit, OnChanges, OnDestroy {
       this.raceOrder,
       participantsCount,
       [],
-      [],
       instantAdvancements,
       secondChances
     );

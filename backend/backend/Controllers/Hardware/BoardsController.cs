@@ -42,13 +42,6 @@ namespace backend.Controllers.Hardware
             return await _boardsService.SyncAllBoards();
         }
 
-        [HttpPost("start-listening-all")]
-        public async Task<IActionResult> StartListeningToAllBoards()
-        {
-            await _boardsService.StartListeningToAllBoards();
-            return Ok();
-        }
-
         // GET: api/PicoBoards/5/sensors
         [HttpGet("{id}/sensors")]
         public async Task<ActionResult<IEnumerable<BreakBeamSensorDto>>> GetBoardBreakBeamSensors(Guid id)
@@ -68,26 +61,6 @@ namespace backend.Controllers.Hardware
         public async Task<ActionResult<PicoBoardDto>> RemoveBreakBeamSensor(Guid boardId, Guid sensorId)
         {
             return await _boardsService.RemoveBreakBeamSensor(boardId, sensorId);
-        }
-
-        [ApiExplorerSettings(IgnoreApi = true)]
-        [Route("boards-websocket")]
-        public async Task BoardsWebsocket()
-        {
-            if (HttpContext.WebSockets.IsWebSocketRequest)
-            {
-                using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-                var socketFinishedTcs = new TaskCompletionSource<object>();
-
-                var observer = new BoardListenerObserver(webSocket, socketFinishedTcs);
-                _boardsService.RegisterBoardListenerObserver(observer);
-
-                await socketFinishedTcs.Task;
-            }
-            else
-            {
-                HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-            }
         }
     }
 }

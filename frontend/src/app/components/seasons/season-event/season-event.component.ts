@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subscription, map, mergeMap, of } from 'rxjs';
+import { Observable, Subscription, mergeMap, of } from 'rxjs';
 import { RouteTitleService } from 'src/app/services/route-title.service';
 import {
   SeasonEventDto,
@@ -14,6 +14,7 @@ import {
 } from 'src/app/services/seasons/events/rounds/season-event-rounds.service';
 import { SeasonEventScoreRulesFormComponent } from './season-event-score-rules-form/season-event-score-rules-form.component';
 import { ConfirmationService } from 'primeng/api';
+import { SeasonEventParticipantsFormComponent } from './season-event-participants-form/season-event-participants-form.component';
 
 @Component({
   selector: 'app-season-event',
@@ -24,6 +25,9 @@ import { ConfirmationService } from 'primeng/api';
 export class SeasonEventComponent implements OnInit, OnDestroy {
   @ViewChild(SeasonEventScoreRulesFormComponent, { static: true })
   private scoreRulesFormCmp!: SeasonEventScoreRulesFormComponent;
+
+  @ViewChild(SeasonEventParticipantsFormComponent, { static: true })
+  private participantsFormCmp!: SeasonEventParticipantsFormComponent;
 
   private seasonIdNullable: string | null = null;
   private seasonEventIdNullable: string | null = null;
@@ -45,6 +49,7 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
   isCircuitFormOpen = false;
   isScoreRulesFormOpen = false;
   isRoundFormOpen = false;
+  isParticipantsFormOpen = false;
 
   nextRoundParticipantsCount = 0;
   nextRoundOrder = 0;
@@ -93,6 +98,10 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
     );
   }
 
+  handleOpenParticipantsForm(): void {
+    this.isParticipantsFormOpen = true;
+  }
+
   handleEnterRound(roundId: string) {
     this.router.navigate([`rounds/${roundId}`], {
       relativeTo: this.route,
@@ -130,22 +139,24 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
   }
 
   handleDeleteRound(event: Event, roundId: string) {
-    const s = this.roundsService
-      .hasRoundStarted(roundId)
-      .subscribe(hasStarted => {
-        if (!hasStarted) {
-          this.deleteRound(roundId);
-          return;
-        }
+    this.deleteRound(roundId);
 
-        this.displayConfirmationPopup(
-          event,
-          'This round has already started. Deleting will result in a loss of data. Do you want to continue?',
-          () => this.deleteRound(roundId)
-        );
-      });
+    // const s = this.roundsService
+    //   .hasRoundStarted(roundId)
+    //   .subscribe(hasStarted => {
+    //     if (!hasStarted) {
+    //       this.deleteRound(roundId);
+    //       return;
+    //     }
 
-    this.subscription.add(s);
+    //     this.displayConfirmationPopup(
+    //       event,
+    //       'This round has already started. Deleting will result in a loss of data. Do you want to continue?',
+    //       () => this.deleteRound(roundId)
+    //     );
+    //   });
+
+    // this.subscription.add(s);
   }
 
   private deleteRound(roundId: string) {
@@ -183,10 +194,23 @@ export class SeasonEventComponent implements OnInit, OnDestroy {
     );
   }
 
+  handleSubmittedParticipants(participantsIds: string[]): void {
+    this.subscription.add(
+      this.seasonsService
+        .assignSeasonEventParticipants(this.seasonEventId, participantsIds)
+        .subscribe(() => this.refreshData())
+        .add(() => {
+          this.participantsFormCmp.isSubmitButtonLoading = false;
+          this.isParticipantsFormOpen = false;
+        })
+    );
+  }
+
   closeDialog(refreshData: boolean) {
     this.isCircuitFormOpen = false;
     this.isRoundFormOpen = false;
     this.isScoreRulesFormOpen = false;
+    this.isParticipantsFormOpen = false;
 
     if (refreshData) {
       this.refreshData();

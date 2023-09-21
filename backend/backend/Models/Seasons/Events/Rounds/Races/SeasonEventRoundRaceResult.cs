@@ -13,6 +13,14 @@ namespace backend.Models.Seasons.Events.Rounds.Races
         SecondChanceDropped,
     }
 
+    public enum RaceState
+    {
+        Inactive,
+        Pending,
+        Active,
+        Paused,
+    }
+
     public class SeasonEventRoundRaceResult
     {
         public Guid Id { get; set; }
@@ -24,7 +32,19 @@ namespace backend.Models.Seasons.Events.Rounds.Races
         public SeasonEventRoundRace SeasonEventRoundRace { get; set; }
 
         public int? Position { get; set; }
+
         public float Points { get; set; }
+        
+        public float[] SectorTimes { get; set; }
+
+        public long[] SectorTimestamps { get; set; }
+        
+        public float Distance { get; set; }
+        
+        public float BonusesPoints { get; set; }
+     
+        public RaceState RaceState { get; set; }
+
         public RaceOutcome RaceOutcome { get; set; }
     }
 }

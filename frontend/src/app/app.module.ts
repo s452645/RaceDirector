@@ -22,6 +22,7 @@ import { ChipsModule } from 'primeng/chips';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { PanelModule } from 'primeng/panel';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -46,13 +47,10 @@ import { RoundFormComponent } from './components/seasons/season-event-round/roun
 import { RaceFormComponent } from './components/seasons/season-event-round/round-form/race-form/race-form.component';
 import { BoardSensorsDetailsComponent } from './components/containers/settings/board-sensors-details/board-sensors-details.component';
 import { SeasonEventRoundComponent } from './components/seasons/season-event-round/season-event-round/season-event-round.component';
-import { SeasonEventRoundRaceComponent } from './components/seasons/season-event-round-race/season-event-round-race.component';
-import { RaceHeatViewComponent } from './components/seasons/season-event-round-race/race-heat-view/race-heat-view.component';
 import { RoundRaceViewComponent } from './components/seasons/season-event-round/season-event-round/round-race-view/round-race-view.component';
-import { SeasonEventRoundRaceHeatComponent } from './components/seasons/season-event-round-race-heat/season-event-round-race-heat.component';
-import { HeatCurrentRaceTableComponent } from './components/seasons/season-event-round-race-heat/heat-current-race-table/heat-current-race-table.component';
-import { HeatPointsTableComponent } from './components/seasons/season-event-round-race-heat/heat-points-table/heat-points-table.component';
-import { HeatRaceSectorTableComponent } from './components/seasons/season-event-round-race-heat/heat-race-sector-table/heat-race-sector-table.component';
+import { SeasonEventParticipantsFormComponent } from './components/seasons/season-event/season-event-participants-form/season-event-participants-form.component';
+import { SeasonEventRoundRaceComponent } from './components/seasons/season-event-round-race/season-event-round-race.component';
+import { TimeTrialHeatComponent } from './components/seasons/season-event-round-race/time-trial-heat/time-trial-heat.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
@@ -81,13 +79,10 @@ export function HttpLoaderFactory(http: HttpClient) {
     RaceFormComponent,
     BoardSensorsDetailsComponent,
     SeasonEventRoundComponent,
-    SeasonEventRoundRaceComponent,
-    RaceHeatViewComponent,
     RoundRaceViewComponent,
-    SeasonEventRoundRaceHeatComponent,
-    HeatCurrentRaceTableComponent,
-    HeatPointsTableComponent,
-    HeatRaceSectorTableComponent,
+    SeasonEventParticipantsFormComponent,
+    SeasonEventRoundRaceComponent,
+    TimeTrialHeatComponent,
   ],
   imports: [
     BrowserModule,
@@ -114,6 +109,7 @@ export function HttpLoaderFactory(http: HttpClient) {
     CardModule,
     MultiSelectModule,
     ProgressBarModule,
+    PanelModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {

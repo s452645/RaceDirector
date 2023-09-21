@@ -3,8 +3,6 @@ using backend.Models;
 using backend.Models.Cars;
 using backend.Models.Dtos.Seasons.Events.Rounds;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races;
-using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats;
-using backend.Models.Dtos.Seasons.Events.Rounds.Races.Heats.HeatResults;
 using backend.Models.Seasons.Events;
 using backend.Models.Seasons.Events.Rounds;
 using backend.Models.Seasons.Events.Rounds.Races;
@@ -54,7 +52,7 @@ namespace backend.Services.Seasons.Events.Rounds
 
         public async Task<SeasonEventRoundDto> AddSeasonEventRound(Guid seasonEventId, SeasonEventRoundDto roundDto)
         {
-            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId, new() { SeasonEventInclusion.ROUNDS });
+            var seasonEvent = await GetSeasonEventOrThrow(seasonEventId, new() { SeasonEventInclusion.ROUNDS, SeasonEventInclusion.PARTICIPANTS });
             var round = roundDto.ToEntity();
 
             if (seasonEvent.Rounds == null)
@@ -135,7 +133,6 @@ namespace backend.Services.Seasons.Events.Rounds
                 .Where(r => r.Id == roundId)
                 .Include(r => r.Participants)
                 .Include(r => r.Races).ThenInclude(r => r.Results).ThenInclude(r => r.Car)
-                .Include(r => r.Races).ThenInclude(r => r.Heats).ThenInclude(h => h.Results).ThenInclude(r => r.Car)
                 .Include(r => r.SecondChanceRules)
                 .FirstOrDefaultAsync();
             
@@ -151,8 +148,6 @@ namespace backend.Services.Seasons.Events.Rounds
 
             races.ForEach(race =>
             {
-                var heatOrder = 0;
-
                 while (race.ParticipantsCount > race.Results.Count)
                 {
                     var participantIndex = random.Next(participants.Count);
@@ -165,63 +160,22 @@ namespace backend.Services.Seasons.Events.Rounds
                     raceResult.RaceOutcome = RaceOutcome.Undetermined;
                     raceResult.Position = 0;
                     raceResult.Points = 0;
+                    raceResult.SectorTimes = new();
+                    raceResult.Distance = 0;
+                    raceResult.BonusesPoints = 0;
+                    raceResult.RaceState = RaceState.Inactive;
 
                     race.Results.Add(raceResult);
-                    _context.SeasonEventRoundRaceResults.Add(raceResult.ToEntity());
 
-                    var heat = new SeasonEventRoundRaceHeatDto();
+                    var entity = raceResult.ToEntity();
+                    entity.SectorTimestamps = new List<long>().ToArray();
 
-                    heat.Order = heatOrder;
-                    heatOrder++;
-
-                    var heatResults = new RaceHeatResultDto();
-                    heatResults.CarId = participant.Id;
-
-/*                    heatResults.SectorTimes = new float [0];
-                    heatResults.FullTime = 0;
-
-                    heatResults.TimePoints = 0;
-                    heatResults.AdvantagePoints = 0;
-*/                  heatResults.DistancePoints = 0;
-
-                    heatResults.Bonuses = new float[0];
-
-                    heatResults.Position = 0;
-                    heatResults.PointsSummed = 0;
-
-                    var sectorOneResults = new RaceHeatSectorResultDto();
-                    sectorOneResults.Order = 0;
-                    sectorOneResults.PositionPoints = 1;
-                    sectorOneResults.AdvantagePoints = 3.50f;
-
-                    var sectorTwoResults = new RaceHeatSectorResultDto();
-                    sectorTwoResults.Order = 1;
-                    sectorTwoResults.AdvantagePoints = 2.45f;
-
-                    heatResults.SectorResults.AddRange(new List<RaceHeatSectorResultDto> {sectorOneResults, sectorTwoResults });
-
-                    heat.RaceId = race.Id;
-                    heat.Results.Add(heatResults);
-
-                    _context.SeasonEventRoundRaceHeats.Add(heat.ToEntity());
+                    _context.SeasonEventRoundRaceResults.Add(entity);
                 }
             });
 
             await _context.SaveChangesAsync();
             return new SeasonEventRoundDto(round);
-        }
-
-        public async Task<bool> HasRoundStarted(Guid roundId)
-        {
-            var races = await _context.SeasonEventRoundRaces
-                .Where(r => r.RoundId == roundId)
-                .Include(r => r.Heats).ThenInclude(h => h.Results)
-                .ToListAsync();
-
-            return races
-                .SelectMany(r => r.Heats)
-                .SelectMany(h => h.Results)
-                .Any(result => result.PointsSummed != 0);
         }
 
         private async Task<SeasonEvent> GetSeasonEventOrThrow(Guid seasonEventId, List<SeasonEventInclusion> inclusions) 

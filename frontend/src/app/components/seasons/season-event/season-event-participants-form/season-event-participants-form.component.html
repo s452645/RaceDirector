@@ -1,0 +1,21 @@
+<div class="card flex flex-column">
+  <div class="grid overflow-y-auto py-1" [ngStyle]="{ maxHeight: '50vh' }">
+    <div *ngFor="let car of cars" class="col-3 field-checkbox">
+      <p-checkbox
+        name="group"
+        [value]="car.id"
+        [(ngModel)]="participants"
+        [inputId]="car.id ?? ''"
+      ></p-checkbox>
+      <label [for]="car.id">{{ car.name }}</label>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <p-button
+      label="Submit"
+      [loading]="isSubmitButtonLoading"
+      (onClick)="onSubmit()"
+    ></p-button>
+  </div>
+</div>

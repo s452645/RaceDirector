@@ -8,7 +8,7 @@ namespace backend.Services.Hardware
 {
     public interface IBoardListenerObserver
     {
-        void Notify(BoardEvent boardEvent);
+        Task Notify(BoardEvent boardEvent);
     }
 
     public class BoardListener
@@ -82,13 +82,92 @@ namespace backend.Services.Hardware
 
         private async Task HandleBoardEvent(BoardEvent boardEvent)
         {
-            _observers.ForEach(observer => observer.Notify(boardEvent));
+            List<Task> tasks = new();
+            
+            foreach (IBoardListenerObserver observer in _observers)
+            {
+                tasks.Add(observer.Notify(boardEvent));
+            }
+
+            await Task.WhenAll(tasks);
 
             using var scope = _scopeFactory.CreateScope();
             var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
 
             db.BoardEvents.Add(boardEvent);
             await db.SaveChangesAsync();
+        }
+
+        public async Task EmitElevatorEnterEvent(long timestamp)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
+
+            var sensor = db.BreakBeamSensors.Where(bbs => bbs.Name == "ELEVATOR_DOWN").First();
+
+            var boardEvent = new BoardEvent
+            {
+                SensorId = sensor.Id,
+                Broken = true,
+                PicoLocalTimestamp = timestamp,
+                ReceivedTimestamp = timestamp
+            };
+
+            await HandleBoardEvent(boardEvent);
+        }
+
+        public async Task EmitElevatorExitEvent(long timestamp)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
+
+            var sensor = db.BreakBeamSensors.Where(bbs => bbs.Name == "ELEVATOR_UP").First();
+
+            var boardEvent = new BoardEvent
+            {
+                SensorId = sensor.Id,
+                Broken = true,
+                PicoLocalTimestamp = timestamp,
+                ReceivedTimestamp = timestamp
+            };
+
+            await HandleBoardEvent(boardEvent);
+        }
+
+        public async Task EmitStartEvent(long timestamp)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
+
+            var sensor = db.BreakBeamSensors.Where(bbs => bbs.Name == "START").First();
+
+            var boardEvent = new BoardEvent
+            {
+                SensorId = sensor.Id,
+                Broken = true,
+                PicoLocalTimestamp = timestamp,
+                ReceivedTimestamp = timestamp
+            };
+
+            await HandleBoardEvent(boardEvent);
+        }
+
+        public async Task EmitSector0Event(long timestamp)
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
+
+            var sensor = db.BreakBeamSensors.Where(bbs => bbs.Name == "SECTOR_ZERO").First();
+
+            var boardEvent = new BoardEvent
+            {
+                SensorId = sensor.Id,
+                Broken = true,
+                PicoLocalTimestamp = timestamp,
+                ReceivedTimestamp = timestamp
+            };
+
+            await HandleBoardEvent(boardEvent);
         }
 
         private void CatchBoardEventException(Exception ex, ActivePicoWBoard activeBoard)

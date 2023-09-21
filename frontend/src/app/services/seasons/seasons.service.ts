@@ -3,6 +3,7 @@ import { Observable, map } from 'rxjs';
 import { BackendService } from '../backend.service';
 import { CircuitDto } from './events/circuit.service';
 import { isNil } from 'lodash';
+import { CarDto } from '../cars/car.service';
 
 const URL = 'https://localhost:7219/api/Seasons';
 
@@ -191,6 +192,26 @@ export class SeasonsService {
       .post<SeasonEventScoreRulesDto, SeasonEventDto>(
         `${URL}/${seasonEventId}/score-rules`,
         scoreRules
+      )
+      .pipe(map(event => SeasonEventDto.fromPayload(event)));
+  }
+
+  public getSeasonEventParticipants(
+    seasonEventId: string
+  ): Observable<CarDto[]> {
+    return this.backendService
+      .get<CarDto[]>(`${URL}/${seasonEventId}/participants`)
+      .pipe(map(cars => cars.map(car => CarDto.fromPayload(car))));
+  }
+
+  public assignSeasonEventParticipants(
+    seasonEventId: string,
+    participantsIds: string[]
+  ): Observable<SeasonEventDto> {
+    return this.backendService
+      .put<string[], SeasonEventDto>(
+        `${URL}/${seasonEventId}/participants`,
+        participantsIds
       )
       .pipe(map(event => SeasonEventDto.fromPayload(event)));
   }

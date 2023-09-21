@@ -21,7 +21,7 @@ class Syncer:
 
     async def _sync_clock(self):
         await recv(self.reader, self.timer, "[0]")
-        
+
         _ = await send(
             self.writer,
             self.timer,
@@ -58,40 +58,14 @@ class Syncer:
         t3 = int(t3)
         t4 = int(t4)
 
-        sync_result = self.timer.calculate_offset(t1, t2, t3, t4)
         response = {
-            # commented out until .NET can handle it
-            # "t1": t1,
-            # "t2": t2,
-            # "t3": t3,
-            # "t4": t4,
-            # "sync_result":
-            # {
-            "Result": sync_result.result,
-            "CurrentSyncOffset": sync_result.offset,
-            "LastTenOffsetsAvg": sync_result.avg_offset,
-            "NewClockOffset": sync_result.new_clock_offset,
-            "ClockAdjustedPicoTimestamp": sync_result.clock_adjusted_pico_timestamp,
-            # },
+            "t1": t1,
+            "t2": t2,
+            "t3": t3,
+            "t4": t4,
         }
 
         await send(self.writer, self.timer, "[3]", json.dumps(response))
-
-        # if (
-        #     abs(sync_result.offset) < 10
-        #     and sync_result.avg_offset
-        #     and abs(sync_result.avg_offset) < 10
-        # ):
-        #     self.next_sleep_seconds = 300
-
-        # elif abs(sync_result.offset) < 10:
-        #     self.next_sleep_seconds = 120
-
-        # elif abs(sync_result.offset) < 20:
-        #     self.next_sleep_seconds = 30
-
-        # else:
-        #     self.next_sleep_seconds = 10
 
     async def _sync_packet(self):
         t2, _ = await recv(self.reader, self.timer, "[1]")

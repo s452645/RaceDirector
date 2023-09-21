@@ -3,6 +3,7 @@ using backend.Services.Seasons;
 using backend.Models.Dtos.Seasons.Events;
 using backend.Models.Dtos.Seasons;
 using backend.Models.Seasons;
+using backend.Models.Cars;
 
 namespace backend.Controllers.Seasons
 {
@@ -85,6 +86,20 @@ namespace backend.Controllers.Seasons
         public async Task<ActionResult<SeasonEventDto>> AddScoreRules(Guid seasonEventId, SeasonEventScoreRulesDto scoreRulesDto)
         {
             var seasonEvent = await _seasonService.AddScoreRules(seasonEventId, scoreRulesDto);
+            return Ok(seasonEvent);
+        }
+
+        [HttpGet("{seasonEventId}/participants")]
+        public async Task<ActionResult<List<Car>>> GetParticipants(Guid seasonEventId)
+        {
+            var participants = await _seasonService.GetSeasonEventParticipants(seasonEventId);
+            return Ok(participants);
+        }
+
+        [HttpPut("{seasonEventId}/participants")]
+        public async Task<ActionResult<SeasonEventDto>> AssignParticipants(Guid seasonEventId, [FromBody] List<Guid> participantsIds)
+        {
+            var seasonEvent = await _seasonService.AssignSeasonEventParticipants(seasonEventId, participantsIds);
             return Ok(seasonEvent);
         }
     }

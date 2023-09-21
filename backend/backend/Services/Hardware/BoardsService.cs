@@ -30,7 +30,8 @@ namespace backend.Services.Hardware
                 .Include(pb => pb.BreakBeamSensors)
                 .ToListAsync();
 
-            return boards.Select(b => new PicoBoardDto(b)).ToList();
+            var boardsDtos = boards.Select(b => new PicoBoardDto(b)).ToList();
+            return boardsDtos.Select(b => AssignLastSyncData(b)).ToList();
         }
 
         public async Task<List<BreakBeamSensorDto>> GetBoardBreakBeamSensors(Guid id)
@@ -139,42 +140,6 @@ namespace backend.Services.Hardware
             return syncResults.ToList();
         }
 
-        public async Task StartListeningToAllBoards()
-        {
-            var boards = await _context.PicoBoards
-                .Include(pb => pb.BreakBeamSensors)
-                .Where(b => PicoBoardType.WiFi.Equals(b.Type)).ToListAsync();
-
-            var startListeningTasks = new List<Task>();
-
-            foreach (var board in boards)
-            {
-                var dto = new PicoBoardDto(board);
-                var task = _boardListener.StartListening(dto);
-                startListeningTasks.Add(task);
-            }
-
-            await Task.WhenAll(startListeningTasks);
-        }
-
-        public async Task SendSensorsToAllBoards()
-        {
-            var boards = await _context.PicoBoards
-                .Include(pb => pb.BreakBeamSensors)
-                .Where(pb => PicoBoardType.WiFi.Equals(pb.Type))
-                .ToListAsync();
-            
-            foreach (var board in boards)
-            {
-                var dto = new PicoBoardDto(board);
-            }
-        }
-
-        public void RegisterBoardListenerObserver(IBoardListenerObserver observer)
-        {
-            _boardListener.RegisterObserver(observer);
-        }
-
         private async Task<PicoBoard> FindPicoBoardOrThrow(Guid picoBoardId, List<PicoBoardInclusion> inclusions)
         {
             var defaultErrorMsg = $"Pico Board [{picoBoardId}] not found";
@@ -192,6 +157,25 @@ namespace backend.Services.Hardware
             {
                 throw new NotFoundException(errorMsg);
             }
+
+            return board;
+        }
+
+        private PicoBoardDto AssignLastSyncData(PicoBoardDto board)
+        {
+            var lastSync = _context.SyncBoardResults
+                .Where(r => r.PicoBoardId == board.Id)
+                .OrderByDescending(r => r.SyncFinishedTimestamp)
+                .FirstOrDefault();
+
+            if (lastSync == null)
+            {
+                return board;
+            }
+
+            board.LastSyncOffset = lastSync.CurrentSyncOffset;
+            board.LastSyncResult = lastSync.SyncResult;
+            board.LastSyncDateTime = lastSync.SyncFinishedTimestamp;
 
             return board;
         }

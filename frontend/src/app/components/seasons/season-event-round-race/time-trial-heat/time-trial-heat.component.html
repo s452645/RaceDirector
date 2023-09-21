@@ -1,0 +1,77 @@
+<p-panel>
+  <ng-template pTemplate="header">
+    <div class="flex justify-content-between align-items-center w-full">
+      <span class="font-semibold text-xl" [ngClass]="getHeaderClass()">{{
+        raceResult?.car?.name
+      }}</span>
+
+      <div class="flex w-3 justify-content-around align-items-center">
+        <button
+          type="button"
+          pButton
+          pRipple
+          icon="pi pi-play"
+          ngClass="p-button-text p-button-sm"
+          [ngStyle]="{ height: '30px', width: '30px' }"
+          [disabled]="!isInactive()"
+          (click)="onRaceStarted()"
+        ></button>
+
+        <button
+          type="button"
+          pButton
+          pRipple
+          icon="pi pi-times-circle"
+          ngClass="p-button-text p-button-sm p-button-danger"
+          [ngStyle]="{ height: '30px', width: '30px' }"
+          [disabled]="isInactive()"
+          (click)="onRaceDNFed()"
+        ></button>
+      </div>
+    </div>
+  </ng-template>
+
+  <p class="text-5xl p-0" [ngStyle]="{ margin: '-2px' }">
+    {{ timer.toFixed(3) }}
+  </p>
+
+  <ng-template pTemplate="footer">
+    <div class="flex h-2rem w-full">
+      <div
+        *ngFor="let sectorIndex of [0, 1, 2, 3, 4]"
+        class="sector-time-container flex justify-content-center align-items-center"
+        [ngStyle]="{ border: '1px solid #999999' }"
+      >
+        <p class="text-xs">
+          {{ raceResult?.sectorTimes?.at(sectorIndex)?.toFixed(3) }}
+        </p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" class="mt-4">
+      <div class="flex h-4rem w-full justify-content-around">
+        <div class="flex flex-column justify-content-around">
+          <label for="integeronly" class="text-xs ml-1">Distance</label>
+          <p-inputNumber
+            inputId="distance"
+            formControlName="distance"
+            [size]="12"
+            [ngStyle]="{ height: '30px' }"
+          >
+          </p-inputNumber>
+        </div>
+
+        <div class="flex flex-column justify-content-around">
+          <label for="integeronly" class="text-xs ml-1">Bonus points</label>
+          <p-inputNumber
+            inputId="bonusesPoints"
+            formControlName="bonusesPoints"
+            [size]="12"
+            [ngStyle]="{ height: '30px' }"
+          >
+          </p-inputNumber>
+        </div>
+      </div>
+    </form>
+  </ng-template>
+</p-panel>

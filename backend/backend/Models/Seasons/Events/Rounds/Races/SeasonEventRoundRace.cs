@@ -1,6 +1,4 @@
-﻿using backend.Models.Seasons.Events.Rounds.Races.Heats;
-
-namespace backend.Models.Seasons.Events.Rounds.Races
+﻿namespace backend.Models.Seasons.Events.Rounds.Races
 {
     public class SeasonEventRoundRace
     {
@@ -9,7 +7,6 @@ namespace backend.Models.Seasons.Events.Rounds.Races
         public int ParticipantsCount { get; set; }
 
         public List<SeasonEventRoundRaceResult> Results { get; set; }
-        public List<SeasonEventRoundRaceHeat> Heats { get; set; }
 
         public int InstantAdvancements { get; set; }
         public int SecondChances { get; set; }

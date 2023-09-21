@@ -7,8 +7,6 @@ using backend.Models.Seasons.Events;
 using backend.Models.Seasons.Events.Circuits;
 using backend.Models.Seasons.Events.Rounds;
 using backend.Models.Seasons.Events.Rounds.Races;
-using backend.Models.Seasons.Events.Rounds.Races.Heats;
-using backend.Models.Seasons.Events.Rounds.Races.Heats.HeatResults;
 using backend.Models.Teams;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -38,8 +36,17 @@ public class BackendContext : DbContext
             c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
             c => c.ToArray());
 
-        modelBuilder.Entity<SeasonEventRoundRaceHeatResult>()
-            .Property(heatResult => heatResult.Bonuses)
+        var longArrayConverter = new ValueConverter<long[], string>(
+            v => string.Join(";", v),
+            v => v.Split(";", StringSplitOptions.RemoveEmptyEntries).Select(val => long.Parse(val)).ToArray());
+
+        var longArrayComparer = new ValueComparer<long[]>(
+            (c1, c2) => c1.SequenceEqual(c2),
+            c => c.Aggregate(0, (a, v) => HashCode.Combine(a, v.GetHashCode())),
+            c => c.ToArray());
+
+        modelBuilder.Entity<SeasonEventRoundRaceResult>()
+            .Property(raceResult => raceResult.SectorTimes)
             .HasConversion(floatArrayConverter)
             .Metadata
             .SetValueComparer(floatArrayComparer);
@@ -52,11 +59,18 @@ public class BackendContext : DbContext
             .SetValueComparer(floatArrayComparer);
 
         modelBuilder
+            .Entity<SeasonEventRoundRaceResult>()
+            .Property(serrr => serrr.SectorTimestamps)
+            .HasConversion(longArrayConverter)
+            .Metadata
+            .SetValueComparer(longArrayComparer);
+
+/*        modelBuilder
             .Entity<TimeTrialHeatResult>()
             .Property(heatResult => heatResult.SectorTimes)
             .HasConversion(floatArrayConverter)
             .Metadata
-            .SetValueComparer(floatArrayComparer);
+            .SetValueComparer(floatArrayComparer);*/
     }
 
     public DbSet<Car> Cars => Set<Car>();
@@ -81,11 +95,6 @@ public class BackendContext : DbContext
     public DbSet<SecondChanceRules> SecondChanceRules => Set<SecondChanceRules>();
     public DbSet<SeasonEventRoundRace> SeasonEventRoundRaces => Set<SeasonEventRoundRace>();
     public DbSet<SeasonEventRoundRaceResult> SeasonEventRoundRaceResults => Set<SeasonEventRoundRaceResult>();
-    public DbSet<SeasonEventRoundRaceHeat> SeasonEventRoundRaceHeats => Set<SeasonEventRoundRaceHeat>();
-    public DbSet<SeasonEventRoundRaceHeatResult> SeasonEventRoundRaceHeatResults => Set<SeasonEventRoundRaceHeatResult>();
-    public DbSet<TimeTrialHeatResult> TimeTrialHeatResults => Set<TimeTrialHeatResult>();
-    public DbSet<RaceHeatResult> RaceHeatResults => Set<RaceHeatResult>();
-    public DbSet<RaceHeatSectorResult> RaceHeatSectorResults => Set<RaceHeatSectorResult>();
     public DbSet<SyncBoardResult> SyncBoardResults => Set<SyncBoardResult>();
     public DbSet<BoardEvent> BoardEvents => Set<BoardEvent>();
 

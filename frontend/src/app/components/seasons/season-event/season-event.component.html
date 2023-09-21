@@ -10,6 +10,11 @@
       (onClick)="handleOpenScoreRulesForm()"
     ></p-button>
 
+    <p-button
+      label="Configure participants"
+      (onClick)="handleOpenParticipantsForm()"
+    ></p-button>
+
     <p-button label="Add round" (onClick)="handleOpenNewRoundForm()"></p-button>
   </div>
 
@@ -121,6 +126,22 @@
     [participantsCount]="nextRoundParticipantsCount"
     [roundOrder]="nextRoundOrder"
     [seasonEventId]="seasonEventId"
+    (closeSelf)="closeDialog(true)"
+  />
+</p-dialog>
+
+<p-dialog
+  header="Confiugure participants"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [(visible)]="isParticipantsFormOpen"
+  [style]="{ width: '50vw' }"
+  (onHide)="closeDialog(false)"
+>
+  <app-season-event-participants-form
+    [seasonEventId]="seasonEventId"
+    (submittedPatricipantsIds)="handleSubmittedParticipants($event)"
     (closeSelf)="closeDialog(true)"
   />
 </p-dialog>

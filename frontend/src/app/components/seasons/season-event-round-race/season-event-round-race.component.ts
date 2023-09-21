@@ -1,9 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { isNil, sum } from 'lodash';
+import { Subject, Subscription } from 'rxjs';
+import { ElevatorService } from 'src/app/services/hardware/elevator.service';
 import { SeasonEventRoundRacesService } from 'src/app/services/seasons/events/rounds/races/season-event-round-races.service';
-import { SeasonEventRoundRaceDto } from 'src/app/services/seasons/events/rounds/season-event-rounds.service';
+import {
+  SeasonEventRoundRaceDto,
+  SeasonEventRoundRaceResultData,
+  SeasonEventRoundRaceResultDto,
+} from 'src/app/services/seasons/events/rounds/season-event-rounds.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { WebSocketService } from 'src/app/services/websocket.service';
 
 @Component({
   selector: 'app-season-event-round-race',
@@ -11,22 +18,15 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./season-event-round-race.component.css'],
 })
 export class SeasonEventRoundRaceComponent implements OnInit, OnDestroy {
-  private seasonIdNullable: string | null = null;
-  private seasonEventIdNullable: string | null = null;
+  public availableBonuses: number[] = [];
+  public activeRaceResult: SeasonEventRoundRaceResultDto | null = null;
+
   private roundIdNullable: string | null = null;
   private raceIdNullable: string | null = null;
-
   private raceDtoNullable: SeasonEventRoundRaceDto | null = null;
 
+  private webSocketMessages: Subject<string> = new Subject();
   private subscription = new Subscription();
-
-  get seasonId(): string {
-    return this.utils.getNullableOrThrow(this.seasonIdNullable);
-  }
-
-  get seasonEventId(): string {
-    return this.utils.getNullableOrThrow(this.seasonEventIdNullable);
-  }
 
   get roundId(): string {
     return this.utils.getNullableOrThrow(this.roundIdNullable);
@@ -41,34 +41,121 @@ export class SeasonEventRoundRaceComponent implements OnInit, OnDestroy {
   }
 
   constructor(
+    private raceService: SeasonEventRoundRacesService,
     private route: ActivatedRoute,
     private utils: UtilsService,
-    private raceService: SeasonEventRoundRacesService
+    private webSocketService: WebSocketService,
+    private elevatorService: ElevatorService
   ) {
-    this.seasonIdNullable = this.route.snapshot.paramMap.get('seasonId');
-    this.seasonEventIdNullable = this.route.snapshot.paramMap.get('eventId');
     this.roundIdNullable = this.route.snapshot.paramMap.get('roundId');
     this.raceIdNullable = this.route.snapshot.paramMap.get('raceId');
   }
 
-  ngOnInit(): void {
-    this.refreshData();
+  public ngOnInit(): void {
+    this.registerWebSocket();
+    this.refreshRace();
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
 
-  private refreshData(): void {
-    this.subscription.add(
-      this.raceService.getRace(this.roundId, this.raceId).subscribe(race => {
+  public getTotalTime(sectorTimes: number[]): string {
+    return sum(sectorTimes).toFixed(3);
+  }
+
+  public getTotalBonuses(bonuses: number[]): string {
+    return sum(bonuses).toFixed(0);
+  }
+
+  public handleEnterHeat(result: SeasonEventRoundRaceResultDto): void {
+    this.activeRaceResult = result;
+  }
+
+  public handleRaceDataChange(data: SeasonEventRoundRaceResultData): void {
+    this.raceService.saveDistanceAndBonuses(this.raceId, data).subscribe(() => {
+      return null;
+    });
+  }
+
+  public handleRaceStarted(raceResultId: string): void {
+    const s = this.raceService
+      .startRace(this.raceId, raceResultId)
+      .subscribe(() => {
+        return null;
+      });
+    this.subscription.add(s);
+  }
+
+  public handleRaceDNF(raceResultId: string): void {
+    const s = this.raceService
+      .DNFrace(this.raceId, raceResultId)
+      .subscribe(() => {
+        return null;
+      });
+
+    this.subscription.add(s);
+  }
+
+  private refreshRace(): void {
+    const s1 = this.raceService
+      .getRace(this.roundId, this.raceId)
+      .subscribe(race => {
         this.raceDtoNullable = race;
-        this.sortHeats();
-      })
+        this.updateActiveRaceResult();
+        this.sortRaceResults();
+      });
+
+    this.subscription.add(s1);
+  }
+
+  private updateActiveRaceResult(): void {
+    if (isNil(this.activeRaceResult)) {
+      return;
+    }
+
+    const id = this.activeRaceResult.id;
+    this.activeRaceResult = this.raceDto.results.find(r => r.id === id) ?? null;
+  }
+
+  private sortRaceResults(): void {
+    this.raceDto.results.sort((a, b) => {
+      const posA =
+        a.position == null || a.position == 0 ? Infinity : a.position;
+
+      const posB =
+        b.position == null || b.position == 0 ? Infinity : b.position;
+
+      return posA - posB;
+    });
+  }
+
+  private registerWebSocket(): void {
+    this.webSocketMessages =
+      this.webSocketService.createSyncWebSocket<string>('race');
+
+    this.subscription.add(
+      this.webSocketMessages.subscribe(message =>
+        this.handleWebSocketMessage(message)
+      )
     );
   }
 
-  private sortHeats(): void {
-    this.raceDto.heats.sort((a, b) => a.order - b.order);
+  private handleWebSocketMessage(message: string): void {
+    try {
+      this.raceDtoNullable = SeasonEventRoundRaceDto.fromWebSocketPayload(
+        JSON.parse(message)
+      );
+      this.updateActiveRaceResult();
+      this.sortRaceResults();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  public sendCommand(message: string): void {
+    this.elevatorService
+      .sendCommand(message)
+      .subscribe(response => console.log(response));
   }
 }
