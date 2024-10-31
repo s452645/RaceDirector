@@ -144,7 +144,39 @@ namespace backend.Services.Seasons.Events.Rounds
             var random = new Random();
             var participants = new List<Car>(round.Participants);
             
-            var races = round.Races.Select(r => new SeasonEventRoundRaceDto(r)).ToList();
+            var races = round.Races.Select(r => new SeasonEventRoundRaceDto(r, null)).ToList();
+
+            // for the final
+            // TODO: ile % pkt zostawiamy z poprzedniego wyścigu?
+            /*races.ForEach(race =>
+            {
+                var i = 0;
+                while (10 > race.Results.Count)
+                {
+                    var participant = participants[i];
+
+                    var raceResult = new SeasonEventRoundRaceResultDto();
+                    raceResult.CarId = participant.Id;
+                    raceResult.RaceId = race.Id;
+                    raceResult.RaceOutcome = RaceOutcome.Undetermined;
+                    raceResult.Position = 0;
+                    raceResult.Points = 0;
+                    raceResult.SectorTimes = new();
+                    raceResult.Distance = 0;
+                    raceResult.BonusesPoints = 0;
+                    raceResult.RaceState = RaceState.Inactive;
+
+                    race.Results.Add(raceResult);
+
+                    var entity = raceResult.ToEntity();
+                    entity.SectorTimestamps = new List<long>().ToArray();
+
+                    _context.SeasonEventRoundRaceResults.Add(entity);
+
+                    i++;
+                }
+            });*/
+
 
             races.ForEach(race =>
             {

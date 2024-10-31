@@ -5,17 +5,17 @@ import { Observable, map } from 'rxjs';
 export class CarDto {
   public id: string | undefined;
 
-  constructor(public name: string) {}
+  constructor(public name: string, public note: string) {}
 
   public static fromPayload(payload: any): CarDto {
-    const carDto = new CarDto(payload?.name);
+    const carDto = new CarDto(payload?.name, payload?.note);
     carDto.id = payload?.id;
 
     return carDto;
   }
 
   public static fromWebsocketPayload(payload: any): CarDto {
-    const carDto = new CarDto(payload?.Name);
+    const carDto = new CarDto(payload?.Name, payload?.Note);
     carDto.id = payload?.Id;
 
     return carDto;

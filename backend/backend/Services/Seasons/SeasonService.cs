@@ -111,12 +111,48 @@ namespace backend.Services.Seasons
             var eventEntity = seasonEvent.ToEntity();
             eventEntity.Season = season;
 
-            var participants = _context.Cars
-                .Where(c => c.Owner.Name == "Borys")
-                .ToList();
+            // List<string> participantsIds = new List<string> { "Mj17BiitU0aoVNzlvtqwlC", "TLCLdUGxlrFaOXY7hLgEda", "TNYx3qz5eS46MftAKeNNrc", "vAUm9925klU7W2HMTeLIZz", "0yzJ3HYmPJphA7XDmK0Nsl", "9eMoGf6ej7VQ2eccABmhtm", "Y1fCZ2RfuroyEt18K8FbU7", "cbEoPtVPnZ4lQwyj_QmQf6", "S0W5qy05WC4de-snQL6aW4", "9theuRsOAq4Zii6PD2PKY1" };
 
-            eventEntity.Participants = participants;
+            // var participants = _context.Cars
+            //    .Where(c => participantsIds.Contains(c.Note))
+            //    .ToList();
 
+            // eventEntity.CircuitId = new Guid("6e377b07-6932-436d-8864-5aab7b389b8a");
+            // eventEntity.Participants = participants;
+
+            var placeholderCar1 = new Car();
+            var placeholderCar2 = new Car();
+            var placeholderCar3 = new Car();
+            var placeholderCar4 = new Car();
+            var placeholderCar5 = new Car();
+            var placeholderCar6 = new Car();
+            var placeholderCar7 = new Car();
+            var placeholderCar8 = new Car();
+            var placeholderCar9 = new Car();
+            var placeholderCar10 = new Car();
+            var placeholderCar11 = new Car();
+            var placeholderCar12 = new Car();
+            var placeholderCar13 = new Car();
+            var placeholderCar14 = new Car();
+            var placeholderCar15 = new Car();
+            var placeholderCar16 = new Car();
+            var placeholderCar17 = new Car();
+            var placeholderCar18 = new Car();
+            var placeholderCar19 = new Car();
+            var placeholderCar20 = new Car();
+            var placeholderCar21 = new Car();
+            var placeholderCar22 = new Car();
+            var placeholderCar23 = new Car();
+            var placeholderCar24 = new Car();
+            var placeholderCar25 = new Car();
+
+            var placeholders = new List<Car> { placeholderCar1, placeholderCar2, placeholderCar3, placeholderCar4, placeholderCar5, placeholderCar6, placeholderCar7, placeholderCar8, placeholderCar9, placeholderCar10 };
+            placeholders.ForEach(p =>
+            {
+                p.Name = "Placeholder";
+            });
+
+            _context.AddRange(placeholders);
             _context.SeasonEvents.Add(eventEntity);
 
             await _context.SaveChangesAsync();

@@ -59,7 +59,8 @@ export class SeasonEventRoundRaceResultDto {
     public sectorTimes: number[],
     public distance: number,
     public bonusesPoints: number,
-    public raceState: RaceState
+    public raceState: RaceState,
+    public lastCheckpointTimestamp: number
   ) {}
 
   public static fromPayload(payload: any): SeasonEventRoundRaceResultDto {
@@ -73,7 +74,8 @@ export class SeasonEventRoundRaceResultDto {
       payload?.sectorTimes ?? [],
       payload?.distance,
       payload?.bonusesPoints,
-      payload?.raceState
+      payload?.raceState,
+      payload?.lastCheckpointTimestamp
     );
 
     resultDto.id = payload?.id;
@@ -93,7 +95,8 @@ export class SeasonEventRoundRaceResultDto {
       payload?.SectorTimes ?? [],
       payload?.Distance,
       payload?.BonusesPoints,
-      payload?.RaceState
+      payload?.RaceState,
+      payload?.LastCheckpointTimestamp
     );
 
     resultDto.id = payload?.Id;
@@ -110,7 +113,9 @@ export class SeasonEventRoundRaceDto {
     public results: SeasonEventRoundRaceResultDto[],
     public instantAdvancements: number,
     public secondChances: number,
-    public roundId?: string
+    public roundId?: string,
+    public firstResultFromNextRace?: SeasonEventRoundRaceResultDto | null,
+    public secondResultFromNextRace?: SeasonEventRoundRaceResultDto | null
   ) {}
 
   public static fromPayload(payload: any): SeasonEventRoundRaceDto {
@@ -122,7 +127,9 @@ export class SeasonEventRoundRaceDto {
       ) ?? [],
       payload?.instantAdvancements,
       payload?.secondChances,
-      payload?.roundId
+      payload?.roundId,
+      payload?.firstResultFromNextRace,
+      payload?.secondResultFromNextRace
     );
 
     raceDto.id = payload?.id;
@@ -138,7 +145,9 @@ export class SeasonEventRoundRaceDto {
       ) ?? [],
       payload?.InstantAdvancements,
       payload?.SecondChances,
-      payload?.RoundId
+      payload?.RoundId,
+      payload?.FirstResultFromNextRace,
+      payload?.SecondResultFromNextRace
     );
 
     raceDto.id = payload?.Id;

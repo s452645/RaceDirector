@@ -235,6 +235,11 @@ export class RoundFormComponent implements OnInit, OnChanges, OnDestroy {
     const droppedCarsPointsStrategy = this.form.get(DROPPED_CARS_POINTS_FIELD)
       ?.value.value;
 
+    this.racesDtos.forEach(r => {
+      r.firstResultFromNextRace = null;
+      r.secondResultFromNextRace = null;
+    });
+
     return new SeasonEventRoundDto(
       this.roundOrder,
       type,

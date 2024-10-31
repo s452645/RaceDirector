@@ -18,6 +18,8 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races
         public float Distance { get; set; }
         public float BonusesPoints { get; set; }
 
+        public long LastCheckpointTimestamp { get; }
+
         public RaceState RaceState { get; set; }
 
         public RaceOutcome RaceOutcome { get; set; }
@@ -41,6 +43,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds.Races
             BonusesPoints = raceResult.BonusesPoints;
             RaceState = raceResult.RaceState;
             RaceOutcome = raceResult.RaceOutcome;
+            LastCheckpointTimestamp = raceResult.SectorTimestamps.ToList().LastOrDefault();
         }
 
         public SeasonEventRoundRaceResult ToEntity()

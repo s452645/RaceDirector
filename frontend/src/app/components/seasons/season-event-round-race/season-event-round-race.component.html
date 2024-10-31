@@ -1,20 +1,5 @@
 <div class="flex flex-column align-items-center w-full p-4">
-  <!--   <div class="flex w-2 justify-content-between">
-    <button
-      pButton
-      class="p-button-sm"
-      label="Go up"
-      (click)="sendCommand('GO_UP')"
-    ></button>
-    <button
-      pButton
-      class="p-button-sm"
-      label="Cancel"
-      (click)="sendCommand('CANCEL')"
-    ></button>
-  </div> -->
-
-  <div class="w-5" [ngStyle]="{ marginTop: '1rem', marginBottom: '6rem' }">
+  <div class="w-8" [ngStyle]="{ marginTop: '1rem', marginBottom: '1rem' }">
     <p-table
       [value]="raceDto.results"
       styleClass="p-datatable-striped p-datatable-sm"
@@ -43,7 +28,7 @@
           >
             {{ result.car.name }}
           </td>
-          <td class="text-base font-bold">
+          <td class="font-bold">
             {{ result.points === 0 ? '-' : result.points.toFixed(3) }}
           </td>
           <td>{{ getTotalTime(result.sectorTimes) }}</td>
@@ -68,12 +53,46 @@
       </ng-template>
     </p-table>
   </div>
-  <app-time-trial-heat
-    *ngIf="activeRaceResult !== null"
-    [raceResult]="activeRaceResult"
-    [ngStyle]="{ width: '25vw' }"
-    (raceDataChanged)="handleRaceDataChange($event)"
-    (raceStarted)="handleRaceStarted($event)"
-    (raceDNFed)="handleRaceDNF($event)"
-  ></app-time-trial-heat>
+  <div
+    class="flex w-2 justify-content-between"
+    [ngStyle]="{ marginBottom: '1rem' }"
+  >
+    <button
+      pButton
+      class="p-button"
+      label="Gate 1"
+      (click)="sendGateCommand(1)"
+    ></button>
+    <button
+      pButton
+      class="p-button"
+      label="Gate 2"
+      (click)="sendGateCommand(2)"
+    ></button>
+    <!-- <button
+      *ngIf="next?.car?.name"
+      pButton
+      class="p-button"
+      [label]="next?.car?.name ?? '-'"
+      (click)="handleEnterHeat(next!!)"
+    ></button>
+    <button
+      *ngIf="nextnext?.car?.name"
+      pButton
+      class="p-button"
+      [label]="nextnext?.car?.name ?? '-'"
+      (click)="handleEnterHeat(nextnext!!)"
+    ></button> -->
+  </div>
+  <div class="flex w-10">
+    <app-time-trial-heat
+      *ngFor="let activeRaceResult of activeRaceResults"
+      class="mr-4"
+      [raceResult]="activeRaceResult"
+      [ngStyle]="{ width: '25vw' }"
+      (raceDataChanged)="handleRaceDataChange($event)"
+      (raceStarted)="handleRaceStarted($event)"
+      (raceDNFed)="handleRaceDNF($event)"
+    ></app-time-trial-heat>
+  </div>
 </div>

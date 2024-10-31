@@ -5,7 +5,8 @@ import time
 class UsbController:
     TERMINATOR = '\n'.encode('UTF8')
 
-    def __init__(self, device='COM4', baud=115200, timeout=1, mock_connection=False):
+    def __init__(self, device='COM6', baud=115200, timeout=1, mock_connection=False):
+        self.device = device
         self.mock_connection = mock_connection
         self.mock_msg = ''
         self.exit = False
@@ -22,11 +23,17 @@ class UsbController:
                 return
 
             if self.serial.in_waiting > 0:
+                print("Got something at " + self.device)
                 line = self.serial.read_until(self.TERMINATOR)
                 if line.strip():
                     message_handler(line.decode('UTF8').strip())
 
-            time.sleep(0.1)
+            # TODO FIXME
+            # wiesz że zawsze jak zczytywaliśmy czasy z USB, to timestamp był brany lokalnie? XD
+            # czyli brał timestampa z message_handler...
+            # czyli mieliśmy dokładność do 0.1s w przypadku startu, S0, pauzy przed windą i wznowienia XDDDDD
+            # ja pierdole...
+            time.sleep(0.001)
 
     def receive(self) -> str:
         if self.mock_connection:
@@ -49,3 +56,6 @@ class UsbController:
         self.exit = True
         if not self.mock_connection:
             self.serial.close()
+
+
+

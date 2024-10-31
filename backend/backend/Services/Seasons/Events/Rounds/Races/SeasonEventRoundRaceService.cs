@@ -3,6 +3,7 @@ using backend.Models;
 using backend.Models.Dtos.Seasons.Events.Rounds.Races;
 using Microsoft.EntityFrameworkCore;
 using backend.Controllers.Seasons.Events.Rounds.Races;
+using backend.Models.Seasons.Events.Rounds.Races;
 
 namespace backend.Services.Seasons.Events.Rounds.Races
 {
@@ -23,7 +24,7 @@ namespace backend.Services.Seasons.Events.Rounds.Races
             _raceManager = raceManager;
         }
 
-        public SeasonEventRoundRaceDto GetRace(Guid roundId, Guid raceId)
+        public async Task<SeasonEventRoundRaceDto> GetRace(Guid roundId, Guid raceId)
         {
             var race = _context.SeasonEventRoundRaces
                 .Where(r => (r.Id == raceId) && (r.Round.Id == roundId))
@@ -36,7 +37,21 @@ namespace backend.Services.Seasons.Events.Rounds.Races
                 throw new NotFoundException($"Race [{raceId}] not found in round [{roundId}]");
             }
 
-            return new SeasonEventRoundRaceDto(race);
+            var nextRace = await GetNextRace(race);
+            return new SeasonEventRoundRaceDto(race, nextRace);
+        }
+
+        private async Task<SeasonEventRoundRace?> GetNextRace(SeasonEventRoundRace race)
+        {
+            var roundId = race.RoundId;
+            var nextRaceOrder = race.Order + 1;
+
+            var nextRace = await _context.SeasonEventRoundRaces
+                .Where(race => (race.RoundId == roundId) && (race.Order == nextRaceOrder))
+                .Include(race => race.Results).ThenInclude(r => r.Car)
+                .FirstOrDefaultAsync();
+
+            return nextRace;
         }
 
         public async Task<List<float>> GetRaceAvailableBonuses(Guid raceId)
@@ -68,5 +83,6 @@ namespace backend.Services.Seasons.Events.Rounds.Races
         {
             await _raceManager.setRaceDNF(raceId, raceResultId);
         }
+
     }
 }

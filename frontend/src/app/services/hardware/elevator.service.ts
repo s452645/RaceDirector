@@ -13,4 +13,8 @@ export class ElevatorService {
   public sendCommand(command: string): Observable<void> {
     return this.backendService.post(`${URL}/command?command=${command}`, null);
   }
+
+  public sendGateCommmand(gateNumber: number): Observable<void> {
+    return this.backendService.post(`${URL}/open-gate/${gateNumber}`, null);
+  }
 }

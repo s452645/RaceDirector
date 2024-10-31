@@ -22,7 +22,7 @@ class SocketController:
             data = self.connection.recv(4096).decode()
             data_handler(data)
             # investigate
-            time.sleep(0.1)
+            time.sleep(0.001)
 
     def send(self, data):
         self.connection.send(str(data).encode())
@@ -30,3 +30,6 @@ class SocketController:
     def exit(self):
         self.connected = False
         self.connection.close()
+
+
+

@@ -2,7 +2,7 @@
   width: 75%;
   margin-top: 10rem;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(8, 1fr);
   grid-template-rows: repeat(2, 1fr);
   grid-row-gap: 64px;
 }
@@ -19,4 +19,12 @@
 .grid-item:hover {
   background-color: rgb(147, 208, 210);
   cursor: pointer;
+}
+
+.alt {
+  background-color: rgb(255, 100, 100);
+}
+
+.alt:hover {
+  background-color: rgb(255, 150, 150);
 }

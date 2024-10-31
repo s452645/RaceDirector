@@ -95,6 +95,7 @@ export class TimeTrialHeatComponent implements OnInit, OnChanges, OnDestroy {
       const raceData = new SeasonEventRoundRaceResultData(
         resultId,
         distance,
+        // bonusesPoints / 100
         bonusesPoints
       );
 
@@ -105,7 +106,15 @@ export class TimeTrialHeatComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private refreshTimer(): void {
-    this.startTime = Date.now() / 1000 - sum(this.raceResult?.sectorTimes) || 0;
+    // console.warn('Refresh timer for', this.raceResult?.car.name);
+    // console.warn(
+    //   'Last checkpoint timestamp',
+    //   this.raceResult?.lastCheckpointTimestamp
+    // );
+    // console.warn('Sector times', this.raceResult?.sectorTimes);
+    this.startTime =
+      (this.raceResult?.lastCheckpointTimestamp ?? Date.now()) / 1000 -
+        sum(this.raceResult?.sectorTimes) || 0;
     this.timerRunning = this.raceResult?.raceState === RaceState.Active;
     this.timer = Date.now() / 1000 - this.startTime;
 

@@ -26,9 +26,10 @@ namespace backend.Controllers.Seasons.Events.Rounds.Races
 
         // GET: api/SeasonEventRoundRaces/5
         [HttpGet("{id}")]
-        public ActionResult<SeasonEventRoundRaceDto> GetRace(Guid id, [FromQuery] Guid roundId)
+        public async Task<ActionResult<SeasonEventRoundRaceDto>> GetRace(Guid id, [FromQuery] Guid roundId)
         {
-            return Ok(_raceService.GetRace(roundId, id));
+            var result = await _raceService.GetRace(roundId, id);
+            return Ok(result);
         }
 
         // GET: api/SeasonEventRoundRaces/5/bonuses

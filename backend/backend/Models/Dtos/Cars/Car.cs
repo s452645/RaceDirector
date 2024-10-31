@@ -7,22 +7,27 @@ namespace backend.Models.Dtos.Cars
         public Guid Id { get; set; }
         public string Name { get; set; }
 
+        public string Note { get; set; }
+
         public CarDto()
         {
             Id = Guid.NewGuid();
             Name = string.Empty;
+            Note = string.Empty;
         }
 
-        public CarDto(Guid id, string name)
+        public CarDto(Guid id, string name, string? note)
         {
             Id = id;
             Name = name;
+            Note = note;
         }
 
         public CarDto(Car car)
         {
             Id = car.Id;
             Name = car.Name;
+            Note = car.Note;
         }
     }
 }

@@ -23,5 +23,12 @@ namespace backend.Controllers.Hardware
             _commsService.SendMessage(command);
             return Ok();
         }
+
+        [HttpPost("open-gate/{gateNumber}")]
+        public IActionResult OpenGate(int gateNumber)
+        {
+            _commsService.SendGateMessage(gateNumber);
+            return Ok();
+        }
     }
 }

@@ -12,6 +12,13 @@
     ></p-button>
   </div>
 
+  <!-- <span>1st:</span>
+  <div *ngFor="let result of getPositionsSorted(1)" class="mb-1 text-2xl">
+    <span>{{ result.name }}: {{ result.sum.toFixed(3) }}</span>
+    <span>{{ result.note }}</span>
+  </div>
+ -->
+
   <div class="grid mt-4">
     <div class="col-3" *ngFor="let race of roundDto.races">
       <app-round-race-view [raceNullable]="race"></app-round-race-view>

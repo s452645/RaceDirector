@@ -38,7 +38,7 @@
   <ng-template pTemplate="footer">
     <div class="flex h-2rem w-full">
       <div
-        *ngFor="let sectorIndex of [0, 1, 2, 3, 4]"
+        *ngFor="let sectorIndex of [0, 1, 2, 3, 4, 5]"
         class="sector-time-container flex justify-content-center align-items-center"
         [ngStyle]="{ border: '1px solid #999999' }"
       >
@@ -62,7 +62,7 @@
         </div>
 
         <div class="flex flex-column justify-content-around">
-          <label for="integeronly" class="text-xs ml-1">Bonus points</label>
+          <label class="text-xs ml-1">Bonus points</label>
           <p-inputNumber
             inputId="bonusesPoints"
             formControlName="bonusesPoints"

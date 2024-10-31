@@ -61,7 +61,8 @@ namespace backend.Services.Seasons.Events.Rounds.Races
 
             await UpdatePointsSummedAndPositions(raceResult);
 
-            var raceDto = new SeasonEventRoundRaceDto(raceResult.SeasonEventRoundRace);
+            var nextRace = await GetNextRace(raceResult.SeasonEventRoundRace);
+            var raceDto = new SeasonEventRoundRaceDto(raceResult.SeasonEventRoundRace, nextRace);
             if (_webSocket != null)
             {
                 await _webSocket.Send(raceDto);
@@ -77,7 +78,8 @@ namespace backend.Services.Seasons.Events.Rounds.Races
 
             await UpdatePointsSummedAndPositions(raceResult);
 
-            var raceDto = new SeasonEventRoundRaceDto(raceResult.SeasonEventRoundRace);
+            var nextRace = await GetNextRace(raceResult.SeasonEventRoundRace);
+            var raceDto = new SeasonEventRoundRaceDto(raceResult.SeasonEventRoundRace, nextRace);
             if (_webSocket != null)
             {
                 await _webSocket.Send(raceDto);
@@ -94,7 +96,8 @@ namespace backend.Services.Seasons.Events.Rounds.Races
 
             await UpdatePointsSummedAndPositions(raceResult);
 
-            var raceDto = new SeasonEventRoundRaceDto(raceResult.SeasonEventRoundRace);
+            var nextRace = await GetNextRace(raceResult.SeasonEventRoundRace);
+            var raceDto = new SeasonEventRoundRaceDto(raceResult.SeasonEventRoundRace, nextRace);
             if (_webSocket != null)
             {
                 await _webSocket.Send(raceDto);
@@ -210,7 +213,8 @@ namespace backend.Services.Seasons.Events.Rounds.Races
 
             await UpdatePointsSummedAndPositions(possibleRaceResult);
 
-            var raceDto = new SeasonEventRoundRaceDto(possibleRaceResult.SeasonEventRoundRace);
+            var nextRace = await GetNextRace(possibleRaceResult.SeasonEventRoundRace);
+            var raceDto = new SeasonEventRoundRaceDto(possibleRaceResult.SeasonEventRoundRace, nextRace);
             if (_webSocket != null)
             {
                 await _webSocket.Send(raceDto);
@@ -324,7 +328,7 @@ namespace backend.Services.Seasons.Events.Rounds.Races
             var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
 
             var raceResult = await db.SeasonEventRoundRaceResults
-                .Where(result => (result.SeasonEventRoundRaceId == raceId) && (result.Id == raceResultId))
+                .Where(result => result.Id == raceResultId)
                 .Include(result => result.SeasonEventRoundRace).ThenInclude(r => r.Results).ThenInclude(r => r.Car)
                 .Include(result => result.Car)
                 .FirstOrDefaultAsync();
@@ -335,6 +339,22 @@ namespace backend.Services.Seasons.Events.Rounds.Races
             }
 
             return raceResult;
+        }
+
+        private async Task<SeasonEventRoundRace?> GetNextRace(SeasonEventRoundRace race)
+        {
+            var roundId = race.RoundId;
+            var nextRaceOrder = race.Order + 1;
+
+            using var scope = _scopeFactory.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<BackendContext>();
+
+            var nextRace = await db.SeasonEventRoundRaces
+                .Where(race => (race.RoundId == roundId) && (race.Order == nextRaceOrder))
+                .Include(race => race.Results).ThenInclude(r => r.Car)
+                .FirstOrDefaultAsync();
+
+            return nextRace;
         }
 
         private async Task StartListeningToEvents()

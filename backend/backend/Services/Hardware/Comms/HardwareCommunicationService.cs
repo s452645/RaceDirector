@@ -75,22 +75,31 @@ namespace backend.Services.Hardware.Comms
                         return;
                     }
 
-                    if (picoMessage.msg == "car_detected")
+                    if (picoMessage.msg == "gate_detected")
                     {
-                        await _boardListener.EmitElevatorEnterEvent(picoMessage.timestamp);
+                        await _boardListener.EmitSensorDetectedEvent(picoMessage.timestamp, "GATE_1");
                     }
-                    else if (picoMessage.msg == "release")
+                    else if (picoMessage.msg == "alt_gate_detected")
                     {
-                        await _boardListener.EmitElevatorExitEvent(picoMessage.timestamp);
+                        await _boardListener.EmitSensorDetectedEvent(picoMessage.timestamp, "GATE_2");
                     }
-                    else if (picoMessage.msg == "start")
+                    else if (picoMessage.msg == "start_detected")
                     {
-                        await _boardListener.EmitStartEvent(picoMessage.timestamp);
+                        await _boardListener.EmitSensorDetectedEvent(picoMessage.timestamp, "START");
                     }
-                    else if (picoMessage.msg == "sector_0")
+                    else if (picoMessage.msg == "sector_0_detected")
                     {
-                        await _boardListener.EmitSector0Event(picoMessage.timestamp);
+                        await _boardListener.EmitSensorDetectedEvent(picoMessage.timestamp, "SECTOR_0");
                     }
+                    else if (picoMessage.msg == "old-resume")
+                    {
+                        await _boardListener.EmitSensorDetectedEvent(picoMessage.timestamp, "RESUME_1");
+                    }
+                    else if (picoMessage.msg == "alt-resume")
+                    {
+                        await _boardListener.EmitSensorDetectedEvent(picoMessage.timestamp, "RESUME_2");
+                    }
+
                 } catch (Exception e)
                 {
                     Console.WriteLine(e.ToString());
@@ -98,17 +107,32 @@ namespace backend.Services.Hardware.Comms
             }
         }
 
-        public int SendMessage(string msg)
+        public void SendMessage(string msg)
         {
             if (!isConnected || socket == null)
             {
-                return 0;
+                return;
             }
 
+            msg = "ELEVATOR->" + msg;
             byte[] message = Encoding.UTF8.GetBytes(msg);
 
             // returns number of sent bytes
-            return socket.Send(message);
+            socket.Send(message);
+        }
+
+        public void SendGateMessage(int gateNumber)
+        {
+            if (!isConnected || socket == null)
+            {
+                return;
+            }
+
+            string msg = "BARRIERS->ACTIVATE_GATE_" + gateNumber.ToString();
+            byte[] message = Encoding.UTF8.GetBytes(msg);
+
+            // returns number of sent bytes
+            socket.Send(message);
         }
 
         public async Task<PicoUSBMessage?> ReceiveMessage()

@@ -71,7 +71,7 @@ namespace backend.Models.Dtos.Seasons.Events.Rounds
             Type = seasonEventRound.Type;
             ParticipantsIds = seasonEventRound.Participants?.Select(p => p.Id).ToList() ?? new();
             ParticipantsNames= seasonEventRound.Participants?.Select(p => p.Name).ToList() ?? new();
-            Races = seasonEventRound.Races?.Select(race => new SeasonEventRoundRaceDto(race)).ToList() ?? new();
+            Races = seasonEventRound.Races?.Select(race => new SeasonEventRoundRaceDto(race, null)).ToList() ?? new();
             PointsStrategy = seasonEventRound.PointsStrategy;
             DroppedCarsPositionDefinementStrategy = seasonEventRound.DroppedCarsPositionDefinementStrategy;
             DroppedCarsPointsStrategy = seasonEventRound.DroppedCarsPointsStrategy;
